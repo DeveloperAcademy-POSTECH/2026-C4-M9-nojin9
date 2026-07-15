@@ -3,21 +3,26 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0A1B2C3D4E5F600000000001 /* Nojin9App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1B2C3D4E5F600000000101 /* Nojin9App.swift */; };
 		0A1B2C3D4E5F600000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1B2C3D4E5F600000000102 /* ContentView.swift */; };
 		0A1B2C3D4E5F600000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A1B2C3D4E5F600000000103 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0A1B2C3D4E5F600000000101 /* Nojin9App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Nojin9App.swift; sourceTree = "<group>"; };
 		0A1B2C3D4E5F600000000102 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0A1B2C3D4E5F600000000103 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0A1B2C3D4E5F600000000104 /* Nojin9.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nojin9.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CCE46CE33005C0BC00A16465 /* Features */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Features; sourceTree = "<group>"; };
+		CCE46CE53005C0F700A16465 /* Core */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Core; sourceTree = "<group>"; };
+		CCE46CE63005C10200A16465 /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
+		CCE46CE73005C11900A16465 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		0A1B2C3D4E5F600000000201 /* Frameworks */ = {
@@ -41,7 +46,10 @@
 		0A1B2C3D4E5F600000000302 /* Nojin9 */ = {
 			isa = PBXGroup;
 			children = (
-				0A1B2C3D4E5F600000000101 /* Nojin9App.swift */,
+				CCE46CE73005C11900A16465 /* App */,
+				CCE46CE63005C10200A16465 /* Resources */,
+				CCE46CE53005C0F700A16465 /* Core */,
+				CCE46CE33005C0BC00A16465 /* Features */,
 				0A1B2C3D4E5F600000000102 /* ContentView.swift */,
 				0A1B2C3D4E5F600000000103 /* Assets.xcassets */,
 			);
@@ -70,6 +78,12 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CCE46CE33005C0BC00A16465 /* Features */,
+				CCE46CE53005C0F700A16465 /* Core */,
+				CCE46CE63005C10200A16465 /* Resources */,
+				CCE46CE73005C11900A16465 /* App */,
 			);
 			name = Nojin9;
 			productName = Nojin9;
@@ -125,7 +139,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A1B2C3D4E5F600000000001 /* Nojin9App.swift in Sources */,
 				0A1B2C3D4E5F600000000002 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -255,8 +268,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "상품 사진을 촬영하기 위해 카메라를 사용합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -283,8 +298,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "상품 사진을 촬영하기 위해 카메라를 사용합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -329,4 +346,3 @@
 	};
 	rootObject = 0A1B2C3D4E5F600000000601 /* Project object */;
 }
-
