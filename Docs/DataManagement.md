@@ -460,31 +460,48 @@ AppDataSnapshot: Codable
 
 ## 11. 추천 파일 구조
 
+기능별 화면과 상태 관리가 함께 움직이므로, `Models`와 `ViewModels`를 전역 폴더로 나누기보다 Feature 단위로 묶는다. 여러 Feature가 함께 쓰는 저장소, MockData, JSON 저장 로직은 `Data`에 두고, 공통 유틸은 `Core`에 둔다.
+
 ```text
 Nojin9/
-  Models/
-    User.swift
-    UserSession.swift
-    ClothItem.swift
-    ClothItemRequest.swift
-    Friendship.swift
-    Rental.swift
-    Review.swift
+  App/
+    Nojin9App.swift
+  Features/
+    UserSession/
+      UserSessionModel.swift
+      UserSessionViewModel.swift
+    Closet/
+      ClosetModel.swift
+      ClosetViewModel.swift
+    FriendCloset/
+      FriendClosetModel.swift
+      FriendClosetViewModel.swift
+    ClothItemRequest/
+      ClothItemRequestModel.swift
+      ClothItemRequestViewModel.swift
+    Rental/
+      RentalModel.swift
+      RentalViewModel.swift
+    Review/
+      ReviewModel.swift
+      ReviewViewModel.swift
+  Core/
+    Extensions/
+    Utils/
   Data/
     MockUsers.swift
     MockClothItems.swift
     MockClothItemRequests.swift
     MockRentals.swift
+    MockReviews.swift
     AppDataSnapshot.swift
     LocalDataStorage.swift
     AppDataStore.swift
-  ViewModels/
-    UserSessionViewModel.swift
-    ClosetViewModel.swift
-    FriendClosetViewModel.swift
-    ClothItemRequestViewModel.swift
-    RentalViewModel.swift
-    ReviewViewModel.swift
+  Resources/
+    Assets.xcassets
+    Fonts/
+  Supporting Files/
+    Info.plist
 ```
 
 ## 12. ViewModel 책임
