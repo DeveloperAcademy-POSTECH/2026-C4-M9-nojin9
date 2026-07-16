@@ -12,11 +12,11 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.button)
-                .foregroundStyle(.white)
+                .font(.appButton)
+                .foregroundStyle(.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(Color.primary)
+                .background(Color.brandPrimary)
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
     }
@@ -28,8 +28,8 @@ struct PrimaryDisabledButton: View {
     var body: some View {
         Button(action: { }) {
             Text(title)
-                .font(.button)
-                .foregroundStyle(.white)
+                .font(.appButton)
+                .foregroundStyle(.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background(Color.gray20)
@@ -46,8 +46,8 @@ struct SecondaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.button)
-                .foregroundStyle(.white)
+                .font(.appButton)
+                .foregroundStyle(.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(width: 129, height: 56)
                 .background(Color.gray40)
@@ -63,14 +63,14 @@ struct OutlineButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.button)
-                .foregroundStyle(Color.primary)
+                .font(.appButton)
+                .foregroundStyle(Color.brandPrimary)
                 .frame(maxWidth: .infinity)
                 .frame(width: 129, height: 56)
-                .background(Color.primary10)
+                .background(Color.brandPrimary10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.primary, lineWidth: 1)
+                        .stroke(Color.brandPrimary, lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
@@ -87,9 +87,9 @@ struct PrimaryIconButton: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 10, height: 10)
-                .foregroundStyle(.white)
+                .foregroundStyle(.customWhite)
                 .frame(width: 24, height: 24)
-                .background(Color.primary)
+                .background(Color.brandPrimary)
                 .clipShape(Circle())
         }
     }
@@ -105,11 +105,11 @@ struct OutlineIconButton: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 10, height: 10)
-                .foregroundStyle(Color.primary)
+                .foregroundStyle(Color.brandPrimary)
                 .frame(width: 24, height: 24)
                 .overlay(
                     Circle()
-                        .stroke(Color.primary, lineWidth: 2)
+                        .stroke(Color.brandPrimary, lineWidth: 2)
                 )
         }
     }

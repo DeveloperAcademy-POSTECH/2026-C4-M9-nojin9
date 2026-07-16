@@ -11,8 +11,8 @@ import SwiftUI
 
 extension Color {
 
-    static let black = Color(hex: "#171819")
-    static let white = Color(hex: "#FFFFFF")
+    static let customBlack = Color(hex: "#171819")
+    static let customWhite = Color(hex: "#FFFFFF")
 
     static let gray80 = Color(hex: "#2B2D33")
     static let gray60 = Color(hex: "#575B66")
@@ -21,8 +21,8 @@ extension Color {
     static let gray10 = Color(hex: "#DCDFE5")
     static let gray5  = Color(hex: "#E9EBF2")
 
-    static let primary = Color(hex: "#FF2580")
-    static let primary10 = Color(hex: "#FFE5F0")
+    static let brandPrimary = Color(hex: "#FF2580")
+    static let brandPrimary10 = Color(hex: "#FFE5F0")
 }
 
 // MARK: - Hex Color
