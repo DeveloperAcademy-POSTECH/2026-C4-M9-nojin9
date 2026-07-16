@@ -59,11 +59,157 @@ MockData
 | `thankYouLetters` | 감사편지 화면에 보여줄 예시 데이터. |
 | `reviewSamples` | 사진 후기 흐름에 보여줄 예시 데이터. |
 
-## 5. 최소 모델 기준
+## 5. 초기 상태 기준
+
+앱을 처음 실행했을 때의 데이터 상태는 아래처럼 고정한다.
+
+| 항목 | 초기 기준 |
+| --- | --- |
+| 현재 사용자 | `currentUser` 1명 |
+| 현재 포인트 | 100 포인트 |
+| 연결된 언니 | 첫째 언니, 둘째 언니 2명 |
+| 옷 데이터 | 언니별 2~3개, 전체 4~6개 |
+| 대여 상태 | 처음에는 빌린 옷이 없거나, 테스트용 1개만 둔다. |
+| 후기 / 감사편지 | 반납 이후 흐름 확인용 예시 데이터만 둔다. |
+
+기준:
+
+- 유저 테스트 시작 시 자매 추가를 요구하지 않는다.
+- 옷은 앱 안에서 업로드하지 않고 미리 준비된 MockData로 보여준다.
+- 포인트는 빌려오기 전후 차이가 보이도록 충분한 값으로 시작한다.
+- 초기 대여 상태는 팀 구현 상황에 따라 비워도 되지만, 빌려오기 후에는 반드시 상태 변화가 보여야 한다.
+
+## 6. MockData 예시
+
+아래 예시는 구현 기준을 맞추기 위한 샘플이다. 실제 Swift 모델 이름이나 타입은 팀 코드에 맞춰 조정해도 된다.
+
+```swift
+let currentUser = CurrentUser(
+    id: "user_john",
+    name: "John",
+    point: 100,
+    profileImageName: "profile_john"
+)
+
+let sisters = [
+    Sister(
+        id: "sister_1",
+        name: "첫째 언니",
+        profileImageName: "profile_sister_1",
+        relationshipLabel: "첫째 언니"
+    ),
+    Sister(
+        id: "sister_2",
+        name: "둘째 언니",
+        profileImageName: "profile_sister_2",
+        relationshipLabel: "둘째 언니"
+    )
+]
+
+let clothItems = [
+    ClothItem(
+        id: "cloth_1",
+        ownerId: "sister_1",
+        name: "블루 가디건",
+        category: "아우터",
+        imageName: "cloth_cardigan_blue",
+        pointCost: 20,
+        isBorrowed: false,
+        description: "가볍게 걸치기 좋은 파란색 가디건"
+    ),
+    ClothItem(
+        id: "cloth_2",
+        ownerId: "sister_1",
+        name: "화이트 블라우스",
+        category: "상의",
+        imageName: "cloth_blouse_white",
+        pointCost: 15,
+        isBorrowed: false,
+        description: "단정한 분위기의 흰색 블라우스"
+    ),
+    ClothItem(
+        id: "cloth_3",
+        ownerId: "sister_2",
+        name: "데님 스커트",
+        category: "하의",
+        imageName: "cloth_skirt_denim",
+        pointCost: 15,
+        isBorrowed: false,
+        description: "데일리로 입기 좋은 데님 스커트"
+    ),
+    ClothItem(
+        id: "cloth_4",
+        ownerId: "sister_2",
+        name: "플라워 원피스",
+        category: "원피스",
+        imageName: "cloth_dress_flower",
+        pointCost: 30,
+        isBorrowed: false,
+        description: "약속 있는 날 입기 좋은 플라워 원피스"
+    )
+]
+
+let rentals: [Rental] = []
+
+let reviewSamples = [
+    ReviewSample(
+        id: "review_1",
+        clothItemId: "cloth_1",
+        imageName: "review_sample_1",
+        message: "덕분에 오늘 코디가 잘 어울렸어!"
+    )
+]
+
+let thankYouLetters = [
+    ThankYouLetter(
+        id: "letter_1",
+        toSisterId: "sister_1",
+        clothItemId: "cloth_1",
+        message: "옷 빌려줘서 고마워. 다음에도 조심히 입고 돌려줄게!"
+    )
+]
+```
+
+## 7. 상태 변화 규칙
+
+이번 Working Prototype에서는 `clothItems.isBorrowed`와 `rentals.status`를 화면 기준으로 일관되게 맞춘다.
+
+| 사용자 행동 | 데이터 변화 | 화면 반영 |
+| --- | --- | --- |
+| 빌려오기 | `currentUser.point -= clothItem.pointCost` | 홈 또는 상세에서 포인트가 줄어든다. |
+| 빌려오기 | 해당 `clothItem.isBorrowed = true` | 옷 카드나 상세 화면에 빌린 상태가 보인다. |
+| 빌려오기 | `rentals`에 `status = borrowed` 데이터 추가 | 빌린 옷 확인 화면에서 해당 옷이 보인다. |
+| 반납 | 해당 `rental.status = returned` | 반납 완료 또는 후기/편지 흐름으로 이동한다. |
+| 반납 | 해당 `clothItem.isBorrowed = false` | 다시 빌릴 수 있는 상태로 보이거나 반납 완료 상태가 보인다. |
+
+기준:
+
+- 이번 단계에서는 영구 저장이 필수는 아니다.
+- 앱 실행 중 화면 이동 사이에서 상태 변화가 유지되면 충분하다.
+- 포인트 부족, 중복 대여, 여러 명 동시 대여 같은 예외는 이번 범위에서 깊게 처리하지 않는다.
+
+## 8. Asset naming 기준
+
+린이 업로드하는 asset 이름과 MockData의 `imageName`은 아래 규칙으로 맞춘다.
+
+| asset 종류 | naming 예시 |
+| --- | --- |
+| 현재 사용자 프로필 | `profile_john` |
+| 언니 프로필 | `profile_sister_1`, `profile_sister_2` |
+| 옷 이미지 | `cloth_cardigan_blue`, `cloth_blouse_white` |
+| 후기 이미지 | `review_sample_1`, `review_sample_2` |
+
+기준:
+
+- asset 이름은 공백 없이 영문 소문자와 `_` 조합을 우선한다.
+- 린이 실제 asset 이름을 바꾸면 John의 MockData `imageName`도 같이 바꾼다.
+- 이미지가 아직 없으면 같은 이름의 임시 placeholder를 사용해도 된다.
+
+## 9. 최소 모델 기준
 
 실제 구현에서는 아래 필드를 그대로 맞출 필요는 없지만, 화면 간 데이터 기준은 이 정도로 통일한다.
 
-### 5.1 CurrentUser
+### 9.1 CurrentUser
 
 | 필드 | 설명 |
 | --- | --- |
@@ -77,7 +223,7 @@ MockData
 - 현재 사용자는 고정값으로 둔다.
 - 포인트는 빌려오기 시 실제로 차감되어 화면에 반영되어야 한다.
 
-### 5.2 Sister
+### 9.2 Sister
 
 | 필드 | 설명 |
 | --- | --- |
@@ -91,7 +237,7 @@ MockData
 - 자매 추가 화면이나 요청 흐름은 만들지 않는다.
 - 앱 시작 시 이미 언니들이 연결된 상태로 보여준다.
 
-### 5.3 ClothItem
+### 9.3 ClothItem
 
 | 필드 | 설명 |
 | --- | --- |
@@ -110,7 +256,7 @@ MockData
 - 화면 구현을 빠르게 하기 위해 enum보다 문자열을 써도 된다.
 - 옷 상세에 필요한 설명은 하드코딩해도 된다.
 
-### 5.4 Rental
+### 9.4 Rental
 
 | 필드 | 설명 |
 | --- | --- |
@@ -126,7 +272,7 @@ MockData
 - 빌린 옷 상태는 별도 화면이나 카드에서 확인 가능해야 한다.
 - 반납하면 사진 후기 / 감사편지 흐름으로 이어질 수 있어야 한다.
 
-### 5.5 ReviewSample
+### 9.5 ReviewSample
 
 | 필드 | 설명 |
 | --- | --- |
@@ -140,7 +286,7 @@ MockData
 - 실제 사진 저장은 이번 범위에서 필수 아님.
 - 사진 후기는 유저 테스트에서 흐름이 보이도록 하드코딩된 예시를 사용해도 된다.
 
-### 5.6 ThankYouLetter
+### 9.6 ThankYouLetter
 
 | 필드 | 설명 |
 | --- | --- |
@@ -154,7 +300,7 @@ MockData
 - 실제 전송 기능은 만들지 않는다.
 - 작성 또는 확인 흐름이 유저 테스트에서 이해되면 충분하다.
 
-## 6. 화면별 데이터 기준
+## 10. 화면별 데이터 기준
 
 | 화면 | 사용하는 데이터 | 기준 |
 | --- | --- | --- |
@@ -168,7 +314,7 @@ MockData
 | 사진 후기 | reviewSamples | 실제 저장 대신 예시 흐름을 보여줘도 된다. |
 | 감사편지 | thankYouLetters | 작성/확인 흐름 중심으로 보여준다. |
 
-## 7. 실제로 동작해야 하는 것
+## 11. 실제로 동작해야 하는 것
 
 아래는 유저 테스트에서 실제 상태 변화가 보여야 한다.
 
@@ -179,7 +325,7 @@ MockData
 | 반납 상태 변경 | 반납 후 빌린 상태가 해제되거나 반납 완료 흐름으로 이동한다. |
 | 화면 이동 | 핵심 플로우가 끊기지 않고 이어진다. |
 
-## 8. 하드코딩해도 되는 것
+## 12. 하드코딩해도 되는 것
 
 아래는 이번 Working Prototype에서 하드코딩해도 된다.
 
@@ -192,7 +338,7 @@ MockData
 | 날짜 | 필요하면 고정 문구로 표시 |
 | 사용자 이름 | 고정값 |
 
-## 9. 팀 작업 기준
+## 13. 팀 작업 기준
 
 | 담당 | 데이터 기준 |
 | --- | --- |
@@ -202,7 +348,7 @@ MockData
 | 로렌스 | 온보딩 후 본편 진입 기준을 맞추고 후기/편지 흐름 보조 |
 | 묭 | QA 체크리스트에서 핵심 플로우와 상태 변화를 확인 |
 
-## 10. 구현 시 주의사항
+## 14. 구현 시 주의사항
 
 - 이번 문서는 완성형 데이터 아키텍처 문서가 아니다.
 - 화면을 만들기 위해 필요한 데이터만 먼저 둔다.
@@ -210,8 +356,9 @@ MockData
 - asset 이름이 바뀌면 MockData의 `imageName`도 같이 맞춘다.
 - 포인트 차감과 빌린 상태는 유저 테스트에서 반드시 확인 가능해야 한다.
 - 코드 구조보다 유저 테스트 흐름 완성이 우선이다.
+- `rentals`와 `clothItems.isBorrowed` 중 하나만 화면에 쓰더라도, 팀 안에서는 어떤 값을 기준으로 상태를 판단할지 먼저 맞춘다.
 
-## 11. 완료 기준
+## 15. 완료 기준
 
 이 데이터 기준이 반영되면 아래가 가능해야 한다.
 
