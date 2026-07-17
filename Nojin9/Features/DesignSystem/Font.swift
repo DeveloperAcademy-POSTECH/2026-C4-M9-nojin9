@@ -49,7 +49,7 @@ extension Text {
         self
             .font(.appSubtitleBold)
             .lineSpacing(AppLineSpacing.subtitle)
-            .foregroundStyle(Color(.customBlack))
+            .foregroundStyle(.customBlack)
     }
 
     func subtitleStyle() -> some View {
