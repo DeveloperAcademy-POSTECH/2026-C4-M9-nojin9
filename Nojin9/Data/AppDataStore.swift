@@ -55,6 +55,8 @@ final class AppDataStore: ObservableObject {
                 createdAt: borrowedAt
             )
         )
+
+        return true
     }
 
     @discardableResult
