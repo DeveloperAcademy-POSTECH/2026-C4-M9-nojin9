@@ -206,3 +206,10 @@ private struct CameraPicker: UIViewControllerRepresentable {
         }
     }
 }
+
+#Preview {
+    ClothImagePicker { data in
+        print("이미지 선택됨: \(data.count) bytes")
+    }
+}
+
