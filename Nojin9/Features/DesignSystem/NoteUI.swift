@@ -19,7 +19,7 @@ struct NoteButton: View {
                     .scaledToFit()
 
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(.customBlack)
+                    .fill(Color.customBlack)
                     .frame(width: 130, height: 130)
                     .padding(.bottom, 34)
 
