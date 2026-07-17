@@ -67,10 +67,10 @@ struct SignupView: View {
                                 Text("Kakao로 회원가입")
                             }
                             .font(.appButton)
-                            .foregroundStyle(Color(hex: "#191919"))
+                            .foregroundStyle(Color(.customBlack))
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(Color(hex: "#FEE500"))
+                            .background(Color(.yellow))
                             .clipShape(RoundedRectangle(cornerRadius: 5))
                         }
                         
