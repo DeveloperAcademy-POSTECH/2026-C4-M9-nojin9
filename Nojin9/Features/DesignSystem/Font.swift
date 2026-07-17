@@ -42,55 +42,55 @@ extension Text {
         self
             .font(.appTitle)
             .lineSpacing(AppLineSpacing.title)
-            .foregroundStyle(.customBlack)
+            .foregroundStyle(Color.customBlack)
     }
 
     func subtitleBoldStyle() -> some View {
         self
             .font(.appSubtitleBold)
             .lineSpacing(AppLineSpacing.subtitle)
-            .foregroundStyle(.customBlack)
+            .foregroundStyle(Color.customBlack)
     }
 
     func subtitleStyle() -> some View {
         self
             .font(.appSubtitle)
             .lineSpacing(AppLineSpacing.subtitle)
-            .foregroundStyle(.customBlack)
+            .foregroundStyle(Color.customBlack)
     }
 
     func bodyBoldStyle() -> some View {
         self
             .font(.appBodyBold)
             .lineSpacing(AppLineSpacing.bodyBold)
-            .foregroundStyle(.customBlack)
+            .foregroundStyle(Color.customBlack)
     }
 
     func bodyStyle() -> some View {
         self
             .font(.appBody)
             .lineSpacing(AppLineSpacing.body)
-            .foregroundStyle(.customBlack)
+            .foregroundStyle(Color.customBlack)
     }
 
     func buttonStyle() -> some View {
         self
             .font(.appButton)
             .lineSpacing(AppLineSpacing.button)
-            .foregroundStyle(.customBlack)
+            .foregroundStyle(Color.customBlack)
     }
 
     func captionBoldStyle() -> some View {
         self
             .font(.appCaptionBold)
             .lineSpacing(AppLineSpacing.caption)
-            .foregroundStyle(.customBlack)
+            .foregroundStyle(Color.customBlack)
     }
 
     func captionStyle() -> some View {
         self
             .font(.appCaption)
             .lineSpacing(AppLineSpacing.caption)
-            .foregroundStyle(.customBlack)
+            .foregroundStyle(Color.customBlack)
     }
 }

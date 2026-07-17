@@ -86,11 +86,16 @@ final class VisionClothCutoutService:
             let maskedImage = CIImage(
                 cvPixelBuffer: maskedPixelBuffer
             )
+            
+            let outlinedImage = self.addingWhiteOutline(
+                to: maskedImage,
+                radius: 12
+            )
 
             // CIImage -> CGImage로 최종 변환 (실패 시 이미지 생성 실패 에러)
             guard let cutoutImage = ciContext.createCGImage(
-                maskedImage,
-                from: maskedImage.extent
+                outlinedImage,
+                from: outlinedImage.extent
             ) else {
                 throw CutoutError.imageGenerationFailed
             }
@@ -98,4 +103,61 @@ final class VisionClothCutoutService:
             return cutoutImage
         }.value
     }
+    
+    // 누끼 사진에 Outline 생성
+    private func addingWhiteOutline(
+        to image: CIImage,
+        radius: Float = 12
+    ) -> CIImage {
+        let extent = image.extent
+
+        let alphaMask = image
+            .applyingFilter("CIMaskToAlpha")
+            .cropped(to: extent)
+
+        let expandedMask = alphaMask
+            .applyingFilter(
+                "CIMorphologyMaximum",
+                parameters: [
+                    kCIInputRadiusKey: radius
+                ]
+            )
+            .cropped(to: extent)
+
+        let whiteImage = CIImage(
+            color: CIColor(
+                red: 1,
+                green: 1,
+                blue: 1,
+                alpha: 1
+            )
+        )
+        .cropped(to: extent)
+
+        let transparentImage = CIImage(
+            color: CIColor(
+                red: 0,
+                green: 0,
+                blue: 0,
+                alpha: 0
+            )
+        )
+        .cropped(to: extent)
+
+        let whiteSilhouette = whiteImage
+            .applyingFilter(
+                "CIBlendWithMask",
+                parameters: [
+                    kCIInputBackgroundImageKey: transparentImage,
+                    kCIInputMaskImageKey: expandedMask
+                ]
+            )
+            .cropped(to: extent)
+
+        return image
+            .composited(over: whiteSilhouette)
+            .cropped(to: extent)
+    }
 }
+
+

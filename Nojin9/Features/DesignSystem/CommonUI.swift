@@ -13,7 +13,7 @@ struct PrimaryButton: View {
         Button(action: action) {
             Text(title)
                 .font(.appButton)
-                .foregroundStyle(.customWhite)
+                .foregroundStyle(Color.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background(Color.brandPrimary)
@@ -29,7 +29,7 @@ struct PrimaryDisabledButton: View {
         Button(action: { }) {
             Text(title)
                 .font(.appButton)
-                .foregroundStyle(.customWhite)
+                .foregroundStyle(Color.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background(Color.gray20)
@@ -47,7 +47,7 @@ struct SecondaryButton: View {
         Button(action: action) {
             Text(title)
                 .font(.appButton)
-                .foregroundStyle(.customWhite)
+                .foregroundStyle(Color.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(width: 129, height: 56)
                 .background(Color.gray40)
@@ -87,7 +87,7 @@ struct PrimaryIconButton: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 10, height: 10)
-                .foregroundStyle(.customWhite)
+                .foregroundStyle(Color.customWhite)
                 .frame(width: 24, height: 24)
                 .background(Color.brandPrimary)
                 .clipShape(Circle())
