@@ -41,8 +41,8 @@ extension Text {
     func titleStyle() -> some View {
         self
             .font(.appTitle)
+            .foregroundStyle(Color(.customBlack))
             .lineSpacing(AppLineSpacing.title)
-            .foregroundStyle(.customBlack)
     }
 
     func subtitleBoldStyle() -> some View {

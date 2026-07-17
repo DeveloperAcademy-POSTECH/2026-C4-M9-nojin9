@@ -7,7 +7,28 @@ import SwiftUI
 
 struct PrimaryButton: View {
     let title: String
-    var action: () -> Void
+    let action: () -> Void
+    init(title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.appButton)
+                .foregroundStyle(Color(.customWhite))
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(.brandPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+        }
+    }
+}
+
+struct PrimaryDisabledButton: View {
+    let title: String
+    let action: () -> Void
     
     var body: some View {
         Button(action: action) {
@@ -16,23 +37,7 @@ struct PrimaryButton: View {
                 .foregroundStyle(.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(Color.brandPrimary)
-                .clipShape(RoundedRectangle(cornerRadius: 5))
-        }
-    }
-}
-
-struct PrimaryDisabledButton: View {
-    let title: String
-    
-    var body: some View {
-        Button(action: { }) {
-            Text(title)
-                .font(.appButton)
-                .foregroundStyle(.customWhite)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(Color.gray20)
+                .background(.gray20)
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
         .disabled(true)
@@ -41,7 +46,11 @@ struct PrimaryDisabledButton: View {
 
 struct SecondaryButton: View {
     let title: String
-    var action: () -> Void
+    let action: () -> Void
+    init(title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
+    }
     
     var body: some View {
         Button(action: action) {
@@ -50,7 +59,7 @@ struct SecondaryButton: View {
                 .foregroundStyle(.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(width: 129, height: 56)
-                .background(Color.gray40)
+                .background(.gray40)
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
     }
@@ -58,19 +67,23 @@ struct SecondaryButton: View {
 
 struct OutlineButton: View {
     let title: String
-    var action: () -> Void
+    let action: () -> Void
+    init(title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
+    }
     
     var body: some View {
         Button(action: action) {
             Text(title)
                 .font(.appButton)
-                .foregroundStyle(Color.brandPrimary)
+                .foregroundStyle(.brandPrimary)
                 .frame(maxWidth: .infinity)
                 .frame(width: 129, height: 56)
-                .background(Color.brandPrimary10)
+                .background(.brandPrimary10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.brandPrimary, lineWidth: 1)
+                        .stroke(.brandPrimary, lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
@@ -79,7 +92,11 @@ struct OutlineButton: View {
 
 struct PrimaryIconButton: View {
     let icon: Image
-    var action: () -> Void
+    let action: () -> Void
+    init(icon: Image, action: @escaping () -> Void) {
+        self.icon = icon
+        self.action = action
+    }
     
     var body: some View {
         Button(action: action) {
@@ -89,7 +106,7 @@ struct PrimaryIconButton: View {
                 .frame(width: 10, height: 10)
                 .foregroundStyle(.customWhite)
                 .frame(width: 24, height: 24)
-                .background(Color.brandPrimary)
+                .background(.brandPrimary)
                 .clipShape(Circle())
         }
     }
@@ -97,7 +114,11 @@ struct PrimaryIconButton: View {
 
 struct OutlineIconButton: View {
     let icon: Image
-    var action: () -> Void
+    let action: () -> Void
+    init(icon: Image, action: @escaping () -> Void) {
+        self.icon = icon
+        self.action = action
+    }
     
     var body: some View {
         Button(action: action) {
@@ -105,11 +126,11 @@ struct OutlineIconButton: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 10, height: 10)
-                .foregroundStyle(Color.brandPrimary)
+                .foregroundStyle(.brandPrimary)
                 .frame(width: 24, height: 24)
                 .overlay(
                     Circle()
-                        .stroke(Color.brandPrimary, lineWidth: 2)
+                        .stroke(.brandPrimary, lineWidth: 2)
                 )
         }
     }
@@ -120,7 +141,6 @@ struct OutlineIconButton: View {
         PrimaryButton(title: "빌려오기") {
         }
         
-        PrimaryDisabledButton(title: "2,500하트로 빌려오기")
         
         HStack(spacing: 8) {
             SecondaryButton(title: "Back") {
