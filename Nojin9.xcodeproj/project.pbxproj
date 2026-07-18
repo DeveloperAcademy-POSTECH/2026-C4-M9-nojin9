@@ -83,10 +83,10 @@
 			);
 			fileSystemSynchronizedGroups = (
 				CCE46CE33005C0BC00A16465 /* Features */,
-				CCE46CE83005C11A00A16465 /* Data */,
 				CCE46CE53005C0F700A16465 /* Core */,
 				CCE46CE63005C10200A16465 /* Resources */,
 				CCE46CE73005C11900A16465 /* App */,
+				CCE46CE83005C11A00A16465 /* Data */,
 			);
 			name = Nojin9;
 			productName = Nojin9;
@@ -272,7 +272,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 88KQGUY6Q4;
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "상품 사진을 촬영하기 위해 카메라를 사용합니다.";
@@ -303,7 +303,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 88KQGUY6Q4;
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "상품 사진을 촬영하기 위해 카메라를 사용합니다.";

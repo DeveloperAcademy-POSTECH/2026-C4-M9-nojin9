@@ -4,7 +4,10 @@ import SwiftUI
 struct Nojin9App: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ClosetView()
+//            ClothCutoutView(
+//                originalImage: UIImage(named: "Cloth01")!
+//            )
         }
     }
 }
