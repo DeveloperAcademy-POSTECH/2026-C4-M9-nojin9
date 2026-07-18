@@ -79,7 +79,7 @@ struct OutlineButton: View {
                 .font(.appButton)
                 .foregroundStyle(.brandPrimary)
                 .frame(maxWidth: .infinity)
-                .frame(width: 129, height: 56)
+                .frame(width: 129, height: 47)
                 .background(.brandPrimary10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
