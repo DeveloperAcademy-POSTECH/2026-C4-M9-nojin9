@@ -165,6 +165,28 @@ struct BackButton: View {
     }
 }
 
+struct MyClosetButton: View {
+    let title: String
+    let action: () -> Void
+    init(title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.appButton)
+                .foregroundStyle(Color(.customWhite))
+                .frame(maxWidth: .infinity)
+                .frame(height: 43)
+                .background(.brandPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+        }
+        .frame(width: 311, height: 43)
+    }
+}
+
 #Preview {
     VStack(spacing: 20) {
         PrimaryButton(title: "빌려오기") {

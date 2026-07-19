@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-struct ClothThumbnailView: View {
+struct MyClothThumbnailView: View {
     let imageName: String
 
     var body: some View {
         Image(imageName)
             .resizable()
             .scaledToFit()
-            .frame(width: 100, height: 100, alignment: .top)
+            .frame(width: 100, height: 90)
     }
 }
 
 #Preview {
-    ClothThumbnailView(imageName: "Top01")
+    MyClothThumbnailView(imageName: "Top01")
 }

@@ -20,8 +20,8 @@ struct NoteButton: View {
 
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.customBlack)
-                    .frame(width: 130, height: 130)
-                    .padding(.bottom, 34)
+                    .frame(width: 79.62, height: 79.62)
+                    .padding(.bottom, 25.22)
 
                 Image("NoteFlap")
                     .resizable()
@@ -36,7 +36,7 @@ struct NoteButton: View {
     VStack {
         NoteButton {
         }
-        .frame(width: 163)
+        .frame(width: 99.83)
     }
     .padding()
 }

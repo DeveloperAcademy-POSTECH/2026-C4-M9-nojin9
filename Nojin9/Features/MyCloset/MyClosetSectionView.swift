@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// 옷장 카테고리 한 줄을 담당하는 뷰
-struct ClosetSectionView: View {
+struct MyClosetSectionView: View {
     let title: String
     let imageNames: [String]
 
@@ -19,22 +19,20 @@ struct ClosetSectionView: View {
     @State private var currentIndex = 0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            titleView
-
-            divider
-
-            clothesScrollView
-                .padding(.top, 3)
+        ZStack{
+            Image("MyClosetSection")
+                .resizable()
+            VStack(alignment: .leading, spacing: 0) {
+                titleView
+                
+                divider
+                
+                clothesScrollView
+                    .padding(.top, 3)
+            }
+            
         }
-        .background {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.brandPrimary10)
-        }
-        .clipShape(
-            RoundedRectangle(cornerRadius: 8)
-        )
-        .frame(width: 332, height: 157)
+    
     }
 
     // MARK: - 제목
@@ -64,12 +62,12 @@ struct ClosetSectionView: View {
         ScrollViewReader { proxy in
             ZStack(alignment: .trailing) {
                 ScrollView(.horizontal) {
-                    LazyHStack(spacing: 8) {
+                    LazyHStack(spacing: 0) {
                         ForEach(
                             Array(imageNames.enumerated()),
                             id: \.offset
                         ) { index, imageName in
-                            ClothThumbnailView(
+                            MyClothThumbnailView(
                                 imageName: imageName
                             )
                             .id(index)
@@ -122,7 +120,7 @@ struct ClosetSectionView: View {
 }
 
 #Preview {
-    ClosetSectionView(
+    MyClosetSectionView(
         title: "상의",
         imageNames: ["Top1", "Top2","Top3"]) {}
 }
