@@ -66,9 +66,9 @@ MockData
 | 항목 | 초기 기준 |
 | --- | --- |
 | 현재 사용자 | `currentUser` 1명 |
-| 현재 포인트 | 100 포인트 |
-| 연결된 언니 | 첫째 언니, 둘째 언니 2명 |
-| 옷 데이터 | 언니별 2~3개, 전체 4~6개 |
+| 현재 포인트 | 테스트용으로 충분한 값. 현재 MockData 기준 `20,000` 포인트 |
+| 연결된 언니 | 이미 연결된 자매 2명 |
+| 옷 데이터 | 상의 / 하의 / 기타 카테고리별 샘플 옷. 현재 MockData 기준 전체 9개 |
 | 대여 상태 | 처음에는 빌린 옷이 없거나, 테스트용 1개만 둔다. |
 | 후기 / 감사편지 | 반납 이후 흐름 확인용 예시 데이터만 둔다. |
 
@@ -76,7 +76,7 @@ MockData
 
 - 유저 테스트 시작 시 자매 추가를 요구하지 않는다.
 - 옷은 앱 안에서 업로드하지 않고 미리 준비된 MockData로 보여준다.
-- 포인트는 빌려오기 전후 차이가 보이도록 충분한 값으로 시작한다.
+- 포인트는 빌려오기 전후 차이가 보이도록 충분한 값으로 시작한다. 옷 가격은 화면에서 실제 가격처럼 보이도록 `1,000` 단위 이상을 사용할 수 있다.
 - 초기 대여 상태는 팀 구현 상황에 따라 비워도 되지만, 빌려오기 후에는 반드시 상태 변화가 보여야 한다.
 
 ## 6. 상태 변화 규칙
@@ -101,18 +101,14 @@ MockData
 
 린이 업로드하는 asset 이름과 MockData의 `imageName`은 아래 규칙으로 맞춘다.
 
+현재 Working Prototype 단계에서는 PR별로 asset이 계속 추가되고 있으므로, 우선 **현재 업로드된 asset 이름과 `MockData.imageName`을 일치시키는 것**을 최우선으로 둔다. 최종 asset naming 정리는 화면 PR들이 합쳐진 뒤 별도 정리 PR에서 맞춘다.
+
 | asset 종류 | naming 예시 |
 | --- | --- |
-| 현재 사용자 프로필 | `profile_john` |
-| 언니 프로필 | `profile_sister_1`, `profile_sister_2` |
-| 옷 이미지 | `cloth_cardigan_blue`, `cloth_blouse_white` |
-| 후기 이미지 | `review_sample_1`, `review_sample_2` |
-
-기준:
-
-- asset 이름은 공백 없이 영문 소문자와 `_` 조합을 우선한다.
-- 린이 실제 asset 이름을 바꾸면 John의 MockData `imageName`도 같이 바꾼다.
-- 이미지가 아직 없으면 같은 이름의 임시 placeholder를 사용해도 된다.
+| 현재 사용자 프로필 | 현재 asset 기준 `MyProfile` |
+| 언니 프로필 | 현재 asset 기준 `2ndSisProfile` |
+| 옷 이미지 | 현재 asset 기준 `Top1`, `Top2`, `Top3`, `Bottom1`, `Bottom2`, `Bottom3`, `Accessories1` 등 |
+| 후기 이미지 | 현재 asset 기준 `Review_Top2_1`, `Review_Top2_2` 등 |
 
 ## 8. 최소 모델 기준
 
@@ -145,6 +141,7 @@ MockData
 
 - 자매 추가 화면이나 요청 흐름은 만들지 않는다.
 - 앱 시작 시 이미 언니들이 연결된 상태로 보여준다.
+- `relationshipLabel`은 화면 표시용 문구다. 현재 사용자와 언니들의 정확한 호칭 기준은 홈 / 내 옷장 / 언니 옷장 플로우가 연결된 뒤 한 번 더 맞춘다.
 
 ### 8.3 ClothItem
 
@@ -153,7 +150,7 @@ MockData
 | `id` | 옷 식별값 |
 | `ownerId` | 어떤 언니의 옷인지 |
 | `name` | 옷 이름 |
-| `category` | 상의, 하의, 아우터, 원피스 등 |
+| `category` | 상의, 하의, 기타 |
 | `imageName` | 화면에서 사용할 asset 이름 |
 | `pointCost` | 빌릴 때 차감할 포인트 |
 | `isBorrowed` | 현재 빌린 상태인지 |
@@ -163,7 +160,10 @@ MockData
 
 - `imageName`은 린이 업로드하는 asset 이름과 맞춘다.
 - 화면 구현을 빠르게 하기 위해 enum보다 문자열을 써도 된다.
-- 옷 상세에 필요한 설명은 하드코딩해도 된다.
+- 현재 MVP 카테고리는 상의 / 하의 / 기타 3개만 사용한다.
+- 코드에서는 현재 asset naming과 맞추기 위해 기타를 `accessory` 케이스로 표현하고, 화면 표시값은 "기타"로 둔다.
+- 옷 상세의 기본 정보인 이름, 카테고리, 이미지, 포인트 비용, 대여 가능 여부는 `ClothItem`을 기준으로 한다.
+- 옷 상세에만 필요한 색상, 주의사항 같은 보조 정보는 별도 supplement 목데이터로 둘 수 있다.
 
 ### 8.4 Rental
 
@@ -189,25 +189,31 @@ MockData
 | `clothItemId` | 어떤 옷에 대한 후기인지 |
 | `imageName` | 후기 이미지 asset 이름 |
 | `message` | 후기 문구 |
+| `createdAt` | 후기 작성일 |
 
 기준:
 
 - 실제 사진 저장은 이번 범위에서 필수 아님.
 - 사진 후기는 유저 테스트에서 흐름이 보이도록 하드코딩된 예시를 사용해도 된다.
+- 대여 상세 화면에서 후기 이미지는 `reviewSamples`를 기준으로 보여준다.
 
 ### 8.6 ThankYouLetter
 
 | 필드 | 설명 |
 | --- | --- |
 | `id` | 편지 식별값 |
+| `rentalId` | 어떤 대여 이력에 대한 편지인지 |
 | `toSisterId` | 받을 언니 |
 | `clothItemId` | 빌렸던 옷 |
 | `message` | 감사편지 문구 |
+| `createdAt` | 편지 작성일 |
 
 기준:
 
 - 실제 전송 기능은 만들지 않는다.
 - 작성 또는 확인 흐름이 유저 테스트에서 이해되면 충분하다.
+- 대여 상세 화면에서 감사편지 본문은 `thankYouLetters`를 기준으로 보여준다.
+- 현재 모델에는 별도 `authorId`가 없으므로 작성자는 관련 `rental.borrowerId`에서 추론한다. 더 정확한 작성자 구분이 필요해지면 이후 `authorId` 또는 편지-후기 relation을 추가한다.
 
 ## 9. 화면별 데이터 기준
 
@@ -216,7 +222,7 @@ MockData
 | 온보딩 | 고정 문구, currentUser | 온보딩 후 본편으로 이동한다. |
 | 홈 | currentUser, sisters, rentals | 자매가 이미 연결된 상태를 보여준다. |
 | 언니 옷장 | sisters, clothItems | 선택한 언니의 옷만 보여준다. |
-| 옷 상세 | clothItems | 옷 이미지, 설명, 포인트 비용을 보여준다. |
+| 옷 상세 | clothItems, 상세 supplement, thankYouLetters, reviewSamples | 옷 기본 정보는 `ClothItem` 기준, 색상/주의사항은 supplement 기준, 감사편지/후기는 기존 MockData 기준으로 보여준다. |
 | 빌려오기 | currentUser, clothItems, rentals | 포인트 차감과 빌린 상태 변경이 일어난다. |
 | 빌린 옷 확인 | rentals, clothItems | 내가 빌린 옷 상태를 보여준다. |
 | 반납 | rentals | 반납 후 후기/편지 흐름으로 이어진다. |
