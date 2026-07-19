@@ -44,6 +44,27 @@ enum ClothCategory: String, Codable, Equatable {
     case other
 }
 
+extension ClothCategory {
+    var displayName: String {
+        switch self {
+        case .top:
+            return "상의"
+        case .bottom:
+            return "하의"
+        case .outer:
+            return "아우터"
+        case .dress:
+            return "원피스"
+        case .shoes:
+            return "신발"
+        case .accessory:
+            return "기타"
+        case .other:
+            return "기타"
+        }
+    }
+}
+
 enum ClothCondition: String, Codable, Equatable {
     case good
     case normal
