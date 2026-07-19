@@ -4,34 +4,81 @@
 //
 
 import SwiftUI
+import PhotosUI
+import UIKit
 
 struct UploadView: View {
-    @Environment(\.dismiss) private var dismiss
+    private let cutoutService = VisionClothCutoutService()
 
+    @Environment(\.dismiss) private var dismiss
+    
     @State private var itemName = ""
     @State private var selectedCategory: ClothCategory?
     @State private var precautions = ""
-
+    
     @State private var isShowingImageSource = false
+    
     @State private var selectedImage: UIImage?
-
+    @State private var isCutoutProcessing = false
+    @State private var cutoutErrorMessage: String?
+    @State private var isShowingCutoutError = false
+    
+    @State private var isShowingCamera = false
+    @State private var isShowingPhotoLibrary = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var isShowingCameraAlert = false
+    
     private var canRegister: Bool {
         selectedImage != nil &&
+        !isCutoutProcessing &&
         !itemName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         selectedCategory != nil
     }
+    
+    @MainActor
+    private func processImage(_ originalImage: UIImage) async {
+        isCutoutProcessing = true
+        selectedImage = nil
 
+        defer {
+            isCutoutProcessing = false
+        }
+
+        guard let originalCGImage = originalImage.cgImage else {
+            cutoutErrorMessage = "선택한 사진을 불러오지 못했어요."
+            isShowingCutoutError = true
+            return
+        }
+
+        do {
+            let cutoutCGImage = try await cutoutService.generateCutout(
+                from: originalCGImage,
+                orientation: originalImage.cgImageOrientation
+            )
+
+            selectedImage = UIImage(
+                cgImage: cutoutCGImage,
+                scale: originalImage.scale,
+                orientation: .up
+            )
+        } catch {
+            cutoutErrorMessage = error.localizedDescription
+            isShowingCutoutError = true
+        }
+    }
+    
     var body: some View {
         ZStack {
             Color.white
                 .ignoresSafeArea()
-
+            
             ScrollView {
                 VStack(spacing: 0) {
                     navigationView
-
+                    
                     VStack(alignment: .leading, spacing: 22) {
                         photoSection
+                        divider
                         itemNameSection
                         categorySection
                         precautionsSection
@@ -45,20 +92,106 @@ struct UploadView: View {
             .scrollDismissesKeyboard(.interactively)
         }
         .navigationBarBackButtonHidden()
+        
         .confirmationDialog(
             "사진 첨부하기",
             isPresented: $isShowingImageSource,
             titleVisibility: .hidden
         ) {
             Button("사진 찍기") {
-                // 카메라 화면 열기
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    isShowingCamera = true
+                } else {
+                    isShowingCameraAlert = true
+                }
             }
-
+            
             Button("사진 보관함") {
-                // 사진 보관함 열기
+                isShowingPhotoLibrary = true
+            }
+            
+            Button("취소", role: .cancel) { }
+        }
+        
+        .photosPicker(
+            isPresented: $isShowingPhotoLibrary,
+            selection: $selectedPhotoItem,
+            matching: .images
+        )
+        .onChange(of: selectedPhotoItem) { _, newItem in
+            guard let newItem else {
+                return
             }
 
-            Button("취소", role: .cancel) { }
+            Task {
+                guard let imageData = try? await newItem.loadTransferable(
+                    type: Data.self
+                ),
+                let originalImage = UIImage(data: imageData) else {
+                    return
+                }
+
+                await processImage(originalImage)
+            }
+        }
+        .fullScreenCover(isPresented: $isShowingCamera) {
+            CameraPickerView { originalImage in
+                Task {
+                    await processImage(originalImage)
+                }
+            }
+            .ignoresSafeArea()
+        }
+        
+        .alert("카메라를 사용할 수 없어요", isPresented: $isShowingCameraAlert) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text("실제 기기에서 다시 시도해 주세요.")
+        }
+        
+        .alert(
+            "배경 제거에 실패했어요",
+            isPresented: $isShowingCutoutError
+        ) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text(
+                cutoutErrorMessage ??
+                "옷과 배경이 잘 구분되는 사진으로 다시 시도해 주세요."
+            )
+        }
+    }
+}
+
+private extension UIImage {
+    var cgImageOrientation: CGImagePropertyOrientation {
+        switch imageOrientation {
+        case .up:
+            return .up
+
+        case .upMirrored:
+            return .upMirrored
+
+        case .down:
+            return .down
+
+        case .downMirrored:
+            return .downMirrored
+
+        case .left:
+            return .left
+
+        case .leftMirrored:
+            return .leftMirrored
+
+        case .right:
+            return .right
+
+        case .rightMirrored:
+            return .rightMirrored
+
+        @unknown default:
+            return .up
         }
     }
 }
@@ -70,20 +203,20 @@ private extension UploadView {
         ZStack {
             Text("내 물품 등록하기")
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.black)
-
+                .foregroundStyle(.customBlack)
+            
             HStack {
                 Button {
                     dismiss()
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 22, weight: .medium))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.customBlack)
                         .frame(width: 44, height: 44)
                         .background(Color.gray.opacity(0.08))
                         .clipShape(Circle())
                 }
-
+                
                 Spacer()
             }
         }
@@ -98,18 +231,28 @@ private extension UploadView {
     var photoSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             requiredTitle("물품 사진")
-
+            
             Button {
                 isShowingImageSource = true
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 5)
-                        .fill(Color(red: 0.94, green: 0.82, blue: 0.87))
-
+                        .fill(.brandPrimary10)
+                    
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.gray.opacity(0.25), lineWidth: 1)
+                        .stroke(.gray10)
+                    
+                    if isCutoutProcessing {
+                        VStack(spacing: 14) {
+                            ProgressView()
+                                .tint(.brandPrimary)
+                                .scaleEffect(1.2)
 
-                    if let selectedImage {
+                            Text("사진 배경을 제거하고 있어요")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(.brandPrimary)
+                        }
+                    } else if let selectedImage {
                         Image(uiImage: selectedImage)
                             .resizable()
                             .scaledToFit()
@@ -136,19 +279,29 @@ private extension UploadView {
                 .frame(height: 240)
             }
             .buttonStyle(.plain)
-
-            if selectedImage != nil {
-                HStack(spacing: 6) {
-                    Image(systemName: "checkmark")
-                    Text("사진이 첨부되었습니다.")
-                }
-                .font(.system(size: 14))
-                .foregroundStyle(.pink)
-                .padding(.horizontal, 12)
+            .disabled(isCutoutProcessing)
+            
+            HStack{
+                Image(systemName: "checkmark")
+                    .font(.caption)
+                    .foregroundStyle(.brandPrimary)
+                Text("배경이 있는 이미지도 자동으로 배경이 제거됩니다.")
+                    .font(.caption)
+                    .foregroundStyle(.gray60)
             }
+            .padding(.leading, 10)
         }
     }
 }
+
+// MARK: - 구분선
+
+private var divider: some View {
+    Rectangle()
+        .fill(.gray5)
+        .frame(height: 3)
+}
+
 
 // MARK: - 물품 이름
 
@@ -156,7 +309,7 @@ private extension UploadView {
     var itemNameSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             requiredTitle("물품 이름")
-
+            
             TextField("회색 오프숄더 니트", text: $itemName)
                 .font(.system(size: 16))
                 .padding(.horizontal, 14)
@@ -175,21 +328,21 @@ private extension UploadView {
 private extension UploadView {
     var categorySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("물품 카테고리")
+            requiredTitle("물품 카테고리")
                 .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(.black)
-
+                .foregroundStyle(.customBlack)
+            
             HStack(spacing: 10) {
                 categoryButton(
                     title: "상의",
                     category: .top
                 )
-
+                
                 categoryButton(
                     title: "하의",
                     category: .bottom
                 )
-
+                
                 categoryButton(
                     title: "기타",
                     category: .other
@@ -197,35 +350,35 @@ private extension UploadView {
             }
         }
     }
-
+    
     func categoryButton(
         title: String,
         category: ClothCategory
     ) -> some View {
         let isSelected = selectedCategory == category
-
+        
         return Button {
             selectedCategory = category
         } label: {
             Text(title)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(
-                    isSelected ? Color.white : Color.black.opacity(0.8)
+                    isSelected ? Color.customWhite : Color.customBlack.opacity(0.8)
                 )
                 .padding(.horizontal, 22)
                 .frame(height: 40)
                 .background(
                     isSelected
-                        ? Color.pink
-                        : Color.gray.opacity(0.06)
+                    ? .brandPrimary
+                    : .customWhite.opacity(0.06)
                 )
                 .clipShape(Capsule())
                 .overlay {
                     Capsule()
                         .stroke(
                             isSelected
-                                ? Color.pink
-                                : Color.gray.opacity(0.4),
+                            ? .brandPrimary10
+                            : .gray10.opacity(0.4),
                             lineWidth: 1
                         )
                 }
@@ -241,12 +394,12 @@ private extension UploadView {
         VStack(alignment: .leading, spacing: 8) {
             Text("주의사항")
                 .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(.black)
-
+                .foregroundStyle(.customBlack)
+            
             Text("주의사항은 항목별로 줄바꿈해 주세요.")
                 .font(.system(size: 14))
                 .foregroundStyle(.gray)
-
+            
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $precautions)
                     .font(.system(size: 16))
@@ -255,7 +408,7 @@ private extension UploadView {
                     .frame(height: 125)
                     .scrollContentBackground(.hidden)
                     .background(Color.white)
-
+                
                 if precautions.isEmpty {
                     Text(
                         """
@@ -293,24 +446,24 @@ private extension UploadView {
                 .frame(height: 54)
                 .background(
                     canRegister
-                        ? Color.pink
-                        : Color.gray.opacity(0.55)
+                    ? .brandPrimary
+                    : .gray20
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
         .disabled(!canRegister)
+        .animation(.easeInOut(duration: 0.2), value: canRegister)
     }
-
+    
     func registerItem() {
         guard let selectedCategory else {
             return
         }
-
+        
         print("물품 이름:", itemName)
         print("카테고리:", selectedCategory)
         print("주의사항:", precautions)
-
-        // 이후 AppDataStore에 ClothItem을 추가
+        
     }
 }
 
@@ -321,18 +474,75 @@ private extension UploadView {
         HStack(spacing: 7) {
             Text(title)
                 .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(.black)
-
+                .foregroundStyle(.customBlack)
+            
             Text("필수")
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.pink)
+                .foregroundStyle(.brandPrimary)
         }
     }
 }
 
+// MARK: - 카메라 권한
+struct CameraPickerView: UIViewControllerRepresentable {
+    @Environment(\.dismiss) private var dismiss
 
-#Preview {
-    NavigationStack {
-        UploadView()
+    let onImageSelected: (UIImage) -> Void
+
+    func makeUIViewController(
+        context: Context
+    ) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+
+        picker.sourceType = .camera
+        picker.cameraCaptureMode = .photo
+        picker.allowsEditing = false
+        picker.delegate = context.coordinator
+
+        return picker
+    }
+
+    func updateUIViewController(
+        _ uiViewController: UIImagePickerController,
+        context: Context
+    ) { }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    final class Coordinator: NSObject,
+                             UIImagePickerControllerDelegate,
+                             UINavigationControllerDelegate {
+        private let parent: CameraPickerView
+
+        init(parent: CameraPickerView) {
+            self.parent = parent
+        }
+
+        func imagePickerController(
+            _ picker: UIImagePickerController,
+            didFinishPickingMediaWithInfo info: [
+                UIImagePickerController.InfoKey: Any
+            ]
+        ) {
+            if let originalImage = info[.originalImage] as? UIImage {
+                parent.onImageSelected(originalImage)
+            }
+
+            parent.dismiss()
+        }
+
+        func imagePickerControllerDidCancel(
+            _ picker: UIImagePickerController
+        ) {
+            parent.dismiss()
+        }
     }
 }
+
+//#Preview {
+//    NavigationStack {
+//        UploadView()
+//    }
+//}
