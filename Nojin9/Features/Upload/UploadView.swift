@@ -52,8 +52,7 @@ struct UploadView: View {
 
         do {
             let cutoutCGImage = try await cutoutService.generateCutout(
-                from: originalCGImage,
-                orientation: originalImage.cgImageOrientation
+                from: originalCGImage
             )
 
             selectedImage = UIImage(
@@ -345,7 +344,7 @@ private extension UploadView {
                 
                 categoryButton(
                     title: "기타",
-                    category: .other
+                    category: .accessory
                 )
             }
         }
