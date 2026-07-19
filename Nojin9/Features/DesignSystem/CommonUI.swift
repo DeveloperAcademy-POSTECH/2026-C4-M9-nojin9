@@ -23,6 +23,7 @@ struct PrimaryButton: View {
                 .background(.brandPrimary)
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
+        .frame(width: 332, height: 46)
     }
 }
 
@@ -136,6 +137,56 @@ struct OutlineIconButton: View {
     }
 }
 
+struct BackButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "chevron.left")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.black)
+                .frame(width: 36, height: 36)
+                .background(
+                    Circle()
+                        .fill(.white.opacity(0.9))
+                )
+                .overlay(
+                    Circle()
+                        .stroke(.white.opacity(0.6), lineWidth: 1)
+                )
+                .shadow(
+                    color: .black.opacity(0.08),
+                    radius: 12,
+                    x: 0,
+                    y: 6
+                )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct MyClosetButton: View {
+    let title: String
+    let action: () -> Void
+    init(title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.appButton)
+                .foregroundStyle(Color(.customWhite))
+                .frame(maxWidth: .infinity)
+                .frame(height: 43)
+                .background(.brandPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+        }
+        .frame(width: 311, height: 43)
+    }
+}
+
 #Preview {
     VStack(spacing: 20) {
         PrimaryButton(title: "빌려오기") {
@@ -162,6 +213,7 @@ struct OutlineIconButton: View {
                 icon: Image(systemName: "exclamationmark")
             ) {
             }
+            BackButton{}
         }
     }
     .padding()
