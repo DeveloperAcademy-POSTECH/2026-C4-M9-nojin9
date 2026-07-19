@@ -21,7 +21,7 @@ struct NoteButton: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.customBlack)
                     .frame(width: 79.62, height: 79.62)
-                    .padding(.bottom, 25.22)
+                    .padding(.bottom, 20)
 
                 Image("NoteFlap")
                     .resizable()
