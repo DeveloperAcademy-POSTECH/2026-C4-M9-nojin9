@@ -37,11 +37,20 @@ struct ClothItem: Identifiable, Codable, Equatable {
 enum ClothCategory: String, Codable, Equatable {
     case top
     case bottom
-    case outer
-    case dress
-    case shoes
     case accessory
-    case other
+}
+
+extension ClothCategory {
+    var displayName: String {
+        switch self {
+        case .top:
+            return "상의"
+        case .bottom:
+            return "하의"
+        case .accessory:
+            return "기타"
+        }
+    }
 }
 
 enum ClothCondition: String, Codable, Equatable {

@@ -24,6 +24,38 @@ final class AppDataStore: ObservableObject {
         }
     }
 
+    func user(id: UUID) -> User? {
+        snapshot.users.first { $0.id == id }
+    }
+
+    func clothItem(id: UUID) -> ClothItem? {
+        snapshot.clothItems.first { $0.id == id }
+    }
+
+    func clothItems(category: ClothCategory? = nil, ownerId: UUID? = nil) -> [ClothItem] {
+        snapshot.clothItems.filter { item in
+            let matchesCategory = category.map { item.category == $0 } ?? true
+            let matchesOwner = ownerId.map { item.ownerId == $0 } ?? true
+            return matchesCategory && matchesOwner
+        }
+    }
+
+    func owner(for item: ClothItem) -> User? {
+        user(id: item.ownerId)
+    }
+
+    func rentals(for clothItemId: UUID) -> [Rental] {
+        snapshot.rentals.filter { $0.clothItemId == clothItemId }
+    }
+
+    func reviewSamples(for clothItemId: UUID) -> [ReviewSample] {
+        snapshot.reviewSamples.filter { $0.clothItemId == clothItemId }
+    }
+
+    func thankYouLetters(for clothItemId: UUID) -> [ThankYouLetter] {
+        snapshot.thankYouLetters.filter { $0.clothItemId == clothItemId }
+    }
+
     @discardableResult
     func borrow(clothItemId: UUID, borrowedAt: Date = Date()) -> Bool {
         let currentUserId = snapshot.userSession.currentUserId

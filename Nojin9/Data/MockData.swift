@@ -28,7 +28,7 @@ enum MockData {
             name: "김서연",
             profileImageName: "MyProfile",
             relationshipLabel: "첫째",
-            point: 100,
+            point: 20000,
             status: .active,
             createdAt: baseDate,
             withdrawnAt: nil
@@ -61,11 +61,11 @@ enum MockData {
         ClothItem(
             id: secondTopOneId,
             ownerId: user2Id,
-            name: "Top1",
+            name: "연회색 가디건",
             category: .top,
             imageName: "Top1",
             cutoutImageName: nil,
-            pointCost: 20,
+            pointCost: 2500,
             description: "가볍게 걸치기 좋은 상의예요.",
             condition: .good,
             isBorrowed: false,
@@ -74,24 +74,24 @@ enum MockData {
         ClothItem(
             id: secondTopTwoId,
             ownerId: user2Id,
-            name: "Top2",
+            name: "오프숄더 니트",
             category: .top,
             imageName: "Top2",
             cutoutImageName: nil,
-            pointCost: 25,
+            pointCost: 2500,
             description: "약속 있는 날 입기 좋은 깔끔한 상의예요.",
             condition: .good,
-            isBorrowed: true,
+            isBorrowed: false,
             visibilityStatus: .listed
         ),
         ClothItem(
             id: secondBottomId,
             ownerId: user2Id,
-            name: "Bottom1",
+            name: "버뮤다 팬츠",
             category: .bottom,
             imageName: "Bottom1",
             cutoutImageName: nil,
-            pointCost: 20,
+            pointCost: 1500,
             description: "어디에나 맞춰 입기 쉬운 하의예요.",
             condition: .normal,
             isBorrowed: false,
@@ -100,11 +100,11 @@ enum MockData {
         ClothItem(
             id: secondAccessoryId,
             ownerId: user2Id,
-            name: "Accessories1",
+            name: "리본 단화",
             category: .accessory,
             imageName: "Accessories1",
             cutoutImageName: nil,
-            pointCost: 15,
+            pointCost: 1000,
             description: "룩에 포인트를 주기 좋은 액세서리예요.",
             condition: .good,
             isBorrowed: false,
@@ -113,24 +113,24 @@ enum MockData {
         ClothItem(
             id: youngestTopId,
             ownerId: user3Id,
-            name: "Top3",
+            name: "하이넥 숏코트",
             category: .top,
             imageName: "Top3",
             cutoutImageName: nil,
-            pointCost: 20,
+            pointCost: 3000,
             description: "편하게 입기 좋은 데일리 상의예요.",
             condition: .good,
-            isBorrowed: false,
+            isBorrowed: true,
             visibilityStatus: .listed
         ),
         ClothItem(
             id: youngestBottomOneId,
             ownerId: user3Id,
-            name: "bottom2",
+            name: "트레이닝 팬츠",
             category: .bottom,
-            imageName: "bottom2",
+            imageName: "Bottom2",
             cutoutImageName: nil,
-            pointCost: 20,
+            pointCost: 1000,
             description: "활동하기 편한 하의예요.",
             condition: .good,
             isBorrowed: false,
@@ -139,11 +139,11 @@ enum MockData {
         ClothItem(
             id: youngestBottomTwoId,
             ownerId: user3Id,
-            name: "bottom3",
+            name: "와이드 팬츠",
             category: .bottom,
-            imageName: "bottom3",
+            imageName: "Bottom3",
             cutoutImageName: nil,
-            pointCost: 20,
+            pointCost: 2500,
             description: "차분한 분위기로 입기 좋은 하의예요.",
             condition: .normal,
             isBorrowed: false,
@@ -152,11 +152,11 @@ enum MockData {
         ClothItem(
             id: youngestAccessoryOneId,
             ownerId: user3Id,
-            name: "Accessories2",
+            name: "에어팟 맥스",
             category: .accessory,
             imageName: "Accessories2",
             cutoutImageName: nil,
-            pointCost: 15,
+            pointCost: 4000,
             description: "외출 전에 더하기 좋은 액세서리예요.",
             condition: .good,
             isBorrowed: false,
@@ -165,15 +165,15 @@ enum MockData {
         ClothItem(
             id: youngestAccessoryTwoId,
             ownerId: user3Id,
-            name: "Accessories3",
+            name: "가죽 숄더백",
             category: .accessory,
             imageName: "Accessories3",
             cutoutImageName: nil,
-            pointCost: 15,
+            pointCost: 5000,
             description: "특별한 날 포인트로 쓰기 좋은 액세서리예요.",
             condition: .good,
             isBorrowed: false,
-            visibilityStatus: .stored
+            visibilityStatus: .listed
         )
     ]
 
@@ -197,7 +197,7 @@ enum MockData {
     static let rentals: [Rental] = [
         Rental(
             id: returnedRentalId,
-            clothItemId: secondTopOneId,
+            clothItemId: secondTopTwoId,
             ownerId: user2Id,
             borrowerId: currentUserId,
             status: .returned,
@@ -208,8 +208,8 @@ enum MockData {
         ),
         Rental(
             id: borrowedRentalId,
-            clothItemId: secondTopTwoId,
-            ownerId: user2Id,
+            clothItemId: youngestTopId,
+            ownerId: user3Id,
             borrowerId: currentUserId,
             status: .borrowed,
             borrowedAt: baseDate.addingTimeInterval(172_800),
@@ -222,10 +222,45 @@ enum MockData {
     static let reviewSamples: [ReviewSample] = [
         ReviewSample(
             id: UUID(uuidString: "ffffffff-ffff-ffff-ffff-ffffffffffff")!,
-            clothItemId: secondTopOneId,
-            imageName: "Review101",
-            message: "약속 날에 잘 입었어요. 핏도 좋고 사진도 예쁘게 나왔어요.",
+            clothItemId: secondTopTwoId,
+            imageName: "Review_Top2_1",
+            message: "언니~ 이 셔츠 입고 나 썸남이랑 영화 봤어 ㅎㅎ 땡큐",
             createdAt: baseDate.addingTimeInterval(86_400)
+        ),
+        ReviewSample(
+            id: UUID(uuidString: "f1ffffff-ffff-ffff-ffff-ffffffffffff")!,
+            clothItemId: secondTopTwoId,
+            imageName: "Review_Top2_2",
+            message: "언니~ 이 셔츠 입고 나 썸남이랑 영화 봤어 ㅎㅎ 땡큐",
+            createdAt: baseDate.addingTimeInterval(86_400)
+        ),
+        ReviewSample(
+            id: UUID(uuidString: "f2ffffff-ffff-ffff-ffff-ffffffffffff")!,
+            clothItemId: secondTopTwoId,
+            imageName: "Review_Top2_3",
+            message: "언니~ 이 셔츠 입고 나 썸남이랑 영화 봤어 ㅎㅎ 땡큐",
+            createdAt: baseDate.addingTimeInterval(86_400)
+        ),
+        ReviewSample(
+            id: UUID(uuidString: "f3ffffff-ffff-ffff-ffff-ffffffffffff")!,
+            clothItemId: secondTopTwoId,
+            imageName: "Review_Top2_4",
+            message: "언니 이거 그냥 내 퍼컬이잖아; 완내스!!!",
+            createdAt: baseDate.addingTimeInterval(432_000)
+        ),
+        ReviewSample(
+            id: UUID(uuidString: "f4ffffff-ffff-ffff-ffff-ffffffffffff")!,
+            clothItemId: secondTopTwoId,
+            imageName: "Review_Top2_5",
+            message: "언니 이거 그냥 내 퍼컬이잖아; 완내스!!!",
+            createdAt: baseDate.addingTimeInterval(432_000)
+        ),
+        ReviewSample(
+            id: UUID(uuidString: "f5ffffff-ffff-ffff-ffff-ffffffffffff")!,
+            clothItemId: secondTopTwoId,
+            imageName: "Review_Top2_6",
+            message: "언니 이거 그냥 내 퍼컬이잖아; 완내스!!!",
+            createdAt: baseDate.addingTimeInterval(432_000)
         )
     ]
 
@@ -234,9 +269,17 @@ enum MockData {
             id: UUID(uuidString: "abababab-abab-abab-abab-abababababab")!,
             rentalId: returnedRentalId,
             toSisterId: user2Id,
-            clothItemId: secondTopOneId,
-            message: "덕분에 약속에 잘 다녀왔어. 다음에 나도 필요한 옷 있으면 꼭 빌려줄게!",
+            clothItemId: secondTopTwoId,
+            message: "언니~ 이 셔츠 입고 나 썸남이랑 영화 봤어 ㅎㅎ 땡큐",
             createdAt: baseDate.addingTimeInterval(86_400)
+        ),
+        ThankYouLetter(
+            id: UUID(uuidString: "acacacac-acac-acac-acac-acacacacacac")!,
+            rentalId: returnedRentalId,
+            toSisterId: user2Id,
+            clothItemId: secondTopTwoId,
+            message: "언니 이거 그냥 내 퍼컬이잖아; 완내스!!!",
+            createdAt: baseDate.addingTimeInterval(432_000)
         )
     ]
 
