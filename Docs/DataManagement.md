@@ -110,12 +110,6 @@ MockData
 | 옷 이미지 | 현재 asset 기준 `Top1`, `Top2`, `Top3`, `Bottom1`, `Bottom2`, `Bottom3`, `Accessories1` 등 |
 | 후기 이미지 | 현재 asset 기준 `Review_Top2_1`, `Review_Top2_2` 등 |
 
-기준:
-
-- 최종 정리 시에는 asset 이름을 공백 없이 영문 소문자와 `_` 조합으로 맞추는 것을 우선한다.
-- 그 전까지는 실제 asset 이름을 기준으로 John의 MockData `imageName`을 맞춘다.
-- 이미지가 아직 없으면 같은 이름의 임시 placeholder를 사용해도 된다.
-
 ## 8. 최소 모델 기준
 
 실제 구현에서는 아래 필드를 그대로 맞출 필요는 없지만, 화면 간 데이터 기준은 이 정도로 통일한다.
