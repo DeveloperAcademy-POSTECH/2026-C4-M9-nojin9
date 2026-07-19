@@ -87,34 +87,91 @@ struct MyClosetView: View {
     }
     
     // MARK: - 리뷰
+    @State private var currentReviewIndex = 0
+
+    private let reviewCount = 5
+
     private var reviewView: some View {
-        VStack{
+        VStack(alignment: .leading, spacing: 0) {
             Text("내가 받은 리뷰")
                 .font(.system(size: 16))
                 .foregroundStyle(.secondary)
                 .padding(.leading, 18)
-                .padding(.trailing, 286)
-            HStack {
-                NoteButton {
-                }
-                .frame(width: 99.83)
-                
-                NoteButton {
-                }
-                .frame(width: 99.83)
 
-                NoteButton {
+            reviewScrollView
+                .padding(.top, 12.28)
+                .padding(.bottom, 10.88)
+        }
+    }
+
+    // MARK: - 리뷰 가로 스크롤
+
+    private var reviewScrollView: some View {
+        ScrollViewReader { proxy in
+            ZStack(alignment: .trailing) {
+                ScrollView(.horizontal) {
+                    LazyHStack(spacing: 0) {
+                        ForEach(0..<reviewCount, id: \.self) { index in
+                            NoteButton {
+                                // index 번째 리뷰를 눌렀을 때 실행
+                            }
+                            .frame(width: 99.83)
+                            .id(index)
+                            .padding(.horizontal, 3)
+                        }
+                    }
                 }
-                .frame(width: 99.83)
+                .scrollIndicators(.hidden)
+
+                ZStack {
+                    LinearGradient(
+                        colors: [
+                            Color.customWhite.opacity(0),
+                            Color.customWhite
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: 40, height: 100)
+
+                    PrimaryIconButton(
+                        icon: Image(systemName: "chevron.right")
+                    ) {
+                        moveToNextReview(using: proxy)
+                    }
+                }
             }
-            .padding(.top, 12.28)
-            .padding(.bottom, 10.88)
-            
-            
+            .frame(height: 100)
+            .clipped()
+        }
+        .padding(.leading, 23)
+        .padding(.trailing, 58.83)
+    }
+
+    // MARK: - 다음 리뷰로 이동
+
+    private func moveToNextReview(
+        using proxy: ScrollViewProxy
+    ) {
+        guard reviewCount > 0 else {
+            return
+        }
+
+        if currentReviewIndex < reviewCount - 1 {
+            currentReviewIndex += 1
+        } else {
+            currentReviewIndex = 0
+        }
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            proxy.scrollTo(
+                currentReviewIndex,
+                anchor: .center
+            )
         }
     }
     
-    //    }
+
     // MARK: - 옷장 전체
     
     private var closetView: some View {
