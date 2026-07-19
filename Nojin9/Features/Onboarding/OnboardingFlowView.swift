@@ -12,7 +12,6 @@ struct OnboardingFlowView: View {
     
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
-            // 온보딩의 가장 첫 번째 시작 페이지
             OnboardingMainView()
                 .environmentObject(navigationManager)
                 .navigationDestination(for: OnboardingRoute.self) { route in
@@ -32,7 +31,22 @@ struct OnboardingFlowView: View {
                     case .invite01:
                         invite01View()
                             .environmentObject(navigationManager)
-                    // 새로운 템플릿이 추가되면 이곳에 case만 추가하여 연결합니다.
+                        
+                    case .invite02:
+                        invite02View()
+                            .environmentObject(navigationManager)
+                        
+                    case .invite03:
+                        invite03View()
+                            .environmentObject(navigationManager)
+                        
+                    case .invite04:
+                        invite04View()
+                            .environmentObject(navigationManager)
+                        
+                    case .invite05:
+                        invite05View()
+                            .environmentObject(navigationManager)
                     }
                 }
         }

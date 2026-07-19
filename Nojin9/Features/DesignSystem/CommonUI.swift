@@ -43,22 +43,22 @@ struct PrimaryDisabledButton: View {
     }
 }
 
-struct PrimaryDisabledButton: View {
-    let title: String
-    
-    var body: some View {
-        Button(action: { }) {
-            Text(title)
-                .font(.appButton)
-                .foregroundStyle(Color.customWhite)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(Color.gray20)
-                .clipShape(RoundedRectangle(cornerRadius: 5))
-        }
-        .disabled(true)
-    }
-}
+//struct PrimaryDisabledButton: View {
+//    let title: String
+//    
+//    var body: some View {
+//        Button(action: { }) {
+//            Text(title)
+//                .font(.appButton)
+//                .foregroundStyle(Color.customWhite)
+//                .frame(maxWidth: .infinity)
+//                .frame(height: 56)
+//                .background(Color.gray20)
+//                .clipShape(RoundedRectangle(cornerRadius: 5))
+//        }
+//        .disabled(true)
+//    }
+//}
 
 struct SecondaryButton: View {
     let title: String

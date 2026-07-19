@@ -10,7 +10,7 @@ import SwiftUI
 struct SignupkakaoView: View {
     @Environment(\.dismiss) private var dismiss
     
-    // ✅ 네비게이션 이동을 위한 EnvironmentObject 추가
+    // 네비게이션 이동을 위한 EnvironmentObject 추가
     @EnvironmentObject var navManager: OnboardingNavigationManager
     
     // 개별 동의 항목들의 상태 (기본값: false = 회색 비활성화 상태)
@@ -126,18 +126,18 @@ struct SignupkakaoView: View {
                     
                     // 4. 하단 버튼 (동의하고 계속하기)
                     Button(action: {
-                        // 모두 체크 처리
-                        agreeAll()
-                        
-                        // ✅ 1. 팝업(모달) 닫기
-                        dismiss()
-                        
-                        // ✅ 2. 닫힘과 동시에 다음 화면으로 이동 요청
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            // 오류가 났던 문자열 "invite01View" 대신, enum 케이스인 .invite01 을 사용합니다.
-                            navManager.push(.invite01)
+                        if isAllAgreed {
+                            // ✅ 이미 모두 체크되어 활성화된 상태라면 다음 화면으로 이동
+                            dismiss()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                navManager.push(.invite01)
+                            }
+                        } else {
+                            // ✅ 아직 체크되지 않은 상태라면 체크만 수행 (버튼 활성화)
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                agreeAll()
+                            }
                         }
-                        
                     }) {
                         Text("동의하고 계속하기")
                             .font(.headline)
@@ -222,12 +222,14 @@ struct AgreementRow: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            isAgreed.toggle()
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isAgreed.toggle()
+            }
         }
     }
 }
 
 #Preview {
     SignupkakaoView()
-        .environmentObject(OnboardingNavigationManager()) // 프리뷰 크래시 방지용 추가
+        .environmentObject(OnboardingNavigationManager())
 }
