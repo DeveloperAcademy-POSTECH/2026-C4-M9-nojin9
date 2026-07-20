@@ -37,11 +37,54 @@ struct HomeView: View {
                 ZStack(alignment: .top) {
                     backgroundView
 
+                    TabView(selection: $selectedClosetPage) {
+                        closetPage(
+                            mainTitle: "내 옷장",
+                            subTitle: nil,
+                            showsReview: true,
+                            showsReturnButton: false,
+                            items: myClosetItems
+                        )
+                        .tag(0)
+
+                        closetPage(
+                            mainTitle: "공유 옷장",
+                            subTitle: "첫째 언니",
+                            showsReview: false,
+                            showsReturnButton: true,
+                            items: sisterClosetItems(index: 0)
+                        )
+                        .tag(1)
+
+                        closetPage(
+                            mainTitle: "공유 옷장",
+                            subTitle: "둘째 언니",
+                            showsReview: false,
+                            showsReturnButton: true,
+                            items: sisterClosetItems(index: 1)
+                        )
+                        .tag(2)
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .padding(.top, topContentInset(for: geometry))
+                    .padding(.bottom, bottomContentInset(for: geometry))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
                     topMenuView
                         .padding(.top, toolbarTopInset(for: geometry))
                         .frame(maxWidth: .infinity)
                         .frame(height: toolbarTopInset(for: geometry) + 72, alignment: .bottom)
                         .zIndex(2)
+
+                    VStack {
+                        Spacer()
+
+                        pageIndicator
+                            .frame(height: 24)
+                            .padding(.bottom, max(10, geometry.safeAreaInsets.bottom + 10))
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .zIndex(2)
                 }
             }
             .navigationDestination(
