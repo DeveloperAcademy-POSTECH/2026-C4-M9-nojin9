@@ -106,7 +106,7 @@ struct HomeView: View {
     }
 
     private func topContentInset(for geometry: GeometryProxy) -> CGFloat {
-        min(geometry.safeAreaInsets.top + 60, 210)
+        min(geometry.safeAreaInsets.top + 66, 220)
     }
 
     private func toolbarTopInset(for geometry: GeometryProxy) -> CGFloat {
@@ -249,16 +249,12 @@ struct HomeView: View {
         showsReview: Bool,
         showsReturnButton: Bool
     ) -> CGFloat {
-        let headerHeight = pageHeaderHeight(showsReturnButton: showsReturnButton)
+        let headerHeight: CGFloat = showsReturnButton ? 94 : 46
         let reviewHeight: CGFloat = showsReview ? 170 : 0
         let headerToClosetGap: CGFloat = showsReview ? 0 : 16
         let availableClosetHeight = availableHeight - headerHeight - reviewHeight - headerToClosetGap
 
         return min(542.14, max(390, availableClosetHeight))
-    }
-
-    private func pageHeaderHeight(showsReturnButton: Bool) -> CGFloat {
-        showsReturnButton ? 72 : 46
     }
 
     private func pageHeader(
@@ -289,7 +285,7 @@ struct HomeView: View {
         }
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
-        .frame(height: pageHeaderHeight(showsReturnButton: showsReturnButton), alignment: .bottom)
+        .frame(height: showsReturnButton ? 94 : 46, alignment: .bottom)
     }
 
     // MARK: - Review
