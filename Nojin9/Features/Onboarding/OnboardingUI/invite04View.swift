@@ -107,9 +107,17 @@ struct invite04View: View {
                 if nickname.isEmpty {
                     PrimaryDisabledButton(title: "다음") { }
                 } else {
-                    PrimaryButton(title: "다음") {
-                        // ✅ 다음 버튼 터치 시 invite05View로 이동합니다.
+                    // 🚨 수정 포인트: 텍스트 입력 시 화면을 초과하는 PrimaryButton 대신 유연한 크기의 버튼 적용
+                    Button(action: {
                         navManager.push(.invite05)
+                    }) {
+                        Text("다음")
+                            .font(.appButton)
+                            .foregroundStyle(Color(.customWhite))
+                            .frame(maxWidth: .infinity) // 👈 남은 빈 공간을 안전하게 채움
+                            .frame(height: 56)
+                            .background(Color.brandPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
                     }
                 }
             }
