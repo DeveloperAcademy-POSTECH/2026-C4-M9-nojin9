@@ -66,14 +66,19 @@ struct HomeView: View {
                         .tag(2)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
+                    .background(Color.blue.opacity(0.12))
                     .padding(.top, topContentInset(for: geometry))
                     .padding(.bottom, bottomContentInset(for: geometry))
+                    .background(Color.purple.opacity(0.12))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                     topMenuView
+                        .background(Color.red.opacity(0.22))
                         .padding(.top, toolbarTopInset(for: geometry))
+                        .background(Color.orange.opacity(0.20))
                         .frame(maxWidth: .infinity)
                         .frame(height: toolbarTopInset(for: geometry) + 72, alignment: .bottom)
+                        .background(Color.yellow.opacity(0.18))
                         .zIndex(2)
 
                     VStack {
@@ -82,8 +87,10 @@ struct HomeView: View {
                         pageIndicator
                             .frame(height: 24)
                             .padding(.bottom, max(10, geometry.safeAreaInsets.bottom + 10))
+                            .background(Color.green.opacity(0.22))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.gray.opacity(0.08))
                     .zIndex(2)
                 }
             }
@@ -241,6 +248,7 @@ struct HomeView: View {
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(Color.cyan.opacity(0.12))
         }
     }
 
@@ -286,6 +294,7 @@ struct HomeView: View {
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .frame(height: showsReturnButton ? 94 : 46, alignment: .bottom)
+        .background(Color.pink.opacity(0.20))
     }
 
     // MARK: - Review
@@ -301,6 +310,7 @@ struct HomeView: View {
                 .padding(.top, 12.28)
                 .padding(.bottom, 10.88)
         }
+        .background(Color.mint.opacity(0.22))
     }
 
     private var reviewScrollView: some View {
@@ -385,6 +395,7 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: targetHeight, alignment: .top)
+        .background(Color.teal.opacity(0.18))
         .clipped()
     }
 
@@ -428,6 +439,7 @@ struct HomeView: View {
             .padding(.bottom, 30)
         }
         .frame(width: 356.4, height: 542.14)
+        .background(Color.brown.opacity(0.18))
     }
 
     private var pageIndicator: some View {
