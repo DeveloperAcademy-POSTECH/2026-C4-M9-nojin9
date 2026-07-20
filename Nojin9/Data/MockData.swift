@@ -3,7 +3,7 @@ import Foundation
 enum MockData {
     static let user1Id = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
     static let user2Id = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
-    static let user3Id = UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
+    static let user3Id = UUID(uuidString: "33333333-3333-3333-3333-3333333333333333")!
 
     static let currentUserId = user1Id
 
