@@ -37,16 +37,16 @@ struct ReturnDetailView: View {
                 returnButton
             }
             if isReturnCompleted {
-                        returnCompletedOverlay
-                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                            .zIndex(10)
-                    }
+                returnCompletedOverlay
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    .zIndex(10)
+            }
             
         }
         .animation(
-                .spring(response: 0.4, dampingFraction: 0.75),
-                value: isReturnCompleted
-            )
+            .spring(response: 0.4, dampingFraction: 0.75),
+            value: isReturnCompleted
+        )
         .navigationBarBackButtonHidden()
     }
     
@@ -214,18 +214,16 @@ struct ReturnDetailView: View {
     
     private var returnButton: some View {
         Button {
-            if store.returnRental(id: rental.id) {
                 isReturnCompleted = true
+            } label: {
+                Text("돌려주기")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.customWhite)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 47)
+                    .background(canReturn ? .brandPrimary : .gray20)
+                    .clipShape(RoundedRectangle(cornerRadius: 5))
             }
-        } label: {
-            Text("돌려주기")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(.customWhite)
-                .frame(maxWidth: .infinity)
-                .frame(height: 47)
-                .background(canReturn ? .brandPrimary : .gray20)
-                .clipShape(RoundedRectangle(cornerRadius: 5))
-        }
         .disabled(!canReturn)
         .padding(.top, 20)
         .padding(.horizontal, 16)
@@ -273,24 +271,24 @@ struct ReturnDetailView: View {
         ZStack {
             Color.customBlack.opacity(0.8)
                 .ignoresSafeArea()
-
+            
             VStack {
                 Image("ReturnCompleteSticker")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 330, height: 330)
                     .offset(x: 0, y: 220)
-
-
+                
+                
                 Text("훼손 인정 시 보상이 자동으로 상대에게 지급됩니다.")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.gray10)
                     .padding(.bottom, 10)
                     .padding(.top, 300)
-
+                
                 VStack {
                     Button {
-                        dismiss()
+                        completeReturnAndDismiss()
                     } label: {
                         Text("돌려주기 리스트로 가기")
                             .font(.system(size: 17, weight: .bold))
@@ -300,7 +298,7 @@ struct ReturnDetailView: View {
                             .background(.brandPrimary)
                             .clipShape(RoundedRectangle(cornerRadius: 5))
                     }
-
+                    
                     Button {
                         moveToHome()
                     } label: {
@@ -318,12 +316,26 @@ struct ReturnDetailView: View {
         }
     }
     
-    private func moveToHome() {
-        // TODO: 앱의 루트 네비게이션 구현 후 MyClosetView로 이동하도록 연결
+    private func completeReturnAndDismiss() {
+        guard store.returnRental(id: rental.id) else {
+            return
+        }
+
         dismiss()
     }
+    
+    private func moveToHome() {
+        let rentalId = rental.id
+        
+        dismiss()
+        
+        DispatchQueue.main.async {
+            _ = store.returnRental(id: rentalId)
+        }
+        
+        // TODO: 루트 네비게이션 구현 후 MyClosetView로 이동
+    }
 }
-
 #Preview {
     NavigationStack {
         ReturnDetailView(

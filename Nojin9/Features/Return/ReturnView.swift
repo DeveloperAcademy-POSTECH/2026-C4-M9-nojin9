@@ -12,6 +12,10 @@ struct ReturnView: View {
     @EnvironmentObject private var store: AppDataStore
     @Environment(\.dismiss) private var dismiss
     
+    @State private var selectedRental: Rental?
+    @State private var selectedItem: ClothItem?
+    @State private var isShowingReturnDetail = false
+    
     private var activeRentals: [Rental] {
         store.snapshot.rentals
             .filter {
@@ -46,39 +50,41 @@ struct ReturnView: View {
                 navigationBar
                 
                 ScrollView {
-                    rentalSection(
-                        title: "반납 물품",
-                        rentals: upcomingRentals
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    
-                    ForEach(0..<10) { _ in
-                        VStack(spacing: 0) {
-                            if activeRentals.isEmpty {
-                                emptyView
-                            } else {
-                                rentalSection(
-                                    title: "연체 물품",
-                                    rentals: overdueRentals
-                                )
-                                
-                                if !overdueRentals.isEmpty && !upcomingRentals.isEmpty {
-                                    Divider()
-                                        .padding(.vertical, 20)
-                                }
-                                
-                                
+                    VStack(spacing: 0) {
+                        if activeRentals.isEmpty {
+                            emptyView
+                        } else {
+                            rentalSection(
+                                title: "반납 물품",
+                                rentals: upcomingRentals
+                            )
+                            .padding(.top, 10)
+                            
+                            if !overdueRentals.isEmpty && !upcomingRentals.isEmpty {
+                                Divider()
+                                    .padding(.vertical, 20)
                             }
+                            
+                            rentalSection(
+                                title: "연체 물품",
+                                rentals: overdueRentals
+                            )
                         }
-                        .padding(.horizontal, 16)
                     }
-                    
+                    .padding(.horizontal, 16)
                 }
                 
             }
         }
         .navigationBarBackButtonHidden()
+        .navigationDestination(isPresented: $isShowingReturnDetail) {
+            if let selectedRental, let selectedItem {
+                ReturnDetailView(
+                    rental: selectedRental,
+                    item: selectedItem
+                )
+            }
+        }
     }
     
     private var backgroundView: some View {
@@ -113,9 +119,14 @@ struct ReturnView: View {
                         ReturnItemCard(
                             rental: rental,
                             item: item
-                        )
+                        ) {
+                            selectedRental = rental
+                            selectedItem = item
+                            isShowingReturnDetail = true
+                        }
                     }
                 }
+                
             }
         }
     }
@@ -136,11 +147,12 @@ struct ReturnView: View {
         .frame(maxWidth: .infinity)
         .padding(.top, 150)
     }
+    
 }
 
 #Preview {
     NavigationStack {
         ReturnView()
-            .environmentObject(AppDataStore())
     }
+    .environmentObject(AppDataStore())
 }

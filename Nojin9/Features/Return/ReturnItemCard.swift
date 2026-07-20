@@ -10,11 +10,12 @@ import SwiftUI
 struct ReturnItemCard: View {
     let rental: Rental
     let item: ClothItem
-    
+    let onReturn: () -> Void
+
     var body: some View {
         VStack(spacing: 10) {
             itemInformation
-            
+
             HStack(spacing: 8) {
                 Button {
                     print("편지 작성하기")
@@ -30,12 +31,9 @@ struct ReturnItemCard: View {
                                 .stroke(.brandPrimary, lineWidth: 1)
                         }
                 }
-                
-                NavigationLink {
-                    ReturnDetailView(
-                        rental: rental,
-                        item: item
-                    )
+
+                Button {
+                    onReturn()
                 } label: {
                     Text("돌려주기")
                         .font(.system(size: 16, weight: .bold))
@@ -52,24 +50,19 @@ struct ReturnItemCard: View {
         .padding(12)
         .background(.customWhite)
         .clipShape(RoundedRectangle(cornerRadius: 5))
-        .overlay {
-            RoundedRectangle(cornerRadius: 5)
-                .stroke(.gray5, lineWidth: 1)
-        }
     }
-    
     private var itemInformation: some View {
         HStack(spacing: 12) {
             itemImage
-            
+
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top) {
                     Text(item.name)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundStyle(.customBlack)
-                    
+
                     Spacer()
-                    
+
                     Text(dDayText)
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(dDayColor)
@@ -78,7 +71,7 @@ struct ReturnItemCard: View {
                         .background(dDayColor.opacity(0.12))
                         .clipShape(Capsule())
                 }
-                
+
                 Text(rentalPeriodText)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.secondary)
@@ -89,7 +82,7 @@ struct ReturnItemCard: View {
     private var itemImage: some View {
         ZStack {
             Color.brandPrimary10
-            
+
             if let imageName = item.cutoutImageName ?? item.imageName {
                 Image(imageName)
                     .resizable()
@@ -104,45 +97,45 @@ struct ReturnItemCard: View {
         .frame(width: 82, height: 82)
         .clipShape(RoundedRectangle(cornerRadius: 4))
     }
-    
+
     private var rentalPeriodText: String {
         let start = rental.borrowedAt.returnDateText
         let end = rental.dueAt?.returnDateText ?? "미정"
-        
+
         return "\(start) ~ \(end)"
     }
-    
+
     private var dDayText: String {
         guard let dueAt = rental.dueAt else {
             return "기한 미정"
         }
-        
+
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let dueDate = calendar.startOfDay(for: dueAt)
-        
+
         let difference = calendar.dateComponents(
             [.day],
             from: today,
             to: dueDate
         ).day ?? 0
-        
+
         if difference < 0 {
             return "D+\(abs(difference))"
         }
-        
+
         if difference == 0 {
             return "D-Day"
         }
-        
+
         return "D-\(difference)"
     }
-    
+
     private var dDayColor: Color {
         guard let dueAt = rental.dueAt else {
             return .customBlack
         }
-        
+
         return dueAt < Date() ? .brandPrimary : .secondary
     }
 }
@@ -159,6 +152,9 @@ extension Date {
 }
 
 #Preview {
-    ReturnItemCard(rental: MockData.rentals[1],
-                   item: MockData.clothItems[4])
+    ReturnItemCard(
+        rental: MockData.rentals[1],
+        item: MockData.clothItems[4],
+        onReturn: {}
+    )
 }
