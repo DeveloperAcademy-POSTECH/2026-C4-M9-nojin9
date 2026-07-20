@@ -89,8 +89,7 @@ struct ReturnDetailView: View {
                     Color.brandPrimary10
                     
                     if let imageName = item.cutoutImageName ?? item.imageName {
-                        Image(imageName)
-                            .resizable()
+                        ClothImageView(imageName: imageName)
                             .scaledToFit()
                             .padding(8)
                     } else {

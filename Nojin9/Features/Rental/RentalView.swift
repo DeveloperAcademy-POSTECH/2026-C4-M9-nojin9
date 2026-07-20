@@ -44,8 +44,7 @@ struct RentalView: View {
                                 .frame(height: 420)
                                 .clipped()
                             
-                            Image(currentDetail.id)
-                                .resizable()
+                            ClothImageView(imageName: currentDetail.id)
                                 .scaledToFit()
                                 .frame(height: 340)
                                 .centerView()
@@ -209,13 +208,10 @@ struct RentalView: View {
                                             ScrollView(.horizontal, showsIndicators: false) {
                                                 HStack(spacing: 8) {
                                                     ForEach(letter.images, id: \.self) { imgName in
-                                                        if UIImage(named: imgName) != nil {
-                                                            Image(imgName)
-                                                                .resizable()
-                                                                .scaledToFill()
-                                                                .frame(width: 140, height: 140)
-                                                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                                        }
+                                                        ClothImageView(imageName: imgName)
+                                                            .scaledToFill()
+                                                            .frame(width: 140, height: 140)
+                                                            .clipShape(RoundedRectangle(cornerRadius: 6))
                                                     }
                                                 }
                                                 .padding(.leading, 20)

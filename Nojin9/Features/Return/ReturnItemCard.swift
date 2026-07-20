@@ -84,8 +84,7 @@ struct ReturnItemCard: View {
             Color.brandPrimary10
 
             if let imageName = item.cutoutImageName ?? item.imageName {
-                Image(imageName)
-                    .resizable()
+                ClothImageView(imageName: imageName)
                     .scaledToFit()
                     .padding(12)
             } else {

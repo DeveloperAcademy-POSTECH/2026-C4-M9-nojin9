@@ -78,8 +78,7 @@ struct RentalFormView: View {
                                         .fill(Color("brandPrimary10"))
                                         .frame(width: 120, height: 120)
 
-                                    Image(currentItem.id)
-                                        .resizable()
+                                    ClothImageView(imageName: currentItem.id)
                                         .scaledToFit()
                                         .frame(width: 100, height: 100)
                                 }

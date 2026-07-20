@@ -456,16 +456,25 @@ private extension UploadView {
     }
     
     func registerItem() {
-        guard let selectedCategory else {
+        guard let selectedCategory, let selectedImage else {
             return
         }
 
-        store.addClothItem(
-            name: itemName,
-            category: selectedCategory,
-            description: precautions
-        )
-        dismiss()
+        do {
+            let storedImageName = try UploadedClothImageStore.save(selectedImage)
+
+            store.addClothItem(
+                name: itemName,
+                category: selectedCategory,
+                description: precautions,
+                imageName: storedImageName,
+                cutoutImageName: storedImageName
+            )
+            dismiss()
+        } catch {
+            cutoutErrorMessage = "이미지를 저장하지 못했어요. 다시 시도해 주세요."
+            isShowingCutoutError = true
+        }
     }
 }
 
