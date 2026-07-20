@@ -13,6 +13,7 @@ import SwiftUI
 
 struct RentalFormView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var store: AppDataStore
     
     let itemID: String
     
@@ -249,7 +250,18 @@ struct RentalFormView: View {
                     .background(Color("gray10"))
                 
                 Button(action: {
-                    print("총 \(totalHeartPrice)하트로 대여 완료")
+                    guard
+                        let item = store.clothItem(imageName: itemID),
+                        store.borrow(
+                            clothItemId: item.id,
+                            borrowedAt: startDate,
+                            dueAt: endDate
+                        )
+                    else {
+                        return
+                    }
+
+                    dismiss()
                 }) {
                     Text(isDateInvalid ? "기간을 다시 설정해주세요" : "\(formatNumber(totalHeartPrice))하트로 빌려오기")
                         .font(.appButton)
@@ -284,4 +296,5 @@ struct RentalFormView: View {
 // ==========================================
 #Preview {
     RentalFormView(itemID: "Top2")
+        .environmentObject(AppDataStore())
 }

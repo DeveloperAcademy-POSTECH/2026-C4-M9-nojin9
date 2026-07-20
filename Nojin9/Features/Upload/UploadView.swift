@@ -11,6 +11,7 @@ struct UploadView: View {
     private let cutoutService = VisionClothCutoutService()
 
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var store: AppDataStore
     
     @State private var itemName = ""
     @State private var selectedCategory: ClothCategory?
@@ -458,11 +459,13 @@ private extension UploadView {
         guard let selectedCategory else {
             return
         }
-        
-        print("물품 이름:", itemName)
-        print("카테고리:", selectedCategory)
-        print("주의사항:", precautions)
-        
+
+        store.addClothItem(
+            name: itemName,
+            category: selectedCategory,
+            description: precautions
+        )
+        dismiss()
     }
 }
 

@@ -9,13 +9,22 @@ import SwiftUI
 
 struct RentalView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var store: AppDataStore
     
     let itemID: String
-    @State private var userHearts: Int = 20000
     @State private var isShowingForm = false
     
     private var currentDetail: ClosetRentalItemDetail {
         RentalMockData.items[itemID] ?? RentalMockData.items["Top1"]!
+    }
+
+    private var currentStoreItem: ClothItem? {
+        store.clothItem(imageName: itemID)
+    }
+
+    private var isAvailable: Bool {
+        guard let currentStoreItem else { return currentDetail.isAvailable }
+        return !currentStoreItem.isBorrowed
     }
     
     var body: some View {
@@ -72,7 +81,7 @@ struct RentalView: View {
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundStyle(Color("customBlack"))
                                 
-                                Text(currentDetail.isAvailable ? "빌려오기 가능" : "대여 중")
+                                Text(isAvailable ? "빌려오기 가능" : "대여 중")
                                     .font(.system(size: 14, weight: .bold))
                                     .foregroundStyle(Color("brandPrimary"))
                             }
@@ -98,7 +107,7 @@ struct RentalView: View {
                                     .foregroundStyle(Color("customBlack"))
                             }
                             
-                            Text("현재 보유 하트 : \(formatNumber(userHearts))")
+                            Text("현재 보유 하트 : \(formatNumber(store.currentUser?.point ?? 0))")
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color("gray40"))
                                 .padding(.top, 6)
@@ -238,10 +247,10 @@ struct RentalView: View {
                             .foregroundStyle(Color("customWhite"))
                             .frame(maxWidth: .infinity)
                             .frame(height: 52)
-                            .background(currentDetail.isAvailable ? Color("brandPrimary") : Color("gray40"))
+                            .background(isAvailable ? Color("brandPrimary") : Color("gray40"))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
-                    .disabled(!currentDetail.isAvailable)
+                    .disabled(!isAvailable)
                     .padding(.horizontal, 20)
                     .padding(.top, 12)
                     .padding(.bottom, 24)
@@ -260,6 +269,7 @@ struct RentalView: View {
         .navigationBarHidden(true)
         .fullScreenCover(isPresented: $isShowingForm) {
             RentalFormView(itemID: itemID)
+                .environmentObject(store)
         }
     }
     
@@ -282,4 +292,5 @@ private extension View {
 
 #Preview {
     RentalView(itemID: "Top2")
+        .environmentObject(AppDataStore())
 }
