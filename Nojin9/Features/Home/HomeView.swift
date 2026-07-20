@@ -33,13 +33,9 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                backgroundView
-
-                VStack(spacing: 0) {
-                    topMenuView
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 72)
+            GeometryReader { geometry in
+                ZStack(alignment: .top) {
+                    backgroundView
 
                     TabView(selection: $selectedClosetPage) {
                         closetPage(
@@ -70,13 +66,26 @@ struct HomeView: View {
                         .tag(2)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
+                    .padding(.top, topContentInset(for: geometry))
+                    .padding(.bottom, bottomContentInset(for: geometry))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                    pageIndicator
-                        .frame(height: 24)
-                        .padding(.bottom, 10)
+                    topMenuView
+                        .padding(.top, toolbarTopInset(for: geometry))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: toolbarTopInset(for: geometry) + 72, alignment: .bottom)
+                        .zIndex(2)
+
+                    VStack {
+                        Spacer()
+
+                        pageIndicator
+                            .frame(height: 24)
+                            .padding(.bottom, max(10, geometry.safeAreaInsets.bottom + 10))
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .zIndex(2)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             .navigationDestination(
                 isPresented: $isUploadViewPresented
@@ -94,6 +103,18 @@ struct HomeView: View {
                 MyPageView()
             }
         }
+    }
+
+    private func topContentInset(for geometry: GeometryProxy) -> CGFloat {
+        min(geometry.safeAreaInsets.top + 66, 220)
+    }
+
+    private func toolbarTopInset(for geometry: GeometryProxy) -> CGFloat {
+        min(geometry.safeAreaInsets.top, 176)
+    }
+
+    private func bottomContentInset(for geometry: GeometryProxy) -> CGFloat {
+        geometry.safeAreaInsets.bottom + 42
     }
 
     // MARK: - Data
