@@ -7,6 +7,7 @@ struct HomeView: View {
     @State private var isUploadViewPresented = false
     @State private var isClosetViewPresented = false
     @State private var isMyPageViewPresented = false
+    @State private var isReturnViewPresented = false
     @State private var selectedClosetPage = 1
     @State private var currentReviewIndex = 0
 
@@ -101,6 +102,13 @@ struct HomeView: View {
                 isPresented: $isMyPageViewPresented
             ) {
                 MyPageView()
+            }
+            .navigationDestination(
+                isPresented: $isReturnViewPresented
+            ) {
+                ReturnView {
+                    isReturnViewPresented = false
+                }
             }
         }
     }
@@ -279,7 +287,7 @@ struct HomeView: View {
 
             if showsReturnButton {
                 OutlineButton(title: "↩︎ 돌려주기") {
-                    print("돌려주기")
+                    isReturnViewPresented = true
                 }
             }
         }

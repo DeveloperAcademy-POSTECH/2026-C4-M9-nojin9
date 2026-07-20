@@ -9,6 +9,11 @@ import SwiftUI
 
 struct invite05View: View {
     @EnvironmentObject var navManager: OnboardingNavigationManager
+    let onComplete: () -> Void
+
+    init(onComplete: @escaping () -> Void = { }) {
+        self.onComplete = onComplete
+    }
     
     // 프로그래스 바 애니메이션을 위한 상태 변수
     @State private var progress: CGFloat = 0.2
@@ -129,7 +134,7 @@ struct invite05View: View {
                 } else {
                     // 🚨 수정 포인트: PrimaryButton 대신 높이 56을 가진 커스텀 버튼 적용
                     Button(action: {
-                        navManager.push(.ClosetView)
+                        onComplete()
                     }) {
                         Text("시작하기")
                             .font(.appButton)
