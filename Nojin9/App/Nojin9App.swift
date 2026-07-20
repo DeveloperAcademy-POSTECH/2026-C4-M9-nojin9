@@ -6,7 +6,7 @@ struct Nojin9App: App {
 
     var body: some Scene {
         WindowGroup {
-            MyClosetView()
+            HomeView()
                 .environmentObject(store)
         }
     }
