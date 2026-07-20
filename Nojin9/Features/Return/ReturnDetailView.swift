@@ -18,6 +18,7 @@ struct ReturnDetailView: View {
     @State private var isDamaged = false
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var damagedImage: UIImage?
+    @State private var isReturnCompleted = false
     
     var body: some View {
         ZStack {
@@ -35,7 +36,17 @@ struct ReturnDetailView: View {
                 
                 returnButton
             }
+            if isReturnCompleted {
+                        returnCompletedOverlay
+                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                            .zIndex(10)
+                    }
+            
         }
+        .animation(
+                .spring(response: 0.4, dampingFraction: 0.75),
+                value: isReturnCompleted
+            )
         .navigationBarBackButtonHidden()
     }
     
@@ -108,7 +119,7 @@ struct ReturnDetailView: View {
                 }
             }
             .padding(12)
-            .background(.white.opacity(0.85))
+            .background(.customWhite.opacity(0.85))
             .clipShape(RoundedRectangle(cornerRadius: 5))
             .overlay {
                 RoundedRectangle(cornerRadius: 5)
@@ -211,7 +222,7 @@ struct ReturnDetailView: View {
     private var returnButton: some View {
         Button {
             if store.returnRental(id: rental.id) {
-                dismiss()
+                isReturnCompleted = true
             }
         } label: {
             Text("돌려주기")
@@ -263,6 +274,60 @@ struct ReturnDetailView: View {
         }
         
         return "D-\(difference)"
+    }
+    
+    private var returnCompletedOverlay: some View {
+        ZStack {
+            Color.customBlack.opacity(0.8)
+                .ignoresSafeArea()
+
+            VStack {
+                Image("ReturnCompleteSticker")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 330, height: 330)
+                    .offset(x: 0, y: 220)
+
+
+                Text("훼손 인정 시 보상이 자동으로 상대에게 지급됩니다.")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.gray10)
+                    .padding(.bottom, 10)
+                    .padding(.top, 300)
+
+                VStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("돌려주기 리스트로 가기")
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundStyle(.customWhite)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 47)
+                            .background(.brandPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                    }
+
+                    Button {
+                        moveToHome()
+                    } label: {
+                        Text("홈으로 돌아가기")
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundStyle(.brandPrimary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 47)
+                            .background(.brandPrimary10)
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+    
+    private func moveToHome() {
+        // TODO: 앱의 루트 네비게이션 구현 후 MyClosetView로 이동하도록 연결
+        dismiss()
     }
 }
 

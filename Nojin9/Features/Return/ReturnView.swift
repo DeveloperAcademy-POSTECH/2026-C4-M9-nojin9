@@ -40,10 +40,11 @@ struct ReturnView: View {
     var body: some View {
         ZStack {
             backgroundView
-                VStack(spacing: 0) {
-                    navigationBar
-                        .padding(.bottom, 16)
+            VStack(spacing: 0) {
+                navigationBar
+                    .padding(.bottom, 16)
 
+                VStack(spacing: 0) {
                     if activeRentals.isEmpty {
                         emptyView
                     } else {
@@ -61,11 +62,10 @@ struct ReturnView: View {
                             title: "돌려주기 예정",
                             rentals: upcomingRentals
                         )
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 10)
                     }
-                    
                 }
+                .padding(.horizontal, 16)
+            }
 
 
         }
@@ -80,20 +80,12 @@ struct ReturnView: View {
     }
 
     private var navigationBar: some View {
-        ZStack {
-            Text("돌려주기")
-                .font(.system(size: 17, weight: .semibold))
-            
-            HStack {
-                BackButton {
-                    dismiss()
-                }
-                Spacer()
+        ToolbarUI(
+            mode: .returnRequest,
+            onBack: {
+                print("뒤로가기")
             }
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 13)
-        .frame(height: 54)
+        )
     }
 
     @ViewBuilder
