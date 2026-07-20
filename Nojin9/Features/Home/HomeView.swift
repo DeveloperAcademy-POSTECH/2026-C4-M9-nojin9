@@ -11,9 +11,6 @@ struct HomeView: View {
     @State private var currentReviewIndex = 0
 
     private let reviewCount = 5
-    private let debugYMarkers: [CGFloat] = [
-        0, 44, 72, 88, 100, 116, 128, 144, 160, 200
-    ]
 
     private let fallbackTopItems = [
         "Top1",
@@ -69,34 +66,14 @@ struct HomeView: View {
                         .tag(2)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
-                    .background(Color.blue.opacity(0.12))
-                    .overlay(alignment: .topLeading) {
-                        debugLabel("TABVIEW CONTENT")
-                    }
                     .padding(.top, topContentInset(for: geometry))
                     .padding(.bottom, bottomContentInset(for: geometry))
-                    .background(Color.purple.opacity(0.12))
-                    .overlay(alignment: .topLeading) {
-                        debugLabel("TABVIEW PADDED")
-                    }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                     topMenuView
-                        .background(Color.red.opacity(0.22))
-                        .overlay(alignment: .topLeading) {
-                            debugLabel("TOOLBAR ACTUAL")
-                        }
                         .padding(.top, toolbarTopInset(for: geometry))
-                        .background(Color.orange.opacity(0.20))
-                        .overlay(alignment: .topLeading) {
-                            debugLabel("TOP PADDING")
-                        }
                         .frame(maxWidth: .infinity)
                         .frame(height: toolbarTopInset(for: geometry) + 72, alignment: .bottom)
-                        .background(Color.yellow.opacity(0.18))
-                        .overlay(alignment: .topLeading) {
-                            debugLabel("TOP FINAL FRAME")
-                        }
                         .zIndex(2)
 
                     VStack {
@@ -105,23 +82,9 @@ struct HomeView: View {
                         pageIndicator
                             .frame(height: 24)
                             .padding(.bottom, max(10, geometry.safeAreaInsets.bottom + 10))
-                            .background(Color.green.opacity(0.22))
-                            .overlay(alignment: .topLeading) {
-                                debugLabel("PAGE INDICATOR")
-                            }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.gray.opacity(0.08))
-                    .overlay(alignment: .topLeading) {
-                        debugLabel("INDICATOR OVERLAY")
-                    }
                     .zIndex(2)
-
-                    debugRuler
-                        .zIndex(9)
-
-                    debugMetricsPanel(geometry: geometry)
-                        .zIndex(10)
                 }
             }
             .navigationDestination(
@@ -152,71 +115,6 @@ struct HomeView: View {
 
     private func bottomContentInset(for geometry: GeometryProxy) -> CGFloat {
         geometry.safeAreaInsets.bottom + 42
-    }
-
-    // MARK: - Debug Layout
-
-    private var debugRuler: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .topLeading) {
-                ForEach(debugYMarkers, id: \.self) { yPosition in
-                    ZStack(alignment: .leading) {
-                        Rectangle()
-                            .fill(Color.black.opacity(0.55))
-                            .frame(width: geometry.size.width, height: 1)
-
-                        Text("\(Int(yPosition))pt")
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Color.black)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 2)
-                            .background(Color.white.opacity(0.78))
-                            .clipShape(RoundedRectangle(cornerRadius: 3))
-                            .offset(x: 4, y: -9)
-                    }
-                    .offset(y: yPosition)
-                }
-            }
-        }
-        .allowsHitTesting(false)
-    }
-
-    private func debugMetricsPanel(geometry: GeometryProxy) -> some View {
-        let safeTop = geometry.safeAreaInsets.top
-        let toolbarInset = toolbarTopInset(for: geometry)
-        let topInset = topContentInset(for: geometry)
-        let toolbarFrameHeight = toolbarInset + 72
-
-        return VStack(alignment: .leading, spacing: 4) {
-            Text("safeTop: \(safeTop, specifier: "%.1f")")
-            Text("toolbarInset: \(toolbarInset, specifier: "%.1f")")
-            Text("toolbarFrame: \(toolbarFrameHeight, specifier: "%.1f")")
-            Text("topContentInset: \(topInset, specifier: "%.1f")")
-        }
-        .font(.system(size: 11, weight: .semibold, design: .monospaced))
-        .foregroundStyle(Color.black)
-        .padding(8)
-        .background(Color.white.opacity(0.82))
-        .overlay(
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(Color.black.opacity(0.45), lineWidth: 1)
-        )
-        .padding(.trailing, 8)
-        .padding(.top, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-        .allowsHitTesting(false)
-    }
-
-    private func debugLabel(_ title: String) -> some View {
-        Text(title)
-            .font(.system(size: 10, weight: .bold, design: .monospaced))
-            .foregroundStyle(Color.black)
-            .padding(.horizontal, 4)
-            .padding(.vertical, 2)
-            .background(Color.white.opacity(0.72))
-            .clipShape(RoundedRectangle(cornerRadius: 3))
-            .padding(4)
-            .allowsHitTesting(false)
     }
 
     // MARK: - Data
@@ -343,10 +241,6 @@ struct HomeView: View {
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(Color.cyan.opacity(0.12))
-            .overlay(alignment: .topLeading) {
-                debugLabel("CLOSET PAGE")
-            }
         }
     }
 
@@ -392,10 +286,6 @@ struct HomeView: View {
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .frame(height: showsReturnButton ? 94 : 46, alignment: .bottom)
-        .background(Color.pink.opacity(0.20))
-        .overlay(alignment: .topLeading) {
-            debugLabel("PAGE HEADER")
-        }
     }
 
     // MARK: - Review
@@ -410,10 +300,6 @@ struct HomeView: View {
             reviewScrollView
                 .padding(.top, 12.28)
                 .padding(.bottom, 10.88)
-        }
-        .background(Color.mint.opacity(0.22))
-        .overlay(alignment: .topLeading) {
-            debugLabel("REVIEW VIEW")
         }
     }
 
@@ -499,10 +385,6 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: targetHeight, alignment: .top)
-        .background(Color.teal.opacity(0.18))
-        .overlay(alignment: .topLeading) {
-            debugLabel("CENTERED CLOSET")
-        }
         .clipped()
     }
 
@@ -546,10 +428,6 @@ struct HomeView: View {
             .padding(.bottom, 30)
         }
         .frame(width: 356.4, height: 542.14)
-        .background(Color.brown.opacity(0.18))
-        .overlay(alignment: .topLeading) {
-            debugLabel("CLOSET FRAME")
-        }
     }
 
     private var pageIndicator: some View {
