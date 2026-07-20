@@ -58,20 +58,13 @@ struct ReturnDetailView: View {
     }
     
     private var navigationBar: some View {
-        ZStack {
-            Text("돌려주기")
-                .font(.system(size: 17, weight: .semibold))
-            
-            HStack {
-                BackButton {
-                    dismiss()
-                }
-                Spacer()
+        ToolbarUI(
+            mode: .returnRequest,
+            onBack: {
+                dismiss()
             }
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 13)
-        .frame(height: 54)
+        )
+        .padding(.top, 10)
     }
     
     private var itemCard: some View {
@@ -234,7 +227,7 @@ struct ReturnDetailView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
         .disabled(!canReturn)
-        .padding(.top, 30)
+        .padding(.top, 20)
         .padding(.horizontal, 16)
         .padding(.vertical, 13)
         .background(
