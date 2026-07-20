@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MyPageView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var store: AppDataStore
 
     private let menuItems = [
         "최근 본 상품",
@@ -18,6 +19,29 @@ struct MyPageView: View {
         "개인정보처리방침",
         "서비스 이용 약관"
     ]
+
+    private var currentUser: User? {
+        store.currentUser
+    }
+
+    private var profileImageName: String {
+        currentUser?.profileImageName ?? "MyProfile"
+    }
+
+    private var displayName: String {
+        currentUser?.name ?? "사용자"
+    }
+
+    private var rentalHistoryCount: Int {
+        let currentUserId = store.snapshot.userSession.currentUserId
+        return store.snapshot.rentals.filter {
+            $0.borrowerId == currentUserId
+        }.count
+    }
+
+    private var pointText: String {
+        "\(formatNumber(currentUser?.point ?? 0))P"
+    }
 
     var body: some View {
         ZStack {
@@ -76,13 +100,13 @@ struct MyPageView: View {
 
     private var profileView: some View {
         HStack(spacing: 12) {
-            Image("MyProfile")
+            Image(profileImageName)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 44, height: 44)
                 .clipShape(Circle())
 
-            Text("김서연")
+            Text(displayName)
                 .font(.system(size: 19, weight: .bold))
 
             Spacer()
@@ -112,7 +136,7 @@ struct MyPageView: View {
             MyPageSummaryItem(
                 icon: "calendar",
                 title: "대여/반납",
-                value: "15개"
+                value: "\(rentalHistoryCount)개"
             ) {
                 print("대여/반납")
             }
@@ -128,7 +152,7 @@ struct MyPageView: View {
             MyPageSummaryItem(
                 icon: "heart.circle",
                 title: "포인트",
-                value: "80,000P"
+                value: pointText
             ) {
                 print("포인트")
             }
@@ -218,6 +242,12 @@ struct MyPageView: View {
             break
         }
     }
+
+    private func formatNumber(_ num: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: num)) ?? "\(num)"
+    }
 }
 
 // MARK: - 활동 요약 아이템
@@ -251,4 +281,5 @@ private struct MyPageSummaryItem: View {
     NavigationStack {
         MyPageView()
     }
+    .environmentObject(AppDataStore())
 }
