@@ -8,9 +8,6 @@
 import SwiftUI
 
 struct MyClosetView: View {
-    @State private var isUploadViewPresented = false
-    @State private var currentReviewIndex = 0
-    
     private let topItems = [
         "Top1",
         "Top2",
@@ -31,25 +28,18 @@ struct MyClosetView: View {
     ]
     
     var body: some View {
-        NavigationStack{
-            ZStack {
-                backgroundView
-                VStack{
-                    topMenuView
-                    
-                    reviewView
-                    
-                    closetView
-                    
-                }
+        ZStack {
+            backgroundView
+            VStack{
+                topMenuView
                 
+                reviewView
+                
+                closetView
                 
             }
-            .navigationDestination(
-                isPresented: $isUploadViewPresented
-            ){
-                UploadView()
-            }
+            
+            
         }
     }
     
@@ -82,7 +72,7 @@ struct MyClosetView: View {
                     ToolbarUI(
                         mode: .home,
                         onAdd: {
-                            isUploadViewPresented = true
+                            print("옷 추가")
                         },
                         onNotification: {
                             print("알림")
@@ -97,23 +87,25 @@ struct MyClosetView: View {
     }
     
     // MARK: - 리뷰
+    @State private var currentReviewIndex = 0
+
     private let reviewCount = 5
-    
+
     private var reviewView: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("내가 받은 리뷰")
                 .font(.system(size: 16))
                 .foregroundStyle(.secondary)
                 .padding(.leading, 18)
-            
+
             reviewScrollView
                 .padding(.top, 12.28)
                 .padding(.bottom, 10.88)
         }
     }
-    
+
     // MARK: - 리뷰 가로 스크롤
-    
+
     private var reviewScrollView: some View {
         ScrollViewReader { proxy in
             ZStack(alignment: .trailing) {
@@ -130,7 +122,7 @@ struct MyClosetView: View {
                     }
                 }
                 .scrollIndicators(.hidden)
-                
+
                 ZStack {
                     LinearGradient(
                         colors: [
@@ -141,7 +133,7 @@ struct MyClosetView: View {
                         endPoint: .trailing
                     )
                     .frame(width: 40, height: 100)
-                    
+
                     PrimaryIconButton(
                         icon: Image(systemName: "chevron.right")
                     ) {
@@ -155,22 +147,22 @@ struct MyClosetView: View {
         .padding(.leading, 23)
         .padding(.trailing, 58.83)
     }
-    
+
     // MARK: - 다음 리뷰로 이동
-    
+
     private func moveToNextReview(
         using proxy: ScrollViewProxy
     ) {
         guard reviewCount > 0 else {
             return
         }
-        
+
         if currentReviewIndex < reviewCount - 1 {
             currentReviewIndex += 1
         } else {
             currentReviewIndex = 0
         }
-        
+
         withAnimation(.easeInOut(duration: 0.3)) {
             proxy.scrollTo(
                 currentReviewIndex,
@@ -179,7 +171,7 @@ struct MyClosetView: View {
         }
     }
     
-    
+
     // MARK: - 옷장 전체
     
     private var closetView: some View {
