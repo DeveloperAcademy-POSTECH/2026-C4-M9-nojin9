@@ -201,9 +201,9 @@ struct HomeView: View {
             RoundedRectangle(cornerRadius: 4)
                 .stroke(Color.black.opacity(0.45), lineWidth: 1)
         )
-        .padding(.leading, 8)
+        .padding(.trailing, 8)
         .padding(.top, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         .allowsHitTesting(false)
     }
 
