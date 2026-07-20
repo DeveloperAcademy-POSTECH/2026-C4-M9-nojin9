@@ -113,11 +113,11 @@ struct HomeView: View {
     }
 
     private func topContentInset(for geometry: GeometryProxy) -> CGFloat {
-        min(geometry.safeAreaInsets.top + 66, 220)
+        toolbarTopInset(for: geometry) + 72
     }
 
     private func toolbarTopInset(for geometry: GeometryProxy) -> CGFloat {
-        min(geometry.safeAreaInsets.top, 176)
+        min(geometry.safeAreaInsets.top, 44)
     }
 
     private func bottomContentInset(for geometry: GeometryProxy) -> CGFloat {
