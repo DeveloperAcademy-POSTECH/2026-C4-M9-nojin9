@@ -13,7 +13,11 @@ struct HomeView: View {
     @State private var selectedClosetPage = 1
     @State private var currentReviewIndex = 0
 
-    private let reviewCount = 6
+    private let thankYouLetterPreviews: [HomeThankYouLetterPreview] = [
+        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_1_1"),
+        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_2_1"),
+        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_3_1")
+    ]
 
     var body: some View {
         NavigationStack {
@@ -274,14 +278,13 @@ struct HomeView: View {
 
     private var reviewView: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("내가 받은 리뷰")
-                .font(.system(size: 16))
-                .foregroundStyle(.secondary)
+            Text("내가 받은 감사 편지")
+                .font(.system(size: 24, weight: .regular))
+                .foregroundStyle(Color("gray60"))
                 .padding(.leading, 18)
 
             reviewScrollView
-                .padding(.top, 12.28)
-                .padding(.bottom, 10.88)
+                .padding(.top, 10)
         }
     }
 
@@ -289,13 +292,10 @@ struct HomeView: View {
         ScrollViewReader { proxy in
             ZStack(alignment: .trailing) {
                 ScrollView(.horizontal) {
-                    LazyHStack(spacing: 0) {
-                        ForEach(0..<reviewCount, id: \.self) { index in
-                            NoteButton {
-                            }
-                            .frame(width: 99.83)
-                            .id(index)
-                            .padding(.horizontal, 3)
+                    LazyHStack(spacing: 8) {
+                        ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
+                            ThankYouLetterPreviewCardView(preview: preview)
+                                .id(index)
                         }
                     }
                 }
@@ -310,30 +310,35 @@ struct HomeView: View {
                         startPoint: .leading,
                         endPoint: .trailing
                     )
-                    .frame(width: 40, height: 100)
+                    .frame(width: 68, height: 120)
 
-                    PrimaryIconButton(
-                        icon: Image(systemName: "chevron.right")
-                    ) {
+                    Button {
                         moveToNextReview(using: proxy)
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundStyle(Color("customWhite"))
+                            .frame(width: 48, height: 48)
+                            .background(Color("brandPrimary"))
+                            .clipShape(Circle())
                     }
                 }
             }
-            .frame(height: 100)
+            .frame(height: 120)
             .clipped()
         }
-        .padding(.leading, 23)
-        .padding(.trailing, 58.83)
+        .padding(.leading, 16)
+        .padding(.trailing, 56)
     }
 
     private func moveToNextReview(
         using proxy: ScrollViewProxy
     ) {
-        guard reviewCount > 0 else {
+        guard !thankYouLetterPreviews.isEmpty else {
             return
         }
 
-        if currentReviewIndex < reviewCount - 1 {
+        if currentReviewIndex < thankYouLetterPreviews.count - 1 {
             currentReviewIndex += 1
         } else {
             currentReviewIndex = 0
@@ -442,6 +447,58 @@ private struct HomeClosetItems {
 
     var isEmpty: Bool {
         topItems.isEmpty && bottomItems.isEmpty && otherItems.isEmpty
+    }
+}
+
+private struct HomeThankYouLetterPreview: Identifiable {
+    var id: String {
+        imageName
+    }
+
+    let authorName: String
+    let imageName: String
+}
+
+private struct ReviewAuthorBadgeView: View {
+    let authorName: String
+
+    var body: some View {
+        Text(authorName)
+            .font(.system(size: 16, weight: .bold))
+            .foregroundStyle(Color("customWhite"))
+            .frame(width: 42, height: 42)
+            .background(Color("gray40"))
+            .clipShape(Circle())
+            .overlay {
+                Circle()
+                    .stroke(Color("customWhite"), lineWidth: 1.5)
+            }
+    }
+}
+
+private struct ThankYouLetterThumbnailView: View {
+    let imageName: String
+
+    var body: some View {
+        Image(imageName)
+            .resizable()
+            .scaledToFill()
+            .frame(width: 120, height: 120)
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+    }
+}
+
+private struct ThankYouLetterPreviewCardView: View {
+    let preview: HomeThankYouLetterPreview
+
+    var body: some View {
+        ThankYouLetterThumbnailView(imageName: preview.imageName)
+            .overlay(alignment: .topLeading) {
+                ReviewAuthorBadgeView(authorName: preview.authorName)
+                    .padding(.top, 6)
+                    .padding(.leading, 6)
+            }
     }
 }
 
