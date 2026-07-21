@@ -5,7 +5,7 @@ struct HomeView: View {
     @EnvironmentObject private var store: AppDataStore
 
     @State private var isUploadViewPresented = false
-    @State private var isClosetViewPresented = false
+    @State private var isUnavailableClosetAlertPresented = false
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
     @State private var selectedClosetPage = 1
@@ -94,11 +94,6 @@ struct HomeView: View {
                 UploadView()
             }
             .navigationDestination(
-                isPresented: $isClosetViewPresented
-            ) {
-                ClosetView()
-            }
-            .navigationDestination(
                 isPresented: $isMyPageViewPresented
             ) {
                 MyPageView()
@@ -108,6 +103,13 @@ struct HomeView: View {
             ) {
                 ReturnView {
                     isReturnViewPresented = false
+                }
+            }
+            .alert(
+                "현재 없는 뷰지롱 메롱",
+                isPresented: $isUnavailableClosetAlertPresented
+            ) {
+                Button("확인", role: .cancel) {
                 }
             }
         }
@@ -429,7 +431,7 @@ struct HomeView: View {
                 .frame(width: 307, height: 124)
 
                 MyClosetButton(title: "옷장 전체 보기") {
-                    isClosetViewPresented = true
+                    isUnavailableClosetAlertPresented = true
                 }
                 .padding(.top, 8.87)
             }
