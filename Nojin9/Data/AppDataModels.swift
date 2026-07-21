@@ -34,7 +34,7 @@ struct ClothItem: Identifiable, Codable, Equatable {
     var visibilityStatus: ItemVisibilityStatus
 }
 
-enum ClothCategory: String, Codable, Equatable {
+enum ClothCategory: String, Codable, Equatable, CaseIterable {
     case top
     case bottom
     case accessory
