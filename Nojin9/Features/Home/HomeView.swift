@@ -73,15 +73,11 @@ struct HomeView: View {
                         .frame(height: toolbarTopInset(for: geometry) + 72, alignment: .bottom)
                         .zIndex(2)
 
-                    VStack {
-                        Spacer()
-
-                        pageIndicator
-                            .frame(height: 24)
-                            .padding(.bottom, max(10, geometry.safeAreaInsets.bottom + 10))
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .zIndex(2)
+                    pageIndicator
+                        .frame(height: 24)
+                        .padding(.bottom, 10)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                        .zIndex(2)
                 }
             }
             .navigationDestination(
