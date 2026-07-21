@@ -11,7 +11,7 @@ struct HomeView: View {
     @State private var selectedClosetPage = 1
     @State private var currentReviewIndex = 0
 
-    private let reviewCount = 5
+    private let reviewCount = 6
 
     var body: some View {
         NavigationStack {
