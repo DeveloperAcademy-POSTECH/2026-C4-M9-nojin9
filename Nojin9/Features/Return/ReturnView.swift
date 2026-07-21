@@ -11,6 +11,11 @@ import SwiftUI
 struct ReturnView: View {
     @EnvironmentObject private var store: AppDataStore
     @Environment(\.dismiss) private var dismiss
+    let onHomeButtonTapped: () -> Void
+
+    init(onHomeButtonTapped: @escaping () -> Void = { }) {
+        self.onHomeButtonTapped = onHomeButtonTapped
+    }
     
     @State private var selectedRental: Rental?
     @State private var selectedItem: ClothItem?
@@ -81,7 +86,8 @@ struct ReturnView: View {
             if let selectedRental, let selectedItem {
                 ReturnDetailView(
                     rental: selectedRental,
-                    item: selectedItem
+                    item: selectedItem,
+                    onHomeButtonTapped: onHomeButtonTapped
                 )
             }
         }
@@ -99,7 +105,7 @@ struct ReturnView: View {
         ToolbarUI(
             mode: .returnRequest,
             onBack: {
-                print("뒤로가기")
+                dismiss()
             }
         )
     }

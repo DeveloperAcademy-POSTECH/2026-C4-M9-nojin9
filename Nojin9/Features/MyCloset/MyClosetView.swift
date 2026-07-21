@@ -9,6 +9,8 @@ import SwiftUI
 
 struct MyClosetView: View {
     @State private var isUploadViewPresented = false
+    @State private var isClosetViewPresented = false
+    @State private var isMyPageViewPresented = false
     @State private var currentReviewIndex = 0
     
     private let topItems = [
@@ -50,6 +52,16 @@ struct MyClosetView: View {
             ){
                 UploadView()
             }
+            .navigationDestination(
+                isPresented: $isClosetViewPresented
+            ){
+                ClosetView()
+            }
+            .navigationDestination(
+                isPresented: $isMyPageViewPresented
+            ){
+                MyPageView()
+            }
         }
     }
     
@@ -88,7 +100,7 @@ struct MyClosetView: View {
                             print("알림")
                         },
                         onProfile: {
-                            print("프로필")
+                            isMyPageViewPresented = true
                         }
                     )
                 }
@@ -216,6 +228,7 @@ struct MyClosetView: View {
                 .frame(width: 307, height: 124)
                 
                 MyClosetButton(title: "옷장 전체 보기") {
+                    isClosetViewPresented = true
                 }
                 .padding(.top, 8.87)
             }

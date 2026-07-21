@@ -32,6 +32,12 @@ final class AppDataStore: ObservableObject {
         snapshot.clothItems.first { $0.id == id }
     }
 
+    func clothItem(imageName: String) -> ClothItem? {
+        snapshot.clothItems.first {
+            $0.imageName == imageName || $0.cutoutImageName == imageName
+        }
+    }
+
     func clothItems(category: ClothCategory? = nil, ownerId: UUID? = nil) -> [ClothItem] {
         snapshot.clothItems.filter { item in
             let matchesCategory = category.map { item.category == $0 } ?? true
@@ -57,7 +63,7 @@ final class AppDataStore: ObservableObject {
     }
 
     @discardableResult
-    func borrow(clothItemId: UUID, borrowedAt: Date = Date()) -> Bool {
+    func borrow(clothItemId: UUID, borrowedAt: Date = Date(), dueAt: Date? = nil) -> Bool {
         let currentUserId = snapshot.userSession.currentUserId
 
         guard
@@ -70,9 +76,11 @@ final class AppDataStore: ObservableObject {
         let item = snapshot.clothItems[itemIndex]
         guard item.ownerId != currentUserId else { return false }
         guard !item.isBorrowed else { return false }
-        guard snapshot.users[userIndex].point >= item.pointCost else { return false }
 
-        snapshot.users[userIndex].point -= item.pointCost
+        let totalCost = item.pointCost * rentalDayCount(from: borrowedAt, to: dueAt)
+        guard snapshot.users[userIndex].point >= totalCost else { return false }
+
+        snapshot.users[userIndex].point -= totalCost
         snapshot.clothItems[itemIndex].isBorrowed = true
         snapshot.rentals.append(
             Rental(
@@ -82,13 +90,41 @@ final class AppDataStore: ObservableObject {
                 borrowerId: currentUserId,
                 status: .borrowed,
                 borrowedAt: borrowedAt,
-                dueAt: nil,
+                dueAt: dueAt,
                 returnedAt: nil,
                 createdAt: borrowedAt
             )
         )
 
         return true
+    }
+
+    func addClothItem(
+        name: String,
+        category: ClothCategory,
+        description: String,
+        pointCost: Int = 0,
+        imageName: String? = nil,
+        cutoutImageName: String? = nil
+    ) {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
+
+        snapshot.clothItems.append(
+            ClothItem(
+                id: UUID(),
+                ownerId: snapshot.userSession.currentUserId,
+                name: trimmedName,
+                category: category,
+                imageName: imageName,
+                cutoutImageName: cutoutImageName,
+                pointCost: pointCost,
+                description: description.trimmingCharacters(in: .whitespacesAndNewlines),
+                condition: .good,
+                isBorrowed: false,
+                visibilityStatus: .listed
+            )
+        )
     }
 
     @discardableResult
@@ -109,5 +145,16 @@ final class AppDataStore: ObservableObject {
         }
 
         return true
+    }
+
+    private func rentalDayCount(from borrowedAt: Date, to dueAt: Date?) -> Int {
+        guard let dueAt else { return 1 }
+
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: borrowedAt)
+        let end = calendar.startOfDay(for: dueAt)
+        let days = calendar.dateComponents([.day], from: start, to: end).day ?? 0
+
+        return max(days + 1, 1)
     }
 }

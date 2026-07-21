@@ -11,6 +11,7 @@ struct UploadView: View {
     private let cutoutService = VisionClothCutoutService()
 
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var store: AppDataStore
     
     @State private var itemName = ""
     @State private var selectedCategory: ClothCategory?
@@ -455,14 +456,25 @@ private extension UploadView {
     }
     
     func registerItem() {
-        guard let selectedCategory else {
+        guard let selectedCategory, let selectedImage else {
             return
         }
-        
-        print("물품 이름:", itemName)
-        print("카테고리:", selectedCategory)
-        print("주의사항:", precautions)
-        
+
+        do {
+            let storedImageName = try UploadedClothImageStore.save(selectedImage)
+
+            store.addClothItem(
+                name: itemName,
+                category: selectedCategory,
+                description: precautions,
+                imageName: storedImageName,
+                cutoutImageName: storedImageName
+            )
+            dismiss()
+        } catch {
+            cutoutErrorMessage = "이미지를 저장하지 못했어요. 다시 시도해 주세요."
+            isShowingCutoutError = true
+        }
     }
 }
 

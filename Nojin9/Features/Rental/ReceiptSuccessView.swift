@@ -54,8 +54,7 @@ struct ReceiptSuccessView: View {
                         
                         VStack(spacing: 0) {
                             
-                            Image(itemImageName)
-                                .resizable()
+                            ClothImageView(imageName: itemImageName)
                                 .scaledToFit()
                                 .frame(height: 280)
                                 .padding(.top, 10)
