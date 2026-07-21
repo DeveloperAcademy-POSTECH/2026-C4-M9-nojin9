@@ -4,7 +4,7 @@ struct RentalFormView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: AppDataStore
 
-    let itemID: String
+    let clothItemId: UUID
 
     @State private var startDate = Date()
     @State private var endDate = Date()
@@ -12,8 +12,8 @@ struct RentalFormView: View {
 
     @State private var isShowingReceipt = false
 
-    private var currentItem: ClosetRentalItemDetail {
-        RentalMockData.items[itemID] ?? RentalMockData.items["Top1"]!
+    private var currentItem: ClothItem {
+        store.clothItem(id: clothItemId) ?? MockData.clothItems[0]
     }
 
     private var isDateInvalid: Bool {
@@ -30,7 +30,7 @@ struct RentalFormView: View {
     }
 
     private var totalHeartPrice: Int {
-        currentItem.price * rentalDays
+        currentItem.pointCost * rentalDays
     }
 
     private func formatDateToString(_ date: Date) -> String {
@@ -78,20 +78,20 @@ struct RentalFormView: View {
                                         .fill(Color("brandPrimary10"))
                                         .frame(width: 120, height: 120)
 
-                                    ClothImageView(imageName: currentItem.id)
+                                    clothImage(for: currentItem)
                                         .scaledToFit()
                                         .frame(width: 100, height: 100)
                                 }
 
                                 VStack(alignment: .leading, spacing: 0) {
-                                    Text(currentItem.title)
+                                    Text(itemTitle(for: currentItem))
                                         .bodyBoldStyle()
                                         .foregroundStyle(Color("customBlack"))
 
                                     Spacer()
 
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text("소유자 : \(currentItem.owner)")
+                                        Text("소유자 : \(ownerDisplayName(for: currentItem))")
                                             .font(.appCaptionBold)
                                             .lineSpacing(18 - 14)
                                             .foregroundStyle(Color("gray40"))
@@ -102,7 +102,7 @@ struct RentalFormView: View {
                                                 .scaledToFit()
                                                 .frame(width: 20, height: 20)
 
-                                            Text(formatNumber(currentItem.price))
+                                            Text(formatNumber(currentItem.pointCost))
                                                 .subtitleBoldStyle()
                                                 .foregroundStyle(Color("customBlack"))
                                         }
@@ -180,7 +180,7 @@ struct RentalFormView: View {
                                         .bodyStyle()
                                         .foregroundStyle(Color("customBlack"))
                                     Spacer()
-                                    Text(formatNumber(currentItem.price))
+                                    Text(formatNumber(currentItem.pointCost))
                                         .bodyBoldStyle()
                                 }
 
@@ -244,14 +244,11 @@ struct RentalFormView: View {
                         .background(Color("gray10"))
 
                     Button(action: {
-                        guard
-                            let item = store.clothItem(imageName: itemID),
-                            store.borrow(
-                                clothItemId: item.id,
-                                borrowedAt: startDate,
-                                dueAt: endDate
-                            )
-                        else {
+                        guard store.borrow(
+                            clothItemId: currentItem.id,
+                            borrowedAt: startDate,
+                            dueAt: endDate
+                        ) else {
                             return
                         }
 
@@ -282,13 +279,13 @@ struct RentalFormView: View {
                     onHomeButtonTapped: {
                         dismiss()
                     },
-                    itemImageName: currentItem.id,                     // "Top1", "Top2" 등의 아이템 에셋 키값
+                    itemImageName: imageName(for: currentItem) ?? "",  // 현재 아이템 이미지 키값
                     rentDate: formatDateToString(startDate),           // 계산된 대여 시작 날짜 문자열
                     returnDate: formatDateToString(endDate),           // 계산된 대여 반납 날짜 문자열
                     rentDays: rentalDays,                              // 연산 프로퍼티의 대여 일수
                     totalPrice: totalHeartPrice,                       // 연산 프로퍼티의 최종 하트 개수
-                    borrowerName: "김서연",                             // 대여인 (현재 유저 이름 고정 혹은 세션 데이터 연동)
-                    ownerName: currentItem.owner                       // 해당 아이템 소유자 이름 연동
+                    borrowerName: store.currentUser?.name ?? "나",      // 대여인
+                    ownerName: ownerName(for: currentItem)             // 해당 아이템 소유자 이름
                 )
             }
         }
@@ -300,6 +297,50 @@ struct RentalFormView: View {
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: num)) ?? "\(num)"
     }
+
+    @ViewBuilder
+    private func clothImage(for item: ClothItem) -> some View {
+        if let imageName = imageName(for: item) {
+            ClothImageView(imageName: imageName)
+        } else {
+            Image(systemName: "tshirt")
+                .resizable()
+                .foregroundStyle(.gray60)
+        }
+    }
+
+    private func itemTitle(for item: ClothItem) -> String {
+        let trimmedName = item.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedName.isEmpty {
+            return trimmedName
+        }
+
+        return "\(item.category.displayName) 아이템"
+    }
+
+    private func ownerName(for item: ClothItem) -> String {
+        store.owner(for: item)?.name ?? "소유자 정보 없음"
+    }
+
+    private func ownerDisplayName(for item: ClothItem) -> String {
+        guard let owner = store.owner(for: item) else {
+            return "소유자 정보 없음"
+        }
+
+        if owner.id == store.snapshot.userSession.currentUserId {
+            return "나"
+        }
+
+        if let relationshipLabel = owner.relationshipLabel, !relationshipLabel.isEmpty {
+            return "\(relationshipLabel) 언니"
+        }
+
+        return owner.name
+    }
+
+    private func imageName(for item: ClothItem) -> String? {
+        item.imageName ?? item.cutoutImageName
+    }
 }
 
 // ==========================================
@@ -307,7 +348,7 @@ struct RentalFormView: View {
 // ==========================================
 #Preview {
     NavigationStack {
-        RentalFormView(itemID: "Top2")
+        RentalFormView(clothItemId: MockData.returnedRentalClothItemId)
     }
     .environmentObject(AppDataStore())
 }

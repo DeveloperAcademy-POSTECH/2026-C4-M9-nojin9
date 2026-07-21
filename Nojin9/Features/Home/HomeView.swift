@@ -8,6 +8,8 @@ struct HomeView: View {
     @State private var isUnavailableClosetAlertPresented = false
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
+    @State private var isRentalViewPresented = false
+    @State private var selectedRentalItem: ClothItem?
     @State private var selectedClosetPage = 1
     @State private var currentReviewIndex = 0
 
@@ -86,6 +88,13 @@ struct HomeView: View {
                     isReturnViewPresented = false
                 }
             }
+            .navigationDestination(
+                isPresented: $isRentalViewPresented
+            ) {
+                if let selectedRentalItem {
+                    RentalView(clothItemId: selectedRentalItem.id)
+                }
+            }
             .alert(
                 "현재 없는 뷰지롱 메롱",
                 isPresented: $isUnavailableClosetAlertPresented
@@ -138,16 +147,10 @@ struct HomeView: View {
 
     private func closetItems(ownerId: UUID) -> HomeClosetItems {
         HomeClosetItems(
-            topItems: imageNames(category: .top, ownerId: ownerId),
-            bottomItems: imageNames(category: .bottom, ownerId: ownerId),
-            otherItems: imageNames(category: .accessory, ownerId: ownerId)
+            topItems: store.clothItems(category: .top, ownerId: ownerId),
+            bottomItems: store.clothItems(category: .bottom, ownerId: ownerId),
+            otherItems: store.clothItems(category: .accessory, ownerId: ownerId)
         )
-    }
-
-    private func imageNames(category: ClothCategory, ownerId: UUID) -> [String] {
-        store.clothItems(category: category, ownerId: ownerId).compactMap { item in
-            item.imageName ?? item.cutoutImageName
-        }
     }
 
     private func normalizedClosetItems(_ items: HomeClosetItems) -> HomeClosetItems {
@@ -377,7 +380,11 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 MyClosetSectionView(
                     title: "상의",
-                    imageNames: items.topItems
+                    items: items.topItems,
+                    onItemTap: { item in
+                        selectedRentalItem = item
+                        isRentalViewPresented = true
+                    }
                 ) {
                     print("상의 더보기")
                 }
@@ -385,7 +392,11 @@ struct HomeView: View {
 
                 MyClosetSectionView(
                     title: "하의",
-                    imageNames: items.bottomItems
+                    items: items.bottomItems,
+                    onItemTap: { item in
+                        selectedRentalItem = item
+                        isRentalViewPresented = true
+                    }
                 ) {
                     print("하의 더보기")
                 }
@@ -393,7 +404,11 @@ struct HomeView: View {
 
                 MyClosetSectionView(
                     title: "기타",
-                    imageNames: items.otherItems
+                    items: items.otherItems,
+                    onItemTap: { item in
+                        selectedRentalItem = item
+                        isRentalViewPresented = true
+                    }
                 ) {
                     print("기타 더보기")
                 }
@@ -421,9 +436,9 @@ struct HomeView: View {
 }
 
 private struct HomeClosetItems {
-    let topItems: [String]
-    let bottomItems: [String]
-    let otherItems: [String]
+    let topItems: [ClothItem]
+    let bottomItems: [ClothItem]
+    let otherItems: [ClothItem]
 
     var isEmpty: Bool {
         topItems.isEmpty && bottomItems.isEmpty && otherItems.isEmpty

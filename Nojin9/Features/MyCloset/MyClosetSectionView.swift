@@ -10,7 +10,8 @@ import SwiftUI
 /// 옷장 카테고리 한 줄을 담당하는 뷰
 struct MyClosetSectionView: View {
     let title: String
-    let imageNames: [String]
+    let items: [ClothItem]
+    let onItemTap: (ClothItem) -> Void
 
     /// 카테고리 전체 보기 화면으로 이동할 때 사용
     let action: () -> Void
@@ -64,12 +65,15 @@ struct MyClosetSectionView: View {
                 ScrollView(.horizontal) {
                     LazyHStack(spacing: 0) {
                         ForEach(
-                            Array(imageNames.enumerated()),
-                            id: \.offset
-                        ) { index, imageName in
-                            MyClothThumbnailView(
-                                imageName: imageName
-                            )
+                            Array(items.enumerated()),
+                            id: \.element.id
+                        ) { index, item in
+                            Button {
+                                onItemTap(item)
+                            } label: {
+                                MyClothThumbnailView(item: item)
+                            }
+                            .buttonStyle(.plain)
                             .id(index)
                         }
                     }
@@ -100,11 +104,11 @@ struct MyClosetSectionView: View {
     private func moveToNextItem(
         using proxy: ScrollViewProxy
     ) {
-        guard !imageNames.isEmpty else {
+        guard !items.isEmpty else {
             return
         }
 
-        if currentIndex < imageNames.count - 1 {
+        if currentIndex < items.count - 1 {
             currentIndex += 1
         } else {
             currentIndex = 0
@@ -122,5 +126,7 @@ struct MyClosetSectionView: View {
 #Preview {
     MyClosetSectionView(
         title: "상의",
-        imageNames: ["Top1", "Top2","Top3"]) {}
+        items: Array(MockData.clothItems.prefix(3)),
+        onItemTap: { _ in }
+    ) {}
 }
