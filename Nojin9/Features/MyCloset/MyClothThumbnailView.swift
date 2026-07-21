@@ -58,15 +58,28 @@ struct ClothImageView: View {
 }
 
 struct MyClothThumbnailView: View {
-    let imageName: String
+    let item: ClothItem
+
+    private var imageName: String? {
+        item.imageName ?? item.cutoutImageName
+    }
 
     var body: some View {
-        ClothImageView(imageName: imageName)
-            .scaledToFit()
-            .frame(width: 100, height: 90)
+        Group {
+            if let imageName {
+                ClothImageView(imageName: imageName)
+                    .scaledToFit()
+            } else {
+                Image(systemName: "tshirt")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(.gray60)
+            }
+        }
+        .frame(width: 100, height: 90)
     }
 }
 
 #Preview {
-    MyClothThumbnailView(imageName: "Top01")
+    MyClothThumbnailView(item: MockData.clothItems[0])
 }

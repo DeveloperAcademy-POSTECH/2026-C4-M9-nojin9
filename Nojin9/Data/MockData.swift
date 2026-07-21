@@ -164,6 +164,22 @@ enum MockData {
 // MARK: - RentalMockData Bridge (회원님 기존 코드 호환 및 에러 방지 해결 단락)
 // ===================================================
 struct RentalMockData {
+    static func notices(for imageName: String?) -> [String] {
+        guard let imageName else {
+            return []
+        }
+
+        return staticConfig[imageName]?.notices ?? []
+    }
+
+    static func thankYouLetters(for imageName: String?) -> [ClosetThankYouLetter] {
+        guard let imageName else {
+            return []
+        }
+
+        return staticConfig[imageName]?.letters ?? []
+    }
+
     static var items: [String: ClosetRentalItemDetail] {
         var dict: [String: ClosetRentalItemDetail] = [:]
         
