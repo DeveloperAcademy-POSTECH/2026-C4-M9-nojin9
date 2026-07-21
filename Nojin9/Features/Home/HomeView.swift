@@ -339,15 +339,10 @@ struct HomeView: View {
                         )
                         .frame(width: trailingFadeWidth, height: cardSize)
 
-                        Button {
+                        PrimaryIconButton(
+                            icon: Image(systemName: "chevron.right")
+                        ) {
                             moveToNextReview(using: proxy)
-                        } label: {
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundStyle(Color("customWhite"))
-                                .frame(width: 48, height: 48)
-                                .background(Color("brandPrimary"))
-                                .clipShape(Circle())
                         }
                     }
                 }
