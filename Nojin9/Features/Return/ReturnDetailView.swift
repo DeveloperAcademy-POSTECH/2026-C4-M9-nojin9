@@ -14,6 +14,17 @@ struct ReturnDetailView: View {
     
     let rental: Rental
     let item: ClothItem
+    let onHomeButtonTapped: () -> Void
+
+    init(
+        rental: Rental,
+        item: ClothItem,
+        onHomeButtonTapped: @escaping () -> Void = { }
+    ) {
+        self.rental = rental
+        self.item = item
+        self.onHomeButtonTapped = onHomeButtonTapped
+    }
     
     @State private var isDamaged = false
     @State private var selectedPhoto: PhotosPickerItem?
@@ -78,8 +89,7 @@ struct ReturnDetailView: View {
                     Color.brandPrimary10
                     
                     if let imageName = item.cutoutImageName ?? item.imageName {
-                        Image(imageName)
-                            .resizable()
+                        ClothImageView(imageName: imageName)
                             .scaledToFit()
                             .padding(8)
                     } else {
@@ -331,9 +341,8 @@ struct ReturnDetailView: View {
         
         DispatchQueue.main.async {
             _ = store.returnRental(id: rentalId)
+            onHomeButtonTapped()
         }
-        
-        // TODO: 루트 네비게이션 구현 후 MyClosetView로 이동
     }
 }
 #Preview {

@@ -9,6 +9,11 @@ import SwiftUI
 
 struct OnboardingFlowView: View {
     @StateObject private var navigationManager = OnboardingNavigationManager()
+    let onComplete: () -> Void
+
+    init(onComplete: @escaping () -> Void = { }) {
+        self.onComplete = onComplete
+    }
     
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
@@ -45,12 +50,9 @@ struct OnboardingFlowView: View {
                             .environmentObject(navigationManager)
                         
                     case .invite05:
-                        invite05View()
+                        invite05View(onComplete: onComplete)
                             .environmentObject(navigationManager)
                             
-                    // ✅ 목적지에 도달했을 때 띄울 뷰 연결
-                    case .ClosetView:
-                        ClosetView()
                     }
                 }
         }
