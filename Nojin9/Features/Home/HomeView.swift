@@ -13,25 +13,6 @@ struct HomeView: View {
 
     private let reviewCount = 5
 
-    private let fallbackTopItems = [
-        "Top1",
-        "Top2",
-        "Top3",
-        "Top1", "Top1", "Top1", "Top1", "Top1"
-    ]
-
-    private let fallbackBottomItems = [
-        "Bottom1",
-        "Bottom2",
-        "Bottom3"
-    ]
-
-    private let fallbackOtherItems = [
-        "Accessories1",
-        "Accessories2",
-        "Accessories3"
-    ]
-
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
@@ -140,9 +121,9 @@ struct HomeView: View {
 
     private var fallbackClosetItems: HomeClosetItems {
         HomeClosetItems(
-            topItems: fallbackTopItems,
-            bottomItems: fallbackBottomItems,
-            otherItems: fallbackOtherItems
+            topItems: [],
+            bottomItems: [],
+            otherItems: []
         )
     }
 
@@ -170,18 +151,6 @@ struct HomeView: View {
     }
 
     private func normalizedClosetItems(_ items: HomeClosetItems) -> HomeClosetItems {
-        HomeClosetItems(
-            topItems: displayItems(items.topItems, fallback: fallbackTopItems),
-            bottomItems: displayItems(items.bottomItems, fallback: fallbackBottomItems),
-            otherItems: displayItems(items.otherItems, fallback: fallbackOtherItems)
-        )
-    }
-
-    private func displayItems(_ items: [String], fallback: [String]) -> [String] {
-        guard items.count >= 3 else {
-            return Array(fallback.prefix(3))
-        }
-
         return items
     }
 
