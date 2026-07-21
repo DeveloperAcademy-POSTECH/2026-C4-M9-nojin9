@@ -73,12 +73,14 @@ struct HomeView: View {
                         .frame(height: toolbarTopInset(for: geometry) + 72, alignment: .bottom)
                         .zIndex(2)
 
-                    Rectangle()
-
                     pageIndicator
                         .frame(height: 24)
                         .padding(.bottom, 10)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                        .frame(
+                            width: geometry.size.width,
+                            height: geometry.size.height,
+                            alignment: .bottom
+                        )
                         .zIndex(2)
                 }
             }
