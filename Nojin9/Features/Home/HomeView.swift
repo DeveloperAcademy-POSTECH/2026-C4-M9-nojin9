@@ -335,8 +335,9 @@ struct HomeView: View {
     private var reviewScrollView: some View {
         GeometryReader { geometry in
             let leadingPadding: CGFloat = 16
+            let trailingPadding: CGFloat = 16
             let trailingFadeWidth: CGFloat = 56
-            let contentWidth = geometry.size.width - leadingPadding - trailingFadeWidth
+            let contentWidth = geometry.size.width - leadingPadding - trailingPadding
             let cardSize = contentWidth / 3
 
             ScrollViewReader { proxy in
@@ -374,7 +375,7 @@ struct HomeView: View {
                     }
                 }
                 .padding(.leading, leadingPadding)
-                .padding(.trailing, trailingFadeWidth)
+                .padding(.trailing, trailingPadding)
                 .frame(height: cardSize)
                 .clipped()
             }
