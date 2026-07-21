@@ -28,7 +28,7 @@ struct HomeView: View {
                     TabView(selection: $selectedClosetPage) {
                         closetPage(
                             mainTitle: "내 옷장",
-                            subTitle: nil,
+                            subTitle: "내가 받은 감사 편지",
                             showsReview: true,
                             showsReturnButton: false,
                             usesSmallClosetStyle: true,
@@ -203,10 +203,14 @@ struct HomeView: View {
         items: HomeClosetItems
     ) -> some View {
         GeometryReader { geometry in
+            let headerHeight = pageHeaderHeight(
+                hasSubTitle: subTitle != nil,
+                showsReturnButton: showsReturnButton
+            )
             let closetHeight = closetHeight(
                 availableHeight: geometry.size.height,
+                headerHeight: headerHeight,
                 showsReview: showsReview,
-                showsReturnButton: showsReturnButton,
                 usesSmallClosetStyle: usesSmallClosetStyle
             )
 
@@ -214,6 +218,7 @@ struct HomeView: View {
                 pageHeader(
                     mainTitle: mainTitle,
                     subTitle: subTitle,
+                    headerHeight: headerHeight,
                     showsReturnButton: showsReturnButton
                 )
 
@@ -238,12 +243,11 @@ struct HomeView: View {
 
     private func closetHeight(
         availableHeight: CGFloat,
+        headerHeight: CGFloat,
         showsReview: Bool,
-        showsReturnButton: Bool,
         usesSmallClosetStyle: Bool
     ) -> CGFloat {
-        let headerHeight: CGFloat = showsReturnButton ? 94 : 46
-        let reviewHeight: CGFloat = showsReview ? 170 : 0
+        let reviewHeight: CGFloat = showsReview ? 154 : 0
         let headerToClosetGap: CGFloat = showsReview ? 0 : 16
         let availableClosetHeight = availableHeight - headerHeight - reviewHeight - headerToClosetGap
         let closetMaxHeight: CGFloat = usesSmallClosetStyle ? 466.67 : 542.14
@@ -252,9 +256,21 @@ struct HomeView: View {
         return min(closetMaxHeight, max(closetMinHeight, availableClosetHeight))
     }
 
+    private func pageHeaderHeight(
+        hasSubTitle: Bool,
+        showsReturnButton: Bool
+    ) -> CGFloat {
+        if showsReturnButton {
+            return 94
+        }
+
+        return hasSubTitle ? 86 : 46
+    }
+
     private func pageHeader(
         mainTitle: String,
         subTitle: String?,
+        headerHeight: CGFloat,
         showsReturnButton: Bool
     ) -> some View {
         HStack(alignment: .bottom, spacing: 16) {
@@ -280,64 +296,68 @@ struct HomeView: View {
         }
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
-        .frame(height: showsReturnButton ? 94 : 46, alignment: .bottom)
+        .frame(height: headerHeight, alignment: .bottom)
     }
 
     // MARK: - Review
 
     private var reviewView: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("내가 받은 감사 편지")
-                .font(.system(size: 24, weight: .regular))
-                .foregroundStyle(Color("gray60"))
-                .padding(.leading, 18)
-
-            reviewScrollView
-                .padding(.top, 10)
-        }
+        reviewScrollView
     }
 
     private var reviewScrollView: some View {
-        ScrollViewReader { proxy in
-            ZStack(alignment: .trailing) {
-                ScrollView(.horizontal) {
-                    LazyHStack(spacing: 8) {
-                        ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
-                            ThankYouLetterPreviewCardView(preview: preview)
+        GeometryReader { geometry in
+            let leadingPadding: CGFloat = 16
+            let trailingFadeWidth: CGFloat = 56
+            let contentWidth = geometry.size.width - leadingPadding - trailingFadeWidth
+            let cardSize = contentWidth / 3
+
+            ScrollViewReader { proxy in
+                ZStack(alignment: .trailing) {
+                    ScrollView(.horizontal) {
+                        LazyHStack(spacing: 0) {
+                            ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
+                                ThankYouLetterPreviewCardView(
+                                    preview: preview,
+                                    cardSize: cardSize
+                                )
                                 .id(index)
+                                .frame(width: cardSize, height: cardSize)
+                            }
+                        }
+                    }
+                    .scrollIndicators(.hidden)
+
+                    ZStack {
+                        LinearGradient(
+                            colors: [
+                                Color.customWhite.opacity(0),
+                                Color.customWhite
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        .frame(width: trailingFadeWidth, height: cardSize)
+
+                        Button {
+                            moveToNextReview(using: proxy)
+                        } label: {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 28, weight: .bold))
+                                .foregroundStyle(Color("customWhite"))
+                                .frame(width: 48, height: 48)
+                                .background(Color("brandPrimary"))
+                                .clipShape(Circle())
                         }
                     }
                 }
-                .scrollIndicators(.hidden)
-
-                ZStack {
-                    LinearGradient(
-                        colors: [
-                            Color.customWhite.opacity(0),
-                            Color.customWhite
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                    .frame(width: 68, height: 120)
-
-                    Button {
-                        moveToNextReview(using: proxy)
-                    } label: {
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundStyle(Color("customWhite"))
-                            .frame(width: 48, height: 48)
-                            .background(Color("brandPrimary"))
-                            .clipShape(Circle())
-                    }
-                }
+                .padding(.leading, leadingPadding)
+                .padding(.trailing, trailingFadeWidth)
+                .frame(height: cardSize)
+                .clipped()
             }
-            .frame(height: 120)
-            .clipped()
         }
-        .padding(.leading, 16)
-        .padding(.trailing, 56)
+        .frame(height: 120)
     }
 
     private func moveToNextReview(
@@ -488,26 +508,27 @@ private struct ReviewAuthorBadgeView: View {
 
     var body: some View {
         Text(authorName)
-            .font(.system(size: 16, weight: .bold))
+            .font(.system(size: 12, weight: .bold))
             .foregroundStyle(Color("customWhite"))
-            .frame(width: 42, height: 42)
+            .frame(width: 32, height: 32)
             .background(Color("gray40"))
             .clipShape(Circle())
             .overlay {
                 Circle()
-                    .stroke(Color("customWhite"), lineWidth: 1.5)
+                    .stroke(Color("customWhite"), lineWidth: 1.2)
             }
     }
 }
 
 private struct ThankYouLetterThumbnailView: View {
     let imageName: String
+    let size: CGFloat
 
     var body: some View {
         Image(imageName)
             .resizable()
             .scaledToFill()
-            .frame(width: 120, height: 120)
+            .frame(width: size, height: size)
             .clipped()
             .clipShape(RoundedRectangle(cornerRadius: 5))
     }
@@ -515,14 +536,19 @@ private struct ThankYouLetterThumbnailView: View {
 
 private struct ThankYouLetterPreviewCardView: View {
     let preview: HomeThankYouLetterPreview
+    let cardSize: CGFloat
 
     var body: some View {
-        ThankYouLetterThumbnailView(imageName: preview.imageName)
+        ThankYouLetterThumbnailView(
+            imageName: preview.imageName,
+            size: max(cardSize - 8, CGFloat.zero)
+        )
             .overlay(alignment: .topLeading) {
                 ReviewAuthorBadgeView(authorName: preview.authorName)
-                    .padding(.top, 6)
-                    .padding(.leading, 6)
+                    .padding(.top, 4)
+                    .padding(.leading, 4)
             }
+            .frame(width: cardSize, height: cardSize, alignment: .leading)
     }
 }
 
