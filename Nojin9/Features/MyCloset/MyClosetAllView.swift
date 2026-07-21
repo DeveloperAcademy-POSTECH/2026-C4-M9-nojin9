@@ -48,6 +48,47 @@ struct MyClosetAllView: View {
     }
 
     // MARK: - Data
+    
+    private func activeRental(
+        for item: ClothItem
+    ) -> Rental? {
+        let rentals = store.rentals(for: item.id)
+
+        return rentals.first { rental in
+            rental.status == RentalStatus.borrowed
+        }
+    }
+    
+    private func borrowedRentalByCurrentUser(
+        for item: ClothItem
+    ) -> Rental? {
+        guard let currentUserId = store.currentUser?.id else {
+            return nil
+        }
+
+        let rentals: [Rental] = store.rentals(for: item.id)
+
+        return rentals.first { rental -> Bool in
+            let isBorrowed = rental.status == RentalStatus.borrowed
+            let isCurrentUser = rental.borrowerId == currentUserId
+
+            return isBorrowed && isCurrentUser
+        }
+    }
+    
+    private func dueDateText(
+        for rental: Rental
+    ) -> String {
+        guard let dueAt = rental.dueAt else {
+            return ""
+        }
+
+        return dueAt.formatted(
+            .dateTime
+                .month(.defaultDigits)
+                .day(.defaultDigits)
+        )
+    }
 
     private var myItems: [ClothItem] {
         let topItems = store.clothItems(
@@ -237,15 +278,24 @@ struct MyClosetAllView: View {
     private func clothItemButton(
         _ item: ClothItem
     ) -> some View {
-        Button {
-            print(
-                "선택한 옷: \(item.imageName ?? String(describing: item.id))"
-            )
+        let rental = borrowedRentalByCurrentUser(for: item)
+
+        return Button {
+            print("선택한 옷: \(item.name)")
         } label: {
-            clothImage(item)
-                .frame(maxWidth: .infinity)
-                .frame(height: 120)
-                .padding(.horizontal, 4)
+            ZStack {
+                clothImage(item)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 120)
+                    .padding(.horizontal, 4)
+
+                if let rental {
+                    borrowedSticker(rental: rental)
+                        .offset(x: -5, y: 18)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 125)
         }
         .buttonStyle(.plain)
     }
@@ -270,24 +320,32 @@ struct MyClosetAllView: View {
 
     // MARK: - Sticker
 
-    private var rentalSticker: some View {
-        Text("대여중")
-            .font(.system(size: 12, weight: .bold))
-            .foregroundStyle(Color("customWhite"))
-            .padding(.horizontal, 10)
-            .frame(height: 32)
-            .background(Color("brandPrimary"))
-            .clipShape(
-                RoundedRectangle(cornerRadius: 3)
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: 3)
-                    .stroke(
-                        Color("customWhite"),
-                        lineWidth: 2
-                    )
-            }
-            .rotationEffect(.degrees(-8))
+    private func borrowedSticker(
+        rental: Rental
+    ) -> some View {
+        let dateText = dueDateText(for: rental)
+
+        return Text(
+            dateText.isEmpty
+            ? "빌린 옷"
+            : "빌린 옷~\(dateText)"
+        )
+        .font(.system(size: 12, weight: .bold))
+        .foregroundStyle(Color("customWhite"))
+        .padding(.horizontal, 9)
+        .frame(height: 34)
+        .background(Color("brandPrimary"))
+        .clipShape(
+            RoundedRectangle(cornerRadius: 3)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 3)
+                .stroke(
+                    Color("customWhite"),
+                    lineWidth: 2
+                )
+        }
+        .rotationEffect(.degrees(-7))
     }
 }
 
