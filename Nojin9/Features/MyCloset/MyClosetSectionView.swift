@@ -77,19 +77,10 @@ struct MyClosetSectionView: View {
             .padding(.leading, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            ZStack {
-                LinearGradient(
-                    colors: [Color.customWhite.opacity(0), Color.customWhite],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .frame(width: 60)
-
-                PrimaryIconButton(
-                    icon: Image(systemName: "chevron.right")
-                ) {
-                    action()
-                }
+            PrimaryIconButton(
+                icon: Image(systemName: "chevron.right")
+            ) {
+                action()
             }
         }
         .clipped()
