@@ -74,7 +74,16 @@ enum MockData {
         makeClothItem("14141414-1414-1414-1414-141414141414", ownerId: user2Id, name: "가죽 숄더백", category: .accessory, imageName: "Accessories3", pointCost: 5000, description: "특별한 날 포인트로 쓰기 좋은 액세서리예요."),
         makeClothItem("27222222-2222-2222-2222-222222222224", ownerId: user2Id, name: "실버 목걸이", category: .accessory, imageName: "Accessories4", pointCost: 1200, description: "룩을 정리해주는 기타 아이템이에요."),
         makeClothItem("27222222-2222-2222-2222-222222222225", ownerId: user2Id, name: "미니 숄더백", category: .accessory, imageName: "Accessories5", pointCost: 2600, description: "외출할 때 들기 좋은 기타 아이템이에요."),
-        makeClothItem("27222222-2222-2222-2222-222222222226", ownerId: user2Id, name: "체크 머플러", category: .accessory, imageName: "Accessories6", pointCost: 1500, description: "쌀쌀한 날 더하기 좋은 기타 아이템이에요.")
+        makeClothItem("27222222-2222-2222-2222-222222222226", ownerId: user2Id, name: "체크 머플러", category: .accessory, imageName: "Accessories6", pointCost: 1500, description: "쌀쌀한 날 더하기 좋은 기타 아이템이에요."),
+        makeClothItem("33333333-3333-3333-3333-333333333331", ownerId: user3Id, name: "", category: .top, imageName: "2ndSisTop1", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333332", ownerId: user3Id, name: "", category: .top, imageName: "2ndSisTop2", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333333", ownerId: user3Id, name: "", category: .top, imageName: "2ndSisTop3", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333334", ownerId: user3Id, name: "", category: .bottom, imageName: "2ndSisBottom1", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333335", ownerId: user3Id, name: "", category: .bottom, imageName: "2ndSisBottom2", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333336", ownerId: user3Id, name: "", category: .bottom, imageName: "2ndSisBottom3", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333337", ownerId: user3Id, name: "", category: .accessory, imageName: "2ndSisAccessories1", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333338", ownerId: user3Id, name: "", category: .accessory, imageName: "2ndSisAccessories2", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333339", ownerId: user3Id, name: "", category: .accessory, imageName: "2ndSisAccessories3", pointCost: 0, description: "")
     ]
 
     static let clothItemRequests: [ClothItemRequest] = []
