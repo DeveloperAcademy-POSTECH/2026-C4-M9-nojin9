@@ -31,15 +31,8 @@ enum MockData {
 
     static let currentUserId = user1Id
 
-    static let secondTopOneId = UUID(uuidString: "44444444-4444-4444-4444-444444444444")!
-    static let secondTopTwoId = UUID(uuidString: "55555555-5555-5555-5555-555555555555")!
-    static let secondBottomId = UUID(uuidString: "66666666-6666-6666-6666-666666666666")!
-    static let secondAccessoryId = UUID(uuidString: "77777777-7777-7777-7777-777777777777")!
-    static let youngestTopId = UUID(uuidString: "88888888-8888-8888-8888-888888888888")!
-    static let youngestBottomOneId = UUID(uuidString: "99999999-9999-9999-9999-999999999999")!
-    static let youngestBottomTwoId = UUID(uuidString: "12121212-1212-1212-1212-121212121212")!
-    static let youngestAccessoryOneId = UUID(uuidString: "13131313-1313-1313-1313-131313131313")!
-    static let youngestAccessoryTwoId = UUID(uuidString: "14141414-1414-1414-1414-141414141414")!
+    static let returnedRentalClothItemId = UUID(uuidString: "55555555-5555-5555-5555-555555555555")!
+    static let borrowedRentalClothItemId = UUID(uuidString: "88888888-8888-8888-8888-888888888888")!
 
     static let returnedRentalId = UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")!
     static let borrowedRentalId = UUID(uuidString: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")!
@@ -55,15 +48,42 @@ enum MockData {
     static let userSession = UserSession(currentUserId: currentUserId)
 
     static let clothItems: [ClothItem] = [
-        ClothItem(id: secondTopOneId, ownerId: user2Id, name: "연회색 가디건", category: .top, imageName: "Top1", cutoutImageName: nil, pointCost: 2500, description: "가볍게 걸치기 좋은 상의예요.", condition: .good, isBorrowed: false, visibilityStatus: .listed),
-        ClothItem(id: secondTopTwoId, ownerId: user2Id, name: "오프숄더 니트", category: .top, imageName: "Top2", cutoutImageName: nil, pointCost: 2500, description: "약속 있는 날 입기 좋은 깔끔한 상의예요.", condition: .good, isBorrowed: false, visibilityStatus: .listed),
-        ClothItem(id: secondBottomId, ownerId: user2Id, name: "버뮤다 팬츠", category: .bottom, imageName: "Bottom1", cutoutImageName: nil, pointCost: 1500, description: "어디에나 맞춰 입기 쉬운 하의예요.", condition: .normal, isBorrowed: false, visibilityStatus: .listed),
-        ClothItem(id: secondAccessoryId, ownerId: user2Id, name: "리본 단화", category: .accessory, imageName: "Accessories1", cutoutImageName: nil, pointCost: 1000, description: "룩에 포인트를 주기 좋은 액세서리예요.", condition: .good, isBorrowed: false, visibilityStatus: .listed),
-        ClothItem(id: youngestTopId, ownerId: user3Id, name: "하이넥 숏코트", category: .top, imageName: "Top3", cutoutImageName: nil, pointCost: 3000, description: "편하게 입기 좋은 데일리 상의예요.", condition: .good, isBorrowed: true, visibilityStatus: .listed),
-        ClothItem(id: youngestBottomOneId, ownerId: user3Id, name: "트레이닝 팬츠", category: .bottom, imageName: "Bottom2", cutoutImageName: nil, pointCost: 1000, description: "활동하기 편한 하의예요.", condition: .good, isBorrowed: false, visibilityStatus: .listed),
-        ClothItem(id: youngestBottomTwoId, ownerId: user3Id, name: "와이드 팬츠", category: .bottom, imageName: "Bottom3", cutoutImageName: nil, pointCost: 2500, description: "차분한 분위기로 입기 좋은 하의예요.", condition: .normal, isBorrowed: false, visibilityStatus: .listed),
-        ClothItem(id: youngestAccessoryOneId, ownerId: user3Id, name: "에어팟 맥스", category: .accessory, imageName: "Accessories2", cutoutImageName: nil, pointCost: 4000, description: "외출 전에 더하기 좋은 액세서리예요.", condition: .good, isBorrowed: false, visibilityStatus: .listed),
-        ClothItem(id: youngestAccessoryTwoId, ownerId: user3Id, name: "가죽 숄더백", category: .accessory, imageName: "Accessories3", cutoutImageName: nil, pointCost: 5000, description: "특별한 날 포인트로 쓰기 좋은 액세서리예요.", condition: .good, isBorrowed: false, visibilityStatus: .listed)
+        makeClothItem("15111111-1111-1111-1111-111111111111", ownerId: user1Id, name: "빈티지 그래픽 티셔츠", category: .top, imageName: "MyTop1", pointCost: 0, description: "내 옷장에 등록된 상의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111112", ownerId: user1Id, name: "아이보리 셔링 블라우스", category: .top, imageName: "MyTop2", pointCost: 0, description: "내 옷장에 등록된 상의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111113", ownerId: user1Id, name: "스카이블루 니트", category: .top, imageName: "MyTop3", pointCost: 0, description: "내 옷장에 등록된 상의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111114", ownerId: user1Id, name: "데님 미니스커트", category: .bottom, imageName: "MyBottom1", pointCost: 0, description: "내 옷장에 등록된 하의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111115", ownerId: user1Id, name: "크림 와이드 팬츠", category: .bottom, imageName: "MyBottom2", pointCost: 0, description: "내 옷장에 등록된 하의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111116", ownerId: user1Id, name: "리조트 밴딩 팬츠", category: .bottom, imageName: "MyBottom3", pointCost: 0, description: "내 옷장에 등록된 하의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111117", ownerId: user1Id, name: "블랙 숄더백", category: .accessory, imageName: "MyAccessories1", pointCost: 0, description: "내 옷장에 등록된 기타 아이템이에요."),
+        makeClothItem("15111111-1111-1111-1111-111111111118", ownerId: user1Id, name: "니트 비니", category: .accessory, imageName: "MyAccessories2", pointCost: 0, description: "내 옷장에 등록된 기타 아이템이에요."),
+        makeClothItem("15111111-1111-1111-1111-111111111119", ownerId: user1Id, name: "캠프 볼캡", category: .accessory, imageName: "MyAccessories3", pointCost: 0, description: "내 옷장에 등록된 기타 아이템이에요."),
+        makeClothItem("44444444-4444-4444-4444-444444444444", ownerId: user2Id, name: "연회색 가디건", category: .top, imageName: "Top1", pointCost: 2500, description: "가볍게 걸치기 좋은 상의예요."),
+        makeClothItem(returnedRentalClothItemId, ownerId: user2Id, name: "오프숄더 니트", category: .top, imageName: "Top2", pointCost: 2500, description: "약속 있는 날 입기 좋은 깔끔한 상의예요."),
+        makeClothItem(borrowedRentalClothItemId, ownerId: user2Id, name: "하이넥 숏코트", category: .top, imageName: "Top3", pointCost: 3000, description: "편하게 입기 좋은 데일리 상의예요.", isBorrowed: true),
+        makeClothItem("24222222-2222-2222-2222-222222222224", ownerId: user2Id, name: "포인트 셔츠", category: .top, imageName: "Top4", pointCost: 2200, description: "가볍게 빌려 입기 좋은 상의예요."),
+        makeClothItem("24222222-2222-2222-2222-222222222225", ownerId: user2Id, name: "러플 슬리브 탑", category: .top, imageName: "Top5", pointCost: 2300, description: "특별한 날 입기 좋은 상의예요."),
+        makeClothItem("66666666-6666-6666-6666-666666666666", ownerId: user2Id, name: "버뮤다 팬츠", category: .bottom, imageName: "Bottom1", pointCost: 1500, description: "어디에나 맞춰 입기 쉬운 하의예요.", condition: .normal),
+        makeClothItem("99999999-9999-9999-9999-999999999999", ownerId: user2Id, name: "트레이닝 팬츠", category: .bottom, imageName: "Bottom2", pointCost: 1000, description: "활동하기 편한 하의예요."),
+        makeClothItem("12121212-1212-1212-1212-121212121212", ownerId: user2Id, name: "와이드 팬츠", category: .bottom, imageName: "Bottom3", pointCost: 2500, description: "차분한 분위기로 입기 좋은 하의예요.", condition: .normal),
+        makeClothItem("26222222-2222-2222-2222-222222222224", ownerId: user2Id, name: "워싱 데님 팬츠", category: .bottom, imageName: "Bottom4", pointCost: 1800, description: "데일리로 빌려 입기 좋은 하의예요."),
+        makeClothItem("26222222-2222-2222-2222-222222222225", ownerId: user2Id, name: "플리츠 스커트", category: .bottom, imageName: "Bottom5", pointCost: 1700, description: "가볍게 포인트 주기 좋은 하의예요."),
+        makeClothItem("26222222-2222-2222-2222-222222222226", ownerId: user2Id, name: "카고 팬츠", category: .bottom, imageName: "Bottom6", pointCost: 1900, description: "활동적인 날 빌려 입기 좋은 하의예요."),
+        makeClothItem("26222222-2222-2222-2222-222222222227", ownerId: user2Id, name: "롱 데님 스커트", category: .bottom, imageName: "Bottom7", pointCost: 2000, description: "깔끔한 무드로 입기 좋은 하의예요."),
+        makeClothItem("77777777-7777-7777-7777-777777777777", ownerId: user2Id, name: "리본 단화", category: .accessory, imageName: "Accessories1", pointCost: 1000, description: "룩에 포인트를 주기 좋은 액세서리예요."),
+        makeClothItem("13131313-1313-1313-1313-131313131313", ownerId: user2Id, name: "에어팟 맥스", category: .accessory, imageName: "Accessories2", pointCost: 4000, description: "외출 전에 더하기 좋은 액세서리예요."),
+        makeClothItem("14141414-1414-1414-1414-141414141414", ownerId: user2Id, name: "가죽 숄더백", category: .accessory, imageName: "Accessories3", pointCost: 5000, description: "특별한 날 포인트로 쓰기 좋은 액세서리예요."),
+        makeClothItem("27222222-2222-2222-2222-222222222224", ownerId: user2Id, name: "실버 목걸이", category: .accessory, imageName: "Accessories4", pointCost: 1200, description: "룩을 정리해주는 기타 아이템이에요."),
+        makeClothItem("27222222-2222-2222-2222-222222222225", ownerId: user2Id, name: "미니 숄더백", category: .accessory, imageName: "Accessories5", pointCost: 2600, description: "외출할 때 들기 좋은 기타 아이템이에요."),
+        makeClothItem("27222222-2222-2222-2222-222222222226", ownerId: user2Id, name: "체크 머플러", category: .accessory, imageName: "Accessories6", pointCost: 1500, description: "쌀쌀한 날 더하기 좋은 기타 아이템이에요."),
+        makeClothItem("33333333-3333-3333-3333-333333333331", ownerId: user3Id, name: "", category: .top, imageName: "2ndSisTop1", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333332", ownerId: user3Id, name: "", category: .top, imageName: "2ndSisTop2", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333333", ownerId: user3Id, name: "", category: .top, imageName: "2ndSisTop3", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333334", ownerId: user3Id, name: "", category: .bottom, imageName: "2ndSisBottom1", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333335", ownerId: user3Id, name: "", category: .bottom, imageName: "2ndSisBottom2", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333336", ownerId: user3Id, name: "", category: .bottom, imageName: "2ndSisBottom3", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333337", ownerId: user3Id, name: "", category: .accessory, imageName: "2ndSisAccessories1", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333338", ownerId: user3Id, name: "", category: .accessory, imageName: "2ndSisAccessories2", pointCost: 0, description: ""),
+        makeClothItem("33333333-3333-3333-3333-333333333339", ownerId: user3Id, name: "", category: .accessory, imageName: "2ndSisAccessories3", pointCost: 0, description: "")
     ]
 
     static let clothItemRequests: [ClothItemRequest] = []
@@ -72,8 +92,8 @@ enum MockData {
         makeAcceptedFriendship(id: UUID(uuidString: "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee")!, firstUserId: currentUserId, secondUserId: user3Id, requestedByUserId: user3Id)
     ]
     static let rentals: [Rental] = [
-        Rental(id: returnedRentalId, clothItemId: secondTopTwoId, ownerId: user2Id, borrowerId: currentUserId, status: .returned, borrowedAt: baseDate, dueAt: nil, returnedAt: baseDate.addingTimeInterval(86_400), createdAt: baseDate),
-        Rental(id: borrowedRentalId, clothItemId: youngestTopId, ownerId: user3Id, borrowerId: currentUserId, status: .borrowed, borrowedAt: baseDate.addingTimeInterval(172_800), dueAt: baseDate.addingTimeInterval(432_000), returnedAt: nil, createdAt: baseDate.addingTimeInterval(172_800))
+        Rental(id: returnedRentalId, clothItemId: returnedRentalClothItemId, ownerId: user2Id, borrowerId: currentUserId, status: .returned, borrowedAt: baseDate, dueAt: nil, returnedAt: baseDate.addingTimeInterval(86_400), createdAt: baseDate),
+        Rental(id: borrowedRentalId, clothItemId: borrowedRentalClothItemId, ownerId: user2Id, borrowerId: currentUserId, status: .borrowed, borrowedAt: baseDate.addingTimeInterval(172_800), dueAt: baseDate.addingTimeInterval(432_000), returnedAt: nil, createdAt: baseDate.addingTimeInterval(172_800))
     ]
 
     static let reviewSamples: [ReviewSample] = []
@@ -83,6 +103,56 @@ enum MockData {
         users: users, userSession: userSession, clothItems: clothItems, clothItemRequests: clothItemRequests,
         friendships: friendships, rentals: rentals, reviewSamples: reviewSamples, thankYouLetters: thankYouLetters, savedAt: baseDate
     )
+
+    private static func makeClothItem(
+        _ uuidString: String,
+        ownerId: UUID,
+        name: String,
+        category: ClothCategory,
+        imageName: String,
+        pointCost: Int,
+        description: String,
+        condition: ClothCondition = .good,
+        isBorrowed: Bool = false
+    ) -> ClothItem {
+        makeClothItem(
+            UUID(uuidString: uuidString)!,
+            ownerId: ownerId,
+            name: name,
+            category: category,
+            imageName: imageName,
+            pointCost: pointCost,
+            description: description,
+            condition: condition,
+            isBorrowed: isBorrowed
+        )
+    }
+
+    private static func makeClothItem(
+        _ id: UUID,
+        ownerId: UUID,
+        name: String,
+        category: ClothCategory,
+        imageName: String,
+        pointCost: Int,
+        description: String,
+        condition: ClothCondition = .good,
+        isBorrowed: Bool = false
+    ) -> ClothItem {
+        ClothItem(
+            id: id,
+            ownerId: ownerId,
+            name: name,
+            category: category,
+            imageName: imageName,
+            cutoutImageName: nil,
+            pointCost: pointCost,
+            description: description,
+            condition: condition,
+            isBorrowed: isBorrowed,
+            visibilityStatus: .listed
+        )
+    }
 
     private static func makeAcceptedFriendship(id: UUID, firstUserId: UUID, secondUserId: UUID, requestedByUserId: UUID) -> Friendship {
         let pair = Friendship.normalizedPair(firstUserId, secondUserId)
@@ -187,6 +257,42 @@ struct RentalMockData {
         "Accessories3": (
             notices: ["가방 안에 음식, 음료 넣기 절대 금지.", "스크레치 신경 안 써도 됨."],
             letters: []
+        ),
+        "MyTop1": (
+            notices: [],
+            letters: [
+                ClosetThankYouLetter(author: "첫째 언니", date: "2026년 7월 21일", content: "상하이 여행 갔을 때 입었는데 애들이 다 정보 물어봄~ 근데 이거 브랜드맬빌꺼냐? 좀 끼네;;", images: ["ThanksReview_2_1", "ThanksReview_2_2", "ThanksReview_2_3"])
+            ]
+        ),
+        "MyTop2": (
+            notices: [],
+            letters: [
+                ClosetThankYouLetter(author: "첫째 언니", date: "2026년 7월 21일", content: "스카 왔다가 리뷰 쓰려고 이러고 있다;; 찍다가 소리 나서 사람들이 다 쳐다봄 ㅠㅠ 개쪽팔려", images: ["ThanksReview_4_1", "ThanksReview_4_2", "ThanksReview_4_3"])
+            ]
+        ),
+        "MyAccessories1": (
+            notices: [],
+            letters: [
+                ClosetThankYouLetter(author: "첫째 언니", date: "2026년 7월 21일", content: "이거 아이패드 들어가니?? 들어가면 학교 갈 때도 종종 빌려야겟슨", images: ["ThanksReview_6_1"])
+            ]
+        ),
+        "MyAccessories2": (
+            notices: [],
+            letters: [
+                ClosetThankYouLetter(author: "첫째 언니", date: "2026년 7월 21일", content: "언니 머리 안 감고 쓴거 아니다;; 머리 붕 떠서 쓴거임", images: ["ThanksReview_1_1"])
+            ]
+        ),
+        "MyAccessories3": (
+            notices: [],
+            letters: [
+                ClosetThankYouLetter(author: "첫째 언니", date: "2026년 7월 21일", content: "낼 해방촌 갈 때 써야징~ 어때? 너보다 내가 더 잘 어울리지 않냐?", images: ["ThanksReview_3_1", "ThanksReview_3_2"])
+            ]
+        ),
+        "MyBottom3": (
+            notices: [],
+            letters: [
+                ClosetThankYouLetter(author: "첫째 언니", date: "2026년 7월 21일", content: "남친이랑 바다 갔을 때 입음 ㅎㅎ 준서 오빠가 핏 이쁘다고 리뷰 사진 같이 찍어줌", images: ["ThanksReview_5_1", "ThanksReview_5_2"])
+            ]
         )
     ]
 }

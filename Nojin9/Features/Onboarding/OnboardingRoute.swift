@@ -17,5 +17,4 @@ enum OnboardingRoute: Hashable {
     case invite03
     case invite04
     case invite05
-    case ClosetView // ✅ 여기 추가!
 }

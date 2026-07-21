@@ -5,32 +5,13 @@ struct HomeView: View {
     @EnvironmentObject private var store: AppDataStore
 
     @State private var isUploadViewPresented = false
-    @State private var isClosetViewPresented = false
+    @State private var isUnavailableClosetAlertPresented = false
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
     @State private var selectedClosetPage = 1
     @State private var currentReviewIndex = 0
 
-    private let reviewCount = 5
-
-    private let fallbackTopItems = [
-        "Top1",
-        "Top2",
-        "Top3",
-        "Top1", "Top1", "Top1", "Top1", "Top1"
-    ]
-
-    private let fallbackBottomItems = [
-        "Bottom1",
-        "Bottom2",
-        "Bottom3"
-    ]
-
-    private let fallbackOtherItems = [
-        "Accessories1",
-        "Accessories2",
-        "Accessories3"
-    ]
+    private let reviewCount = 6
 
     var body: some View {
         NavigationStack {
@@ -94,11 +75,6 @@ struct HomeView: View {
                 UploadView()
             }
             .navigationDestination(
-                isPresented: $isClosetViewPresented
-            ) {
-                ClosetView()
-            }
-            .navigationDestination(
                 isPresented: $isMyPageViewPresented
             ) {
                 MyPageView()
@@ -108,6 +84,13 @@ struct HomeView: View {
             ) {
                 ReturnView {
                     isReturnViewPresented = false
+                }
+            }
+            .alert(
+                "현재 없는 뷰지롱 메롱",
+                isPresented: $isUnavailableClosetAlertPresented
+            ) {
+                Button("확인", role: .cancel) {
                 }
             }
         }
@@ -138,9 +121,9 @@ struct HomeView: View {
 
     private var fallbackClosetItems: HomeClosetItems {
         HomeClosetItems(
-            topItems: fallbackTopItems,
-            bottomItems: fallbackBottomItems,
-            otherItems: fallbackOtherItems
+            topItems: [],
+            bottomItems: [],
+            otherItems: []
         )
     }
 
@@ -168,18 +151,6 @@ struct HomeView: View {
     }
 
     private func normalizedClosetItems(_ items: HomeClosetItems) -> HomeClosetItems {
-        HomeClosetItems(
-            topItems: displayItems(items.topItems, fallback: fallbackTopItems),
-            bottomItems: displayItems(items.bottomItems, fallback: fallbackBottomItems),
-            otherItems: displayItems(items.otherItems, fallback: fallbackOtherItems)
-        )
-    }
-
-    private func displayItems(_ items: [String], fallback: [String]) -> [String] {
-        guard items.count >= 3 else {
-            return Array(fallback.prefix(3))
-        }
-
         return items
     }
 
@@ -429,7 +400,7 @@ struct HomeView: View {
                 .frame(width: 307, height: 124)
 
                 MyClosetButton(title: "옷장 전체 보기") {
-                    isClosetViewPresented = true
+                    isUnavailableClosetAlertPresented = true
                 }
                 .padding(.top, 8.87)
             }
