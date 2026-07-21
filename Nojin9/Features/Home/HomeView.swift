@@ -72,11 +72,11 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: toolbarTopInset(for: geometry) + 72, alignment: .bottom)
                         .zIndex(2)
-
+                }
+                .overlay(alignment: .bottom) {
                     pageIndicator
                         .frame(height: 24)
                         .padding(.bottom, 10)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                         .zIndex(2)
                 }
             }
