@@ -33,6 +33,30 @@ struct RentalFormView: View {
         currentItem.pointCost * rentalDays
     }
 
+    private var currentUserPoint: Int {
+        store.currentUser?.point ?? 0
+    }
+
+    private var isPointInsufficient: Bool {
+        !isDateInvalid && totalHeartPrice > currentUserPoint
+    }
+
+    private var canSubmitRental: Bool {
+        isAgreed && !isDateInvalid && !isPointInsufficient
+    }
+
+    private var ctaTitle: String {
+        if isDateInvalid {
+            return "기간을 다시 설정해주세요"
+        }
+
+        if isPointInsufficient {
+            return "포인트가 부족합니다"
+        }
+
+        return "\(formatNumber(totalHeartPrice))하트로 빌려오기"
+    }
+
     private func formatDateToString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy년 M월 d일"
@@ -244,6 +268,8 @@ struct RentalFormView: View {
                         .background(Color("gray10"))
 
                     Button(action: {
+                        guard canSubmitRental else { return }
+
                         guard store.borrow(
                             clothItemId: currentItem.id,
                             borrowedAt: startDate,
@@ -254,15 +280,15 @@ struct RentalFormView: View {
 
                         isShowingReceipt = true
                     }) {
-                        Text(isDateInvalid ? "기간을 다시 설정해주세요" : "\(formatNumber(totalHeartPrice))하트로 빌려오기")
+                        Text(ctaTitle)
                             .font(.appButton)
                             .foregroundStyle(Color("customWhite"))
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(isAgreed && !isDateInvalid ? Color("brandPrimary") : Color("gray20"))
+                            .background(canSubmitRental ? Color("brandPrimary") : Color("gray20"))
                             .clipShape(RoundedRectangle(cornerRadius: 5))
                     }
-                    .disabled(!isAgreed || isDateInvalid)
+                    .disabled(!canSubmitRental)
                     .padding(.horizontal, 20)
                     .padding(.top, 12)
                     .padding(.bottom, 24)

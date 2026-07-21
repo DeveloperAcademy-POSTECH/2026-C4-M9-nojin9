@@ -8,6 +8,10 @@ struct HomeView: View {
     @State private var isUnavailableClosetAlertPresented = false
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
+    @State private var isClosetAllViewPresented = false
+    @State private var selectedClosetOwnerId: UUID?
+    @State private var selectedClosetOwnerName = ""
+
     @State private var isRentalViewPresented = false
     @State private var selectedRentalItem: ClothItem?
     @State private var selectedClosetPage = 1
@@ -36,6 +40,8 @@ struct HomeView: View {
                             showsReturnButton: false,
                             showsPointStatus: true,
                             usesSmallClosetStyle: true,
+                            ownerId: store.currentUser?.id,
+                            ownerName: "내 옷장",
                             items: myClosetItems
                         )
                         .tag(0)
@@ -47,6 +53,10 @@ struct HomeView: View {
                             showsReturnButton: true,
                             showsPointStatus: false,
                             usesSmallClosetStyle: false,
+                            ownerId: store.sisters.indices.contains(0)
+                                ? store.sisters[0].id
+                                : nil,
+                            ownerName: "첫째 언니의 옷장",
                             items: sisterClosetItems(index: 0)
                         )
                         .tag(1)
@@ -58,6 +68,10 @@ struct HomeView: View {
                             showsReturnButton: true,
                             showsPointStatus: false,
                             usesSmallClosetStyle: false,
+                            ownerId: store.sisters.indices.contains(1)
+                                ? store.sisters[1].id
+                                : nil,
+                            ownerName: "둘째 언니의 옷장",
                             items: sisterClosetItems(index: 1)
                         )
                         .tag(2)
@@ -105,14 +119,19 @@ struct HomeView: View {
                 isPresented: $isRentalViewPresented
             ) {
                 if let selectedRentalItem {
-                    RentalView(clothItemId: selectedRentalItem.id)
+                    RentalView(
+                        clothItemId: selectedRentalItem.id
+                    )
                 }
             }
-            .alert(
-                "현재 없는 뷰지롱 메롱",
-                isPresented: $isUnavailableClosetAlertPresented
+            .navigationDestination(
+                isPresented: $isClosetAllViewPresented
             ) {
-                Button("확인", role: .cancel) {
+                if let selectedClosetOwnerId {
+                    MyClosetAllView(
+                        ownerId: selectedClosetOwnerId,
+                        ownerName: selectedClosetOwnerName
+                    )
                 }
             }
         }
@@ -207,6 +226,8 @@ struct HomeView: View {
         showsReturnButton: Bool,
         showsPointStatus: Bool,
         usesSmallClosetStyle: Bool,
+        ownerId: UUID?,
+        ownerName: String,
         items: HomeClosetItems
     ) -> some View {
         GeometryReader { geometry in
@@ -242,10 +263,16 @@ struct HomeView: View {
                 centeredClosetView(
                     items: items,
                     targetHeight: closetHeight,
+                    ownerId: ownerId,
+                    ownerName: ownerName,
                     usesSmallClosetStyle: usesSmallClosetStyle
                 )
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+                alignment: .top
+            )
         }
     }
 
@@ -409,6 +436,8 @@ struct HomeView: View {
     private func centeredClosetView(
         items: HomeClosetItems,
         targetHeight: CGFloat,
+        ownerId: UUID?,
+        ownerName: String,
         usesSmallClosetStyle: Bool
     ) -> some View {
         let closetBaseWidth: CGFloat = 356.4
@@ -421,10 +450,16 @@ struct HomeView: View {
 
             closetView(
                 items: items,
+                ownerId: ownerId,
+                ownerName: ownerName,
                 usesSmallClosetStyle: usesSmallClosetStyle
             )
-                .scaleEffect(scale, anchor: .top)
-                .frame(width: targetWidth, height: targetHeight, alignment: .top)
+            .scaleEffect(scale, anchor: .top)
+            .frame(
+                width: targetWidth,
+                height: targetHeight,
+                alignment: .top
+            )
 
             Spacer(minLength: 0)
         }
@@ -435,6 +470,8 @@ struct HomeView: View {
 
     private func closetView(
         items: HomeClosetItems,
+        ownerId: UUID?,
+        ownerName: String,
         usesSmallClosetStyle: Bool
     ) -> some View {
         let closetBaseWidth: CGFloat = 356.4
@@ -486,7 +523,13 @@ struct HomeView: View {
                 }
 
                 MyClosetButton(title: "옷장 전체 보기") {
-                    isUnavailableClosetAlertPresented = true
+                    guard let ownerId else {
+                        return
+                    }
+
+                    selectedClosetOwnerId = ownerId
+                    selectedClosetOwnerName = ownerName
+                    isClosetAllViewPresented = true
                 }
                 .padding(.top, usesSmallClosetStyle ? 2 : 8.87)
             }
