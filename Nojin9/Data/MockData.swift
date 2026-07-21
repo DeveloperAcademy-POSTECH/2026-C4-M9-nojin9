@@ -40,9 +40,9 @@ enum MockData {
     static let baseDate = Date(timeIntervalSince1970: 1_784_217_600)
 
     static let users: [User] = [
-        User(id: user1Id, name: "김서연", profileImageName: "MyProfile", relationshipLabel: "첫째", point: 20000, status: .active, createdAt: baseDate, withdrawnAt: nil),
-        User(id: user2Id, name: "김현서", profileImageName: "2ndSisProfile", relationshipLabel: "둘째", point: 80, status: .active, createdAt: baseDate, withdrawnAt: nil),
-        User(id: user3Id, name: "김서은", profileImageName: nil, relationshipLabel: "막내", point: 95, status: .active, createdAt: baseDate, withdrawnAt: nil)
+        User(id: user1Id, name: "김서연", profileImageName: "MyProfile", relationshipLabel: "막내", point: 20000, status: .active, createdAt: baseDate, withdrawnAt: nil),
+        User(id: user2Id, name: "김서은", profileImageName: nil, relationshipLabel: "첫째", point: 80, status: .active, createdAt: baseDate, withdrawnAt: nil),
+        User(id: user3Id, name: "김현서", profileImageName: "2ndSisProfile", relationshipLabel: "둘째", point: 95, status: .active, createdAt: baseDate, withdrawnAt: nil)
     ]
 
     static let userSession = UserSession(currentUserId: currentUserId)
