@@ -34,6 +34,7 @@ struct HomeView: View {
                             subTitle: "내가 받은 감사 편지",
                             showsReview: true,
                             showsReturnButton: false,
+                            showsPointStatus: true,
                             usesSmallClosetStyle: true,
                             items: myClosetItems
                         )
@@ -44,6 +45,7 @@ struct HomeView: View {
                             subTitle: "첫째 언니",
                             showsReview: false,
                             showsReturnButton: true,
+                            showsPointStatus: false,
                             usesSmallClosetStyle: false,
                             items: sisterClosetItems(index: 0)
                         )
@@ -54,6 +56,7 @@ struct HomeView: View {
                             subTitle: "둘째 언니",
                             showsReview: false,
                             showsReturnButton: true,
+                            showsPointStatus: false,
                             usesSmallClosetStyle: false,
                             items: sisterClosetItems(index: 1)
                         )
@@ -202,6 +205,7 @@ struct HomeView: View {
         subTitle: String?,
         showsReview: Bool,
         showsReturnButton: Bool,
+        showsPointStatus: Bool,
         usesSmallClosetStyle: Bool,
         items: HomeClosetItems
     ) -> some View {
@@ -222,7 +226,8 @@ struct HomeView: View {
                     mainTitle: mainTitle,
                     subTitle: subTitle,
                     headerHeight: headerHeight,
-                    showsReturnButton: showsReturnButton
+                    showsReturnButton: showsReturnButton,
+                    showsPointStatus: showsPointStatus
                 )
 
                 if showsReview {
@@ -274,7 +279,8 @@ struct HomeView: View {
         mainTitle: String,
         subTitle: String?,
         headerHeight: CGFloat,
-        showsReturnButton: Bool
+        showsReturnButton: Bool,
+        showsPointStatus: Bool
     ) -> some View {
         HStack(alignment: .bottom, spacing: 16) {
             VStack(alignment: .leading, spacing: 6) {
@@ -291,6 +297,10 @@ struct HomeView: View {
 
             Spacer(minLength: 0)
 
+            if showsPointStatus {
+                pointStatusView
+            }
+
             if showsReturnButton {
                 OutlineButton(title: "↩︎ 돌려주기") {
                     isReturnViewPresented = true
@@ -300,6 +310,20 @@ struct HomeView: View {
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .frame(height: headerHeight, alignment: .bottom)
+    }
+
+    private var pointStatusView: some View {
+        HStack(spacing: 6) {
+            Image("Coin")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 22, height: 22)
+
+            Text(formatNumber(store.currentUser?.point ?? 0))
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Color("customBlack"))
+        }
+        .padding(.bottom, 2)
     }
 
     // MARK: - Review
@@ -469,6 +493,12 @@ struct HomeView: View {
             .padding(.bottom, usesSmallClosetStyle ? 0 : 30)
         }
         .frame(width: closetBaseWidth, height: closetBaseHeight)
+    }
+
+    private func formatNumber(_ num: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: num)) ?? "\(num)"
     }
 
     private var pageIndicator: some View {
