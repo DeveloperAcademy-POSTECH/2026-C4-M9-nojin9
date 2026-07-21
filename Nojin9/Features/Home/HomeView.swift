@@ -454,7 +454,7 @@ struct HomeView: View {
                         isRentalViewPresented = true
                     }
                 ) {
-                    print("상의 더보기")
+                    isUnavailableClosetAlertPresented = true
                 }
                 .frame(width: 307, height: 136)
 
@@ -466,7 +466,7 @@ struct HomeView: View {
                         isRentalViewPresented = true
                     }
                 ) {
-                    print("하의 더보기")
+                    isUnavailableClosetAlertPresented = true
                 }
                 .frame(width: 307, height: 136)
 
@@ -479,7 +479,7 @@ struct HomeView: View {
                             isRentalViewPresented = true
                         }
                     ) {
-                        print("기타 더보기")
+                        isUnavailableClosetAlertPresented = true
                     }
                     .frame(width: 307, height: 124)
                 }
