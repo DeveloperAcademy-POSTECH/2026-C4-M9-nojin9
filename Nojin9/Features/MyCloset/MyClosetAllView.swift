@@ -15,6 +15,8 @@ struct MyClosetAllView: View {
     let ownerName: String
 
     @State private var selectedCategory: MyClosetCategory = .all
+    @State private var selectedRentalItem: ClothItem?
+    @State private var isRentalViewPresented = false
 
     private let itemsPerRow = 3
 
@@ -45,6 +47,15 @@ struct MyClosetAllView: View {
             }
         }
         .navigationBarBackButtonHidden()
+        .navigationDestination(
+            isPresented: $isRentalViewPresented
+        ) {
+            if let selectedRentalItem {
+                RentalView(
+                    clothItemId: selectedRentalItem.id
+                )
+            }
+        }
     }
 
     // MARK: - Data
@@ -278,10 +289,9 @@ struct MyClosetAllView: View {
     private func clothItemButton(
         _ item: ClothItem
     ) -> some View {
-        let rental = borrowedRentalByCurrentUser(for: item)
-
-        return Button {
-            print("선택한 옷: \(item.name)")
+        Button {
+            selectedRentalItem = item
+            isRentalViewPresented = true
         } label: {
             ZStack {
                 clothImage(item)
@@ -289,13 +299,14 @@ struct MyClosetAllView: View {
                     .frame(height: 120)
                     .padding(.horizontal, 4)
 
-                if let rental {
+                if let rental = borrowedRentalByCurrentUser(for: item) {
                     borrowedSticker(rental: rental)
                         .offset(x: -5, y: 18)
                 }
             }
             .frame(maxWidth: .infinity)
             .frame(height: 125)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
