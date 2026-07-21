@@ -490,8 +490,8 @@ struct HomeView: View {
                 }
                 .padding(.top, usesSmallClosetStyle ? 2 : 8.87)
             }
-            .padding(.top, usesSmallClosetStyle ? 38 : 0)
-            .padding(.bottom, usesSmallClosetStyle ? 0 : 30)
+            .padding(.top, usesSmallClosetStyle ? 0 : 0)
+            .padding(.bottom, usesSmallClosetStyle ? 30 : 30)
         }
         .frame(width: closetBaseWidth, height: closetBaseHeight)
     }
