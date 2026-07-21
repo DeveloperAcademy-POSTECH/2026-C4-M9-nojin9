@@ -16,7 +16,10 @@ struct HomeView: View {
     private let thankYouLetterPreviews: [HomeThankYouLetterPreview] = [
         HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_1_1"),
         HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_2_1"),
-        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_3_1")
+        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_3_1"),
+        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_4_1"),
+        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_5_1"),
+        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_6_1")
     ]
 
     var body: some View {
