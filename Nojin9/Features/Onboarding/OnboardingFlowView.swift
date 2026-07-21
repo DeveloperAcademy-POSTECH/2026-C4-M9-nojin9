@@ -53,9 +53,6 @@ struct OnboardingFlowView: View {
                         invite05View(onComplete: onComplete)
                             .environmentObject(navigationManager)
                             
-                    // ✅ 목적지에 도달했을 때 띄울 뷰 연결
-                    case .ClosetView:
-                        ClosetView()
                     }
                 }
         }
