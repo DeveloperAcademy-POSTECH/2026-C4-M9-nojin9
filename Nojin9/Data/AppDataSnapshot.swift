@@ -8,6 +8,7 @@ struct AppDataSnapshot: Codable, Equatable {
     var friendships: [Friendship]
     var rentals: [Rental]
     var reviewSamples: [ReviewSample]
+    var reviews: [Review]
     var thankYouLetters: [ThankYouLetter]
     var savedAt: Date
 }

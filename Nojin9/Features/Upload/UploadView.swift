@@ -213,8 +213,9 @@ private extension UploadView {
                         .font(.system(size: 22, weight: .medium))
                         .foregroundStyle(.customBlack)
                         .frame(width: 44, height: 44)
-                        .background(Color.gray.opacity(0.08))
+                        .background(.customWhite)
                         .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.08), radius: 8, y: 3)
                 }
                 
                 Spacer()
@@ -552,8 +553,8 @@ struct CameraPickerView: UIViewControllerRepresentable {
     }
 }
 
-//#Preview {
-//    NavigationStack {
-//        UploadView()
-//    }
-//}
+#Preview {
+    NavigationStack {
+        UploadView()
+    }
+}
