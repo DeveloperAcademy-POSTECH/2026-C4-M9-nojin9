@@ -31,6 +31,7 @@ struct HomeView: View {
                             subTitle: nil,
                             showsReview: true,
                             showsReturnButton: false,
+                            usesSmallClosetStyle: true,
                             items: myClosetItems
                         )
                         .tag(0)
@@ -40,6 +41,7 @@ struct HomeView: View {
                             subTitle: "첫째 언니",
                             showsReview: false,
                             showsReturnButton: true,
+                            usesSmallClosetStyle: false,
                             items: sisterClosetItems(index: 0)
                         )
                         .tag(1)
@@ -49,6 +51,7 @@ struct HomeView: View {
                             subTitle: "둘째 언니",
                             showsReview: false,
                             showsReturnButton: true,
+                            usesSmallClosetStyle: false,
                             items: sisterClosetItems(index: 1)
                         )
                         .tag(2)
@@ -196,13 +199,15 @@ struct HomeView: View {
         subTitle: String?,
         showsReview: Bool,
         showsReturnButton: Bool,
+        usesSmallClosetStyle: Bool,
         items: HomeClosetItems
     ) -> some View {
         GeometryReader { geometry in
             let closetHeight = closetHeight(
                 availableHeight: geometry.size.height,
                 showsReview: showsReview,
-                showsReturnButton: showsReturnButton
+                showsReturnButton: showsReturnButton,
+                usesSmallClosetStyle: usesSmallClosetStyle
             )
 
             VStack(alignment: .leading, spacing: 0) {
@@ -223,7 +228,8 @@ struct HomeView: View {
 
                 centeredClosetView(
                     items: items,
-                    targetHeight: closetHeight
+                    targetHeight: closetHeight,
+                    usesSmallClosetStyle: usesSmallClosetStyle
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -233,14 +239,17 @@ struct HomeView: View {
     private func closetHeight(
         availableHeight: CGFloat,
         showsReview: Bool,
-        showsReturnButton: Bool
+        showsReturnButton: Bool,
+        usesSmallClosetStyle: Bool
     ) -> CGFloat {
         let headerHeight: CGFloat = showsReturnButton ? 94 : 46
         let reviewHeight: CGFloat = showsReview ? 170 : 0
         let headerToClosetGap: CGFloat = showsReview ? 0 : 16
         let availableClosetHeight = availableHeight - headerHeight - reviewHeight - headerToClosetGap
+        let closetMaxHeight: CGFloat = usesSmallClosetStyle ? 466.67 : 542.14
+        let closetMinHeight: CGFloat = usesSmallClosetStyle ? 360 : 390
 
-        return min(542.14, max(390, availableClosetHeight))
+        return min(closetMaxHeight, max(closetMinHeight, availableClosetHeight))
     }
 
     private func pageHeader(
@@ -356,15 +365,21 @@ struct HomeView: View {
 
     private func centeredClosetView(
         items: HomeClosetItems,
-        targetHeight: CGFloat
+        targetHeight: CGFloat,
+        usesSmallClosetStyle: Bool
     ) -> some View {
-        let scale = targetHeight / 542.14
-        let targetWidth = 356.4 * scale
+        let closetBaseWidth: CGFloat = 356.4
+        let closetBaseHeight: CGFloat = usesSmallClosetStyle ? 466.67 : 542.14
+        let scale = targetHeight / closetBaseHeight
+        let targetWidth = closetBaseWidth * scale
 
         return HStack {
             Spacer(minLength: 0)
 
-            closetView(items: items)
+            closetView(
+                items: items,
+                usesSmallClosetStyle: usesSmallClosetStyle
+            )
                 .scaleEffect(scale, anchor: .top)
                 .frame(width: targetWidth, height: targetHeight, alignment: .top)
 
@@ -375,14 +390,20 @@ struct HomeView: View {
         .clipped()
     }
 
-    private func closetView(items: HomeClosetItems) -> some View {
-        ZStack {
-            Image("MyCloset")
+    private func closetView(
+        items: HomeClosetItems,
+        usesSmallClosetStyle: Bool
+    ) -> some View {
+        let closetBaseWidth: CGFloat = 356.4
+        let closetBaseHeight: CGFloat = usesSmallClosetStyle ? 466.67 : 542.14
+
+        return ZStack {
+            Image(usesSmallClosetStyle ? "MyClosetSmall" : "MyCloset")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 356.4, height: 542.14)
+                .frame(width: closetBaseWidth, height: closetBaseHeight)
 
-            VStack(spacing: 0) {
+            VStack(spacing: usesSmallClosetStyle ? 12 : 0) {
                 MyClosetSectionView(
                     title: "상의",
                     items: items.topItems,
@@ -407,26 +428,29 @@ struct HomeView: View {
                 }
                 .frame(width: 307, height: 136)
 
-                MyClosetSectionView(
-                    title: "기타",
-                    items: items.otherItems,
-                    onItemTap: { item in
-                        selectedRentalItem = item
-                        isRentalViewPresented = true
+                if !usesSmallClosetStyle {
+                    MyClosetSectionView(
+                        title: "기타",
+                        items: items.otherItems,
+                        onItemTap: { item in
+                            selectedRentalItem = item
+                            isRentalViewPresented = true
+                        }
+                    ) {
+                        print("기타 더보기")
                     }
-                ) {
-                    print("기타 더보기")
+                    .frame(width: 307, height: 124)
                 }
-                .frame(width: 307, height: 124)
 
                 MyClosetButton(title: "옷장 전체 보기") {
                     isUnavailableClosetAlertPresented = true
                 }
-                .padding(.top, 8.87)
+                .padding(.top, usesSmallClosetStyle ? 2 : 8.87)
             }
-            .padding(.bottom, 30)
+            .padding(.top, usesSmallClosetStyle ? 58 : 0)
+            .padding(.bottom, usesSmallClosetStyle ? 0 : 30)
         }
-        .frame(width: 356.4, height: 542.14)
+        .frame(width: closetBaseWidth, height: closetBaseHeight)
     }
 
     private var pageIndicator: some View {
