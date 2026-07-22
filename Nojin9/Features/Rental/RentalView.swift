@@ -12,6 +12,11 @@ struct RentalView: View {
 
     let clothItemId: UUID
     @State private var isShowingForm = false
+    @State private var isShowingBackConfirmation = false
+    @State private var shouldConfirmFormExit = false
+    @State private var rentalStartDate = Date()
+    @State private var rentalEndDate = Date()
+    @State private var isRentalAgreed = false
 
     private var item: ClothItem? {
         store.clothItem(id: clothItemId)
@@ -30,9 +35,53 @@ struct RentalView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .ignoresSafeArea(edges: .top)
         .navigationDestination(isPresented: $isShowingForm) {
-            RentalFormView(clothItemId: clothItemId)
+            RentalFormView(
+                clothItemId: clothItemId,
+                startDate: $rentalStartDate,
+                endDate: $rentalEndDate,
+                isAgreed: $isRentalAgreed,
+                onRentalFlowFinished: {
+                    resetRentalDraft()
+                    shouldConfirmFormExit = false
+                }
+            )
                 .environmentObject(store)
         }
+        .onChange(of: isShowingForm) { oldValue, newValue in
+            guard oldValue, !newValue, shouldConfirmFormExit else {
+                return
+            }
+
+            shouldConfirmFormExit = false
+            isShowingBackConfirmation = true
+        }
+        .alert(
+            "정말 뒤로 가시겠습니까?",
+            isPresented: $isShowingBackConfirmation
+        ) {
+            Button("뒤로가기", role: .destructive) {
+                resetRentalDraft()
+            }
+
+            Button("이어서 작성하기", role: .cancel) {
+                shouldConfirmFormExit = true
+                isShowingForm = true
+            }
+        } message: {
+            Text("지금까지 작성한 정보는 저장되지 않아요.")
+        }
+    }
+
+    private func startRentalForm() {
+        resetRentalDraft()
+        shouldConfirmFormExit = true
+        isShowingForm = true
+    }
+
+    private func resetRentalDraft() {
+        rentalStartDate = Date()
+        rentalEndDate = Date()
+        isRentalAgreed = false
     }
 
     private func content(for item: ClothItem) -> some View {
@@ -295,7 +344,7 @@ struct RentalView: View {
         case .enabled(let title):
             ctaContainer {
                 Button(action: {
-                    isShowingForm = true
+                    startRentalForm()
                 }) {
                     ctaLabel(title: title, backgroundColor: Color("brandPrimary"))
                 }
