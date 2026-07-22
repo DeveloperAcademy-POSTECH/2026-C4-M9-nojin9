@@ -14,7 +14,8 @@ struct ReviewWritingView: View {
 
     let rental: Rental
     let item: ClothItem
-    let onHomeButtonTapped: () -> Void
+    let onMoveToReviewList: () -> Void
+    let onMoveToHome: () -> Void
 
     @State private var message = ""
 
@@ -37,11 +38,13 @@ struct ReviewWritingView: View {
     init(
         rental: Rental,
         item: ClothItem,
-        onHomeButtonTapped: @escaping () -> Void
+        onMoveToReviewList: @escaping () -> Void,
+        onMoveToHome: @escaping () -> Void
     ) {
         self.rental = rental
         self.item = item
-        self.onHomeButtonTapped = onHomeButtonTapped
+        self.onMoveToReviewList = onMoveToReviewList
+        self.onMoveToHome = onMoveToHome
 
         UIPageControl.appearance().currentPageIndicatorTintColor = UIColor(
             Color.brandPrimary
@@ -75,12 +78,8 @@ struct ReviewWritingView: View {
 
             if isCompleted {
                 ReviewCompletionOverlay(
-                    onMoveToReviewList: {
-                        moveToReviewList()
-                    },
-                    onMoveToHome: {
-                        moveToHome()
-                    }
+                    onMoveToReviewList: onMoveToReviewList,
+                    onMoveToHome: onMoveToHome
                 )
                 .transition(.opacity)
             }
@@ -414,14 +413,6 @@ struct ReviewWritingView: View {
     }
 
     // MARK: - Register
-    
-    private func moveToHome() {
-        dismiss()
-
-        DispatchQueue.main.async {
-            onHomeButtonTapped()
-        }
-    }
 
     private func registerReview() {
         guard canSubmit else {
@@ -443,10 +434,6 @@ struct ReviewWritingView: View {
             isCompleted = true
         }
     }
-    
-    private func moveToReviewList() {
-        dismiss()
-    }
 }
 
 #Preview {
@@ -454,7 +441,10 @@ struct ReviewWritingView: View {
         ReviewWritingView(
             rental: MockData.snapshot.rentals.first!,
             item: MockData.snapshot.clothItems.first!,
-            onHomeButtonTapped: {
+            onMoveToReviewList: {
+                print("리뷰 선택 화면으로 이동")
+            },
+            onMoveToHome: {
                 print("홈으로 이동")
             }
         )

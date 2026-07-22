@@ -51,20 +51,20 @@ struct ToolbarUI: View {
 
     let onBack: () -> Void
     let onAdd: () -> Void
-    let onNotification: () -> Void
+    let onLetter: () -> Void
     let onProfile: () -> Void
 
     init(
         mode: ToolbarMode,
         onBack: @escaping () -> Void = {},
         onAdd: @escaping () -> Void = {},
-        onNotification: @escaping () -> Void = {},
+        onLetter: @escaping () -> Void = {},
         onProfile: @escaping () -> Void = {}
     ) {
         self.mode = mode
         self.onBack = onBack
         self.onAdd = onAdd
-        self.onNotification = onNotification
+        self.onLetter = onLetter
         self.onProfile = onProfile
     }
 
@@ -132,8 +132,8 @@ struct ToolbarUI: View {
                         .frame(width: 36, height: 36)
                 }
                 
-                Button(action: onNotification) {
-                    Image(systemName: "bell.fill")
+                Button(action: onLetter) {
+                    Image(systemName: "envelope")
                         .foregroundStyle(.customBlack)
                         .frame(width: 36, height: 36)
                 }
@@ -141,7 +141,7 @@ struct ToolbarUI: View {
             .frame(width: 104, height: 44)
             .background {
                 Capsule()
-                    .fill(Color.white.opacity(0.9))
+                    .fill(.customWhite.opacity(0.9))
             }
             .shadow(
                 color: .black.opacity(0.05),radius: 10, x: 0, y: 4)
@@ -165,8 +165,8 @@ struct ToolbarUI: View {
         onAdd: {
             print("옷 추가")
         },
-        onNotification: {
-            print("알림")
+        onLetter: {
+            print("편지")
         },
         onProfile: {
             print("프로필")

@@ -54,6 +54,10 @@ final class AppDataStore: ObservableObject {
         snapshot.rentals.filter { $0.clothItemId == clothItemId }
     }
 
+    func rental(id: UUID) -> Rental? {
+        snapshot.rentals.first {$0.id == id}
+    }
+    
     func activeRental(for clothItemId: UUID) -> Rental? {
         snapshot.rentals.first {
             $0.clothItemId == clothItemId && $0.status == .borrowed

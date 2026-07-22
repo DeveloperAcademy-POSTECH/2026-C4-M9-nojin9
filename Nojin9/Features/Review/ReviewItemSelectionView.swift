@@ -11,9 +11,10 @@ struct ReviewItemSelectionView: View {
     @EnvironmentObject private var store: AppDataStore
     @Environment(\.dismiss) private var dismiss
 
+    let onStartWriting: (Rental, ClothItem) -> Void
+    let onMoveToHome: () -> Void
+
     @State private var selectedRentalId: UUID?
-    @State private var selectedItem: ClothItem?
-    @State private var isWritingPresented = false
 
     private var selectedRental: Rental? {
         store.reviewableRentals.first {
@@ -119,8 +120,8 @@ struct ReviewItemSelectionView: View {
                 return
             }
 
-            selectedItem = item
-            isWritingPresented = true
+            onStartWriting(rental, item)
+
         } label: {
             Text("작성하기")
                 .font(.system(size: 16, weight: .semibold))
@@ -135,30 +136,25 @@ struct ReviewItemSelectionView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
         .disabled(selectedRental == nil)
-        .navigationDestination(
-            isPresented: $isWritingPresented
-        ) {
-            if let rental = selectedRental,
-               let item = selectedItem {
-                ReviewWritingView(
-                    rental: rental,
-                    item: item,
-                    onHomeButtonTapped: {
-                        moveToHome()
-                    }
-                )
-            }
-        }
     }
     
     private func moveToHome() {
-        dismiss()
+        onMoveToHome()
     }
 }
 
 #Preview {
     NavigationStack {
-        ReviewItemSelectionView()
-            .environmentObject(AppDataStore(snapshot: MockData.snapshot))
+        ReviewItemSelectionView(
+            onStartWriting: { rental, item in
+                print("\(item.name) 감사 편지 작성")
+            },
+            onMoveToHome: {
+                print("홈으로 이동")
+            }
+        )
+        .environmentObject(
+            AppDataStore(snapshot: MockData.snapshot)
+        )
     }
 }

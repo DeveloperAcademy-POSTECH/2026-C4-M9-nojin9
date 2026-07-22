@@ -1,6 +1,12 @@
 import Foundation
 import SwiftUI
 
+private enum ReviewRoute: Hashable {
+    case allReview
+    case itemSelection
+    case writing(rentalId: UUID, itemId: UUID)
+}
+
 struct HomeView: View {
     @EnvironmentObject private var store: AppDataStore
 
@@ -9,6 +15,7 @@ struct HomeView: View {
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
     @State private var isClosetAllViewPresented = false
+    @State private var reviewPath = NavigationPath()
     @State private var selectedClosetOwnerId: UUID?
     @State private var selectedClosetOwnerName = ""
     @State private var selectedClosetCategory: MyClosetCategory = .all
@@ -28,7 +35,7 @@ struct HomeView: View {
     ]
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $reviewPath) {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
                     backgroundView
@@ -136,6 +143,53 @@ struct HomeView: View {
                     )
                 }
             }
+            .navigationDestination(for: ReviewRoute.self) { route in
+                switch route {
+                case .allReview:
+                    AllReviewView(
+                        onMoveToWriteReview: {
+                            reviewPath.append(ReviewRoute.itemSelection)
+                        },
+                        onMoveToHome: {
+                            reviewPath.removeLast()
+                        }
+                    )
+
+                case .itemSelection:
+                    ReviewItemSelectionView(
+                        onStartWriting: { rental, item in
+                            reviewPath.append(
+                                ReviewRoute.writing(
+                                    rentalId: rental.id,
+                                    itemId: item.id
+                                )
+                            )
+                        },
+                        onMoveToHome: {
+                            reviewPath = NavigationPath()
+                        }
+                    )
+
+                case let .writing(rentalId, itemId):
+                    if let rental = store.rental(id: rentalId),
+                       let item = store.clothItem(id: itemId) {
+                        ReviewWritingView(
+                            rental: rental,
+                            item: item,
+                            onMoveToReviewList: {
+                                // 작성 화면 한 단계만 제거
+                                // → ReviewItemSelectionView로 돌아감
+                                reviewPath.removeLast()
+                            },
+                            onMoveToHome: {
+                                // 리뷰 관련 화면을 전부 제거
+                                // → HomeView로 돌아감
+                                reviewPath = NavigationPath()
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -204,8 +258,8 @@ struct HomeView: View {
             onAdd: {
                 isUploadViewPresented = true
             },
-            onNotification: {
-                print("알림")
+            onLetter: {
+                reviewPath.append(ReviewRoute.allReview)
             },
             onProfile: {
                 isMyPageViewPresented = true
