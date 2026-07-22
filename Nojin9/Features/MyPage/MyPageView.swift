@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MyPageView: View {
     @EnvironmentObject private var store: AppDataStore
+    @State private var isReturnViewPresented = false
 
     private let menuItems = [
         "최근 본 상품",
@@ -58,6 +59,13 @@ struct MyPageView: View {
         .navigationTitle("마이페이지")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
+        .navigationDestination(
+            isPresented: $isReturnViewPresented
+        ) {
+            ReturnView {
+                isReturnViewPresented = false
+            }
+        }
     }
 
     // MARK: - 배경
@@ -116,7 +124,7 @@ struct MyPageView: View {
                 title: "대여/반납",
                 value: "\(rentalHistoryCount)개"
             ) {
-                print("대여/반납")
+                isReturnViewPresented = true
             }
 
             MyPageSummaryItem(
