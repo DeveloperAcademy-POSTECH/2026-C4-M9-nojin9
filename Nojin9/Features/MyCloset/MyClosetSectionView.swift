@@ -68,13 +68,14 @@ struct MyClosetSectionView: View {
                         onItemTap(item)
                     } label: {
                         MyClothThumbnailView(item: item)
-                            .scaleEffect(0.86)
+                            .scaleEffect(1.0)
                             .frame(width: 82, height: 82)
                     }
                     .buttonStyle(.plain)
                 }
             }
             .padding(.leading, 8)
+            .padding(.trailing, 40)
             .frame(maxWidth: .infinity, alignment: .leading)
 
             PrimaryIconButton(
@@ -82,6 +83,7 @@ struct MyClosetSectionView: View {
             ) {
                 action()
             }
+            .padding(.trailing, 12)
         }
         .clipped()
     }
