@@ -57,7 +57,6 @@ struct OnboardingMainView: View {
                 .padding(.bottom, 15)
             }
         }
-        .navigationBarBackButtonHidden(true)
     }
 }
 

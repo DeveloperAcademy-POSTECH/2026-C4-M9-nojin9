@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MyClosetAllView: View {
     @EnvironmentObject private var store: AppDataStore
-    @Environment(\.dismiss) private var dismiss
 
     let ownerId: UUID
     let ownerName: String
@@ -25,8 +24,6 @@ struct MyClosetAllView: View {
             backgroundView
 
             VStack(spacing: 0) {
-                navigationBar
-
                 categoryButtons
                     .padding(.top, 12)
                     .padding(.bottom, 14)
@@ -46,7 +43,9 @@ struct MyClosetAllView: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .navigationBarBackButtonHidden()
+        .navigationTitle(ownerName)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .navigationDestination(
             isPresented: $isRentalViewPresented
         ) {
@@ -154,42 +153,6 @@ struct MyClosetAllView: View {
             .scaledToFill()
             .ignoresSafeArea()
             .frame(width: .infinity, height: 300)
-    }
-
-    // MARK: - Navigation Bar
-
-    private var navigationBar: some View {
-        ZStack {
-            Text(ownerName)
-                .font(.headline)
-                .foregroundStyle(Color("customBlack"))
-
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(Color("customBlack"))
-                        .frame(width: 44, height: 44)
-                        .background(Color("customWhite"))
-                        .clipShape(Circle())
-                        .overlay {
-                            Circle()
-                                .stroke(
-                                    Color("gray20"),
-                                    lineWidth: 1
-                                )
-                        }
-                }
-                .buttonStyle(.plain)
-
-                Spacer()
-            }
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
-        .frame(height: 60)
     }
 
     // MARK: - Category

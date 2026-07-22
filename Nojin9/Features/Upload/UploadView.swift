@@ -76,13 +76,11 @@ struct UploadView: View {
     
     var body: some View {
         ZStack {
-            Color.white
+            Color.customWhite
                 .ignoresSafeArea()
             
             ScrollView {
                 VStack(spacing: 0) {
-                    navigationView
-                    
                     VStack(alignment: .leading, spacing: 22) {
                         photoSection
                         pointColorSection
@@ -99,7 +97,9 @@ struct UploadView: View {
             }
             .scrollDismissesKeyboard(.interactively)
         }
-        .navigationBarBackButtonHidden()
+        .navigationTitle("내 물품 등록하기")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         
         .confirmationDialog(
             "사진 첨부하기",
@@ -201,35 +201,6 @@ private extension UIImage {
         @unknown default:
             return .up
         }
-    }
-}
-
-// MARK: - 상단 메뉴
-
-private extension UploadView {
-    var navigationView: some View {
-        ZStack {
-            Text("내 물품 등록하기")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.customBlack)
-            
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundStyle(.customBlack)
-                        .frame(width: 44, height: 44)
-                        .background(Color.gray.opacity(0.08))
-                        .clipShape(Circle())
-                }
-                
-                Spacer()
-            }
-        }
-        .frame(height: 52)
-        .padding(.horizontal, 14)
     }
 }
 
@@ -473,14 +444,21 @@ private extension UploadView {
         VStack(alignment: .leading, spacing: 10) {
             requiredTitle("물품 이름")
             
-            TextField("회색 오프숄더 니트", text: $itemName)
+            TextField(
+                "",
+                text: $itemName,
+                prompt: Text("회색 오프숄더 니트")
+                    .foregroundStyle(Color.gray60)
+            )
                 .font(.system(size: 16))
+                .foregroundStyle(Color.customBlack)
+                .tint(Color.brandPrimary)
                 .padding(.horizontal, 14)
                 .frame(height: 52)
-                .background(Color.white)
+                .background(Color.customWhite)
                 .overlay {
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.gray.opacity(0.35), lineWidth: 1)
+                        .stroke(Color.gray60.opacity(0.35), lineWidth: 1)
                 }
         }
     }
@@ -561,16 +539,18 @@ private extension UploadView {
             
             Text("주의사항은 항목별로 줄바꿈해 주세요.")
                 .font(.system(size: 14))
-                .foregroundStyle(.gray)
+                .foregroundStyle(Color.gray60)
             
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $precautions)
                     .font(.system(size: 16))
+                    .foregroundStyle(Color.customBlack)
+                    .tint(Color.brandPrimary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 8)
                     .frame(height: 125)
                     .scrollContentBackground(.hidden)
-                    .background(Color.white)
+                    .background(Color.customWhite)
                 
                 if precautions.isEmpty {
                     Text(
@@ -581,7 +561,7 @@ private extension UploadView {
                         """
                     )
                     .font(.system(size: 16))
-                    .foregroundStyle(Color.gray.opacity(0.6))
+                    .foregroundStyle(Color.gray60.opacity(0.6))
                     .padding(.horizontal, 13)
                     .padding(.vertical, 15)
                     .allowsHitTesting(false)
@@ -589,7 +569,7 @@ private extension UploadView {
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.gray.opacity(0.35), lineWidth: 1)
+                    .stroke(Color.gray60.opacity(0.35), lineWidth: 1)
             }
         }
     }
@@ -604,7 +584,7 @@ private extension UploadView {
         } label: {
             Text("등록하기")
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 54)
                 .background(

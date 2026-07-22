@@ -108,20 +108,6 @@ struct SignupView: View {
                 .padding(.bottom, 24) // 디자인 비율에 맞게 하단 패딩 조정
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    navManager.pop()
-                }) {
-                    HStack(spacing: 5) {
-                        Image(systemName: "chevron.backward")
-                            .font(.system(size: 17, weight: .semibold))
-                    }
-                    .foregroundStyle(Color.primary)
-                }
-            }
-        }
         .fullScreenCover(isPresented: $isShowingB2View) {
             SignupkakaoView()
                 .presentationBackground(.clear)

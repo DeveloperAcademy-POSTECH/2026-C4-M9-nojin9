@@ -151,7 +151,8 @@ struct invite05View: View {
             .padding(.horizontal, 26)
             .padding(.bottom, 13)
         }
-        .navigationBarBackButtonHidden(true)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.customWhite.ignoresSafeArea())
     }
 }
 

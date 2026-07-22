@@ -50,8 +50,9 @@ struct invite02View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 20)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.customWhite.ignoresSafeArea())
         // 네비게이션 기본 뒤로가기 버튼 숨김
-        .navigationBarBackButtonHidden(true)
     }
 }
 
