@@ -30,11 +30,11 @@ struct ReviewCompletionOverlay: View {
                     } label: {
                         Text("감사 편지 리스트로 가기")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.customWhite)
                             .frame(maxWidth: .infinity)
                             .frame(height: 46)
-                            .background(Color.pink)
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .background(.brandPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
                     }
 
                     Button {
@@ -44,11 +44,11 @@ struct ReviewCompletionOverlay: View {
                     } label: {
                         Text("홈으로 돌아가기")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.pink)
+                            .foregroundStyle(.brandPrimary)
                             .frame(maxWidth: .infinity)
                             .frame(height: 46)
                             .background(Color.pink.opacity(0.13))
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
                     }
                 }
                 .padding(.horizontal, 16)

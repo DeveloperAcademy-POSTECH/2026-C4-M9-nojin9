@@ -21,7 +21,7 @@ struct ReviewRentalRow: View {
     
     private var itemImage: some View {
         ZStack {
-            Color.pink.opacity(0.12)
+            Color.brandPrimary10
 
             if let imageName = item.cutoutImageName ?? item.imageName {
                 Image(imageName)
@@ -30,11 +30,11 @@ struct ReviewRentalRow: View {
                     .padding(7)
             } else {
                 Image(systemName: "tshirt")
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(.gray60)
             }
         }
         .frame(width: 48, height: 48)
-        .clipShape(RoundedRectangle(cornerRadius: 2))
+        .clipShape(RoundedRectangle(cornerRadius: 5))
     }
 
     private var selectionIcon: some View {
@@ -42,8 +42,8 @@ struct ReviewRentalRow: View {
             Circle()
                 .stroke(
                     isSelected
-                    ? Color.pink
-                    : Color.gray.opacity(0.4),
+                    ? Color.brandPrimary
+                    : Color.gray60,
                     lineWidth: 1
                 )
                 .frame(width: 18, height: 18)

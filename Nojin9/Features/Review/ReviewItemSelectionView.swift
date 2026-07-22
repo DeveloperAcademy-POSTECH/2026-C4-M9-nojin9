@@ -62,13 +62,9 @@ struct ReviewItemSelectionView: View {
                         .font(.system(size: 18, weight: .medium))
                         .foregroundStyle(.customBlack)
                         .frame(width: 40, height: 40)
-                        .background(.white)
+                        .background(.customWhite)
                         .clipShape(Circle())
-                        .shadow(
-                            color: .black.opacity(0.08),
-                            radius: 8,
-                            y: 3
-                        )
+                        .shadow(color: .customBlack.opacity(0.08), radius: 8, y: 3)
                 }
 
                 Spacer()
@@ -126,13 +122,13 @@ struct ReviewItemSelectionView: View {
         } label: {
             Text("작성하기")
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
                 .background(
                     selectedRental == nil
-                    ? Color.gray.opacity(0.45)
-                    : Color.pink
+                    ? Color.gray40
+                    : Color.brandPrimary
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 4))
         }
