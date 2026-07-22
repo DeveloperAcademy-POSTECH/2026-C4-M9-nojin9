@@ -89,10 +89,10 @@ final class VisionClothCutoutService:
                 cvPixelBuffer: maskedPixelBuffer
             )
             
-            // 7. 흰색 외곽선 추가
+            // 7. 흰색 외곽선과 그림자 추가
             let outlinedImage = Self.addingWhiteOutline(
                 to: maskedImage,
-                radius: 12
+                radius: 60
             )
             
             // 8. CIImage -> CGImage로 최종 변환 (실패 시 이미지 생성 실패 에러)
@@ -106,64 +106,101 @@ final class VisionClothCutoutService:
         }.value
     }
     
-    // 누끼 이미지의 알파 영역을 확장해 흰색 외곽선을 생성
-        private static func addingWhiteOutline(
-            to image: CIImage,
-            radius: Float = 12
-        ) -> CIImage {
-            let extent = image.extent
+    // 누끼 이미지의 알파 영역을 확장해 흰색 외곽선과 그림자를 생성
+    private static func addingWhiteOutline(
+        to image: CIImage,
+        radius: Float = 12
+    ) -> CIImage {
+        let extent = image.extent
 
-            // 이미지의 알파 채널을 마스크로 변환
-            let alphaMask = image
-                .applyingFilter("CIMaskToAlpha")
-                .cropped(to: extent)
+        // 이미지의 알파 채널을 마스크로 변환
+        let alphaMask = image
+            .applyingFilter("CIMaskToAlpha")
+            .cropped(to: extent)
 
-            // 마스크를 확장해서 외곽선 영역 생성
-            let expandedMask = alphaMask
-                .applyingFilter(
-                    "CIMorphologyMaximum",
-                    parameters: [
-                        kCIInputRadiusKey: radius
-                    ]
-                )
-                .cropped(to: extent)
+        // 마스크를 확장해서 외곽선 영역 생성
+        let expandedMask = alphaMask
+            .applyingFilter(
+                "CIMorphologyMaximum",
+                parameters: [
+                    kCIInputRadiusKey: radius
+                ]
+            )
+            .cropped(to: extent)
 
-            // 흰색 이미지
-            let whiteImage = CIImage(
-                color: CIColor(
-                    red: 1,
-                    green: 1,
-                    blue: 1,
-                    alpha: 1
+        // 투명 배경 이미지
+        let transparentImage = CIImage(
+            color: CIColor(
+                red: 0,
+                green: 0,
+                blue: 0,
+                alpha: 0
+            )
+        )
+        .cropped(to: extent)
+
+        // 확장된 마스크 기반으로 부드러운 그림자 생성
+        let shadowMask = expandedMask
+            .applyingFilter(
+                "CIGaussianBlur",
+                parameters: [
+                    kCIInputRadiusKey: 10
+                ]
+            )
+            .transformed(
+                by: CGAffineTransform(
+                    translationX: 0,
+                    y: -6
                 )
             )
             .cropped(to: extent)
 
-            // 투명 배경 이미지
-            let transparentImage = CIImage(
-                color: CIColor(
-                    red: 0,
-                    green: 0,
-                    blue: 0,
-                    alpha: 0
-                )
+        let shadowImage = CIImage(
+            color: CIColor(
+                red: 0,
+                green: 0,
+                blue: 0,
+                alpha: 0.22
+            )
+        )
+        .cropped(to: extent)
+
+        let shadowSilhouette = shadowImage
+            .applyingFilter(
+                "CIBlendWithMask",
+                parameters: [
+                    kCIInputBackgroundImageKey: transparentImage,
+                    kCIInputMaskImageKey: shadowMask
+                ]
             )
             .cropped(to: extent)
 
-            // 확장된 마스크 영역에 흰색 적용
-            let whiteSilhouette = whiteImage
-                .applyingFilter(
-                    "CIBlendWithMask",
-                    parameters: [
-                        kCIInputBackgroundImageKey: transparentImage,
-                        kCIInputMaskImageKey: expandedMask
-                    ]
-                )
-                .cropped(to: extent)
+        // 흰색 이미지
+        let whiteImage = CIImage(
+            color: CIColor(
+                red: 1,
+                green: 1,
+                blue: 1,
+                alpha: 1
+            )
+        )
+        .cropped(to: extent)
 
-            // 흰색 실루엣 위에 원본 누끼 이미지 합성
-            return image
-                .composited(over: whiteSilhouette)
-                .cropped(to: extent)
-        }
+        // 확장된 마스크 영역에 흰색 적용
+        let whiteSilhouette = whiteImage
+            .applyingFilter(
+                "CIBlendWithMask",
+                parameters: [
+                    kCIInputBackgroundImageKey: transparentImage,
+                    kCIInputMaskImageKey: expandedMask
+                ]
+            )
+            .cropped(to: extent)
+
+        // 그림자 위에 흰색 외곽선, 그 위에 원본 누끼 이미지 합성
+        return image
+            .composited(over: whiteSilhouette)
+            .composited(over: shadowSilhouette)
+            .cropped(to: extent)
     }
+}
