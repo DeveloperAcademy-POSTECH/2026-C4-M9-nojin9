@@ -141,9 +141,6 @@ struct HomeView: View {
                 isPresented: $isAllReviewViewPresented
             ) {
                 AllReviewView(
-                    onMoveToWriteReview: {
-                        print("감사 편지 작성 화면으로 이동")
-                    },
                     onMoveToHome: {
                         isAllReviewViewPresented = false
                     }

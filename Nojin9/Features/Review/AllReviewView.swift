@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct AllReviewView: View {
-    let onMoveToWriteReview: () -> Void
     let onMoveToHome: () -> Void
 
     let columns = [
@@ -11,9 +10,12 @@ struct AllReviewView: View {
 
     @State private var selectedReview: ReviewData? = nil
     
+    // MARK: - 화면 이동을 위한 State
+    @State private var isShowingItemSelection = false
+    
     var body: some View {
         VStack(spacing: 0) {
-            // MARK: - Navigation Bar[cite: 19]
+            // MARK: - Navigation Bar
             HStack {
                 BackButton {
                     onMoveToHome()
@@ -47,7 +49,6 @@ struct AllReviewView: View {
                                     )
                                 }) { EnvelopeCardView(name: "서은", imageName: "ThanksReview_1_1") }
                                 
-                                
                                 Button(action: {
                                     selectedReview = ReviewData(
                                         badgeName: "현서", title: "둘째 언니 (김현서)",
@@ -57,7 +58,6 @@ struct AllReviewView: View {
                                         clothesName: "브라운 리본 민소매", dateRange: "26.06.12 ~ 26.06.18"
                                     )
                                 }) { EnvelopeCardView(name: "현서", imageName: "ThanksReview_2_1") }
-                                
                                 
                                 Button(action: {
                                     selectedReview = ReviewData(
@@ -123,9 +123,9 @@ struct AllReviewView: View {
                     .padding(.bottom, 100)
                 }
                 
-                // MARK: - Floating Button[cite: 19]
+                // MARK: - Floating Button
                 PrimaryButton(title: "감사 편지 작성하기") {
-                    onMoveToWriteReview()
+                    isShowingItemSelection = true
                 }
                 .padding(.bottom, 10)
             }
@@ -137,18 +137,20 @@ struct AllReviewView: View {
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
         )
-        .navigationTitle("감사 편지")
-        .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .sheet(item: $selectedReview) { reviewData in
             EachReview01(review: reviewData)
                 .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
                 .presentationDragIndicator(.hidden)
         }
+        // MARK: - 네비게이션 목적지 설정
+        .navigationDestination(isPresented: $isShowingItemSelection) {
+            ReviewItemSelectionView(onMoveToHome: onMoveToHome)
+        }
     }
 }
 
-// MARK: - 봉투 카드 컴포넌트[cite: 19]
+// MARK: - 봉투 카드 컴포넌트
 struct EnvelopeCardView: View {
     let name: String
     let imageName: String
@@ -175,4 +177,8 @@ struct EnvelopeCardView: View {
     }
 }
 
-#Preview { AllReviewView( onMoveToWriteReview: { print("감사 편지 작성 화면으로 이동") }, onMoveToHome: { print("홈으로 이동") } ) }
+#Preview {
+    NavigationStack {
+        AllReviewView(onMoveToHome: { print("홈으로 이동") })
+    }
+}
