@@ -427,7 +427,7 @@ struct HomeView: View {
 
                 if let subTitle {
                     Text(subTitle)
-                        .font(.system(size: 24))
+                        .font(.appSubtitle)
                         .foregroundStyle(Color.gray60)
                 }
             }
