@@ -17,7 +17,14 @@ struct HomeView: View {
     @State private var selectedClosetPage = 1
     @State private var currentReviewIndex = 0
 
-    private let reviewCount = 6
+    private let thankYouLetterPreviews: [HomeThankYouLetterPreview] = [
+        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_1_1"),
+        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_2_1"),
+        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_3_1"),
+        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_4_1"),
+        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_5_1"),
+        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_6_1")
+    ]
 
     var body: some View {
         NavigationStack {
@@ -28,9 +35,11 @@ struct HomeView: View {
                     TabView(selection: $selectedClosetPage) {
                         closetPage(
                             mainTitle: "내 옷장",
-                            subTitle: nil,
+                            subTitle: "내가 받은 감사 편지",
                             showsReview: true,
                             showsReturnButton: false,
+                            showsPointStatus: true,
+                            usesSmallClosetStyle: true,
                             ownerId: store.currentUser?.id,
                             ownerName: "내 옷장",
                             items: myClosetItems
@@ -42,6 +51,8 @@ struct HomeView: View {
                             subTitle: "첫째 언니",
                             showsReview: false,
                             showsReturnButton: true,
+                            showsPointStatus: false,
+                            usesSmallClosetStyle: false,
                             ownerId: store.sisters.indices.contains(0)
                                 ? store.sisters[0].id
                                 : nil,
@@ -55,6 +66,8 @@ struct HomeView: View {
                             subTitle: "둘째 언니",
                             showsReview: false,
                             showsReturnButton: true,
+                            showsPointStatus: false,
+                            usesSmallClosetStyle: false,
                             ownerId: store.sisters.indices.contains(1)
                                 ? store.sisters[1].id
                                 : nil,
@@ -63,7 +76,6 @@ struct HomeView: View {
                         )
                         .tag(2)
                     }
-                    
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .padding(.top, topContentInset(for: geometry))
                     .padding(.bottom, bottomContentInset(for: geometry))
@@ -75,15 +87,15 @@ struct HomeView: View {
                         .frame(height: toolbarTopInset(for: geometry) + 72, alignment: .bottom)
                         .zIndex(2)
 
-                    VStack {
-                        Spacer()
-
-                        pageIndicator
-                            .frame(height: 24)
-                            .padding(.bottom, max(10, geometry.safeAreaInsets.bottom + 10))
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .zIndex(2)
+                    pageIndicator
+                        .frame(height: 24)
+                        .padding(.bottom, 10)
+                        .frame(
+                            width: geometry.size.width,
+                            height: geometry.size.height,
+                            alignment: .bottom
+                        )
+                        .zIndex(2)
                 }
             }
             .navigationDestination(
@@ -212,22 +224,31 @@ struct HomeView: View {
         subTitle: String?,
         showsReview: Bool,
         showsReturnButton: Bool,
+        showsPointStatus: Bool,
+        usesSmallClosetStyle: Bool,
         ownerId: UUID?,
         ownerName: String,
         items: HomeClosetItems
     ) -> some View {
         GeometryReader { geometry in
+            let headerHeight = pageHeaderHeight(
+                hasSubTitle: subTitle != nil,
+                showsReturnButton: showsReturnButton
+            )
             let closetHeight = closetHeight(
                 availableHeight: geometry.size.height,
+                headerHeight: headerHeight,
                 showsReview: showsReview,
-                showsReturnButton: showsReturnButton
+                usesSmallClosetStyle: usesSmallClosetStyle
             )
 
             VStack(alignment: .leading, spacing: 0) {
                 pageHeader(
                     mainTitle: mainTitle,
                     subTitle: subTitle,
-                    showsReturnButton: showsReturnButton
+                    headerHeight: headerHeight,
+                    showsReturnButton: showsReturnButton,
+                    showsPointStatus: showsPointStatus
                 )
 
                 if showsReview {
@@ -241,9 +262,10 @@ struct HomeView: View {
 
                 centeredClosetView(
                     items: items,
+                    targetHeight: closetHeight,
                     ownerId: ownerId,
                     ownerName: ownerName,
-                    targetHeight: closetHeight
+                    usesSmallClosetStyle: usesSmallClosetStyle
                 )
             }
             .frame(
@@ -256,21 +278,36 @@ struct HomeView: View {
 
     private func closetHeight(
         availableHeight: CGFloat,
+        headerHeight: CGFloat,
         showsReview: Bool,
-        showsReturnButton: Bool
+        usesSmallClosetStyle: Bool
     ) -> CGFloat {
-        let headerHeight: CGFloat = showsReturnButton ? 94 : 46
-        let reviewHeight: CGFloat = showsReview ? 170 : 0
+        let reviewHeight: CGFloat = showsReview ? 154 : 0
         let headerToClosetGap: CGFloat = showsReview ? 0 : 16
         let availableClosetHeight = availableHeight - headerHeight - reviewHeight - headerToClosetGap
+        let closetMaxHeight: CGFloat = usesSmallClosetStyle ? 466.67 : 542.14
+        let closetMinHeight: CGFloat = usesSmallClosetStyle ? 360 : 390
 
-        return min(542.14, max(390, availableClosetHeight))
+        return min(closetMaxHeight, max(closetMinHeight, availableClosetHeight))
+    }
+
+    private func pageHeaderHeight(
+        hasSubTitle: Bool,
+        showsReturnButton: Bool
+    ) -> CGFloat {
+        if showsReturnButton {
+            return 94
+        }
+
+        return hasSubTitle ? 86 : 46
     }
 
     private func pageHeader(
         mainTitle: String,
         subTitle: String?,
-        showsReturnButton: Bool
+        headerHeight: CGFloat,
+        showsReturnButton: Bool,
+        showsPointStatus: Bool
     ) -> some View {
         HStack(alignment: .bottom, spacing: 16) {
             VStack(alignment: .leading, spacing: 6) {
@@ -287,6 +324,10 @@ struct HomeView: View {
 
             Spacer(minLength: 0)
 
+            if showsPointStatus {
+                pointStatusView
+            }
+
             if showsReturnButton {
                 OutlineButton(title: "↩︎ 돌려주기") {
                     isReturnViewPresented = true
@@ -295,73 +336,88 @@ struct HomeView: View {
         }
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
-        .frame(height: showsReturnButton ? 94 : 46, alignment: .bottom)
+        .frame(height: headerHeight, alignment: .bottom)
+    }
+
+    private var pointStatusView: some View {
+        HStack(spacing: 6) {
+            Image("Coin")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 22, height: 22)
+
+            Text(formatNumber(store.currentUser?.point ?? 0))
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Color("customBlack"))
+        }
+        .padding(.bottom, 2)
     }
 
     // MARK: - Review
 
     private var reviewView: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("내가 받은 리뷰")
-                .font(.system(size: 16))
-                .foregroundStyle(.secondary)
-                .padding(.leading, 18)
-
-            reviewScrollView
-                .padding(.top, 12.28)
-                .padding(.bottom, 10.88)
-        }
+        reviewScrollView
     }
 
     private var reviewScrollView: some View {
-        ScrollViewReader { proxy in
-            ZStack(alignment: .trailing) {
-                ScrollView(.horizontal) {
-                    LazyHStack(spacing: 0) {
-                        ForEach(0..<reviewCount, id: \.self) { index in
-                            NoteButton {
+        GeometryReader { geometry in
+            let leadingPadding: CGFloat = 16
+            let trailingPadding: CGFloat = 16
+            let trailingFadeWidth: CGFloat = 56
+            let contentWidth = geometry.size.width - leadingPadding - trailingPadding
+            let cardSize = contentWidth / 3
+
+            ScrollViewReader { proxy in
+                ZStack(alignment: .trailing) {
+                    ScrollView(.horizontal) {
+                        LazyHStack(spacing: 0) {
+                            ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
+                                ThankYouLetterPreviewCardView(
+                                    preview: preview,
+                                    cardSize: cardSize
+                                )
+                                .id(index)
+                                .frame(width: cardSize, height: cardSize)
                             }
-                            .frame(width: 99.83)
-                            .id(index)
-                            .padding(.horizontal, 3)
+                        }
+                    }
+                    .scrollIndicators(.hidden)
+
+                    ZStack {
+                        LinearGradient(
+                            colors: [
+                                Color.customWhite.opacity(0),
+                                Color.customWhite
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        .frame(width: trailingFadeWidth, height: cardSize)
+
+                        PrimaryIconButton(
+                            icon: Image(systemName: "chevron.right")
+                        ) {
+                            moveToNextReview(using: proxy)
                         }
                     }
                 }
-                .scrollIndicators(.hidden)
-
-                ZStack {
-                    LinearGradient(
-                        colors: [
-                            Color.customWhite.opacity(0),
-                            Color.customWhite
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                    .frame(width: 40, height: 100)
-
-                    PrimaryIconButton(
-                        icon: Image(systemName: "chevron.right")
-                    ) {
-                        moveToNextReview(using: proxy)
-                    }
-                }
+                .padding(.leading, leadingPadding)
+                .padding(.trailing, trailingPadding)
+                .frame(height: cardSize)
+                .clipped()
             }
-            .frame(height: 100)
-            .clipped()
         }
-        .padding(.leading, 23)
-        .padding(.trailing, 58.83)
+        .frame(height: 120)
     }
 
     private func moveToNextReview(
         using proxy: ScrollViewProxy
     ) {
-        guard reviewCount > 0 else {
+        guard !thankYouLetterPreviews.isEmpty else {
             return
         }
 
-        if currentReviewIndex < reviewCount - 1 {
+        if currentReviewIndex < thankYouLetterPreviews.count - 1 {
             currentReviewIndex += 1
         } else {
             currentReviewIndex = 0
@@ -379,12 +435,15 @@ struct HomeView: View {
 
     private func centeredClosetView(
         items: HomeClosetItems,
+        targetHeight: CGFloat,
         ownerId: UUID?,
         ownerName: String,
-        targetHeight: CGFloat
+        usesSmallClosetStyle: Bool
     ) -> some View {
-        let scale = targetHeight / 542.14
-        let targetWidth = 356.4 * scale
+        let closetBaseWidth: CGFloat = 356.4
+        let closetBaseHeight: CGFloat = usesSmallClosetStyle ? 466.67 : 542.14
+        let scale = targetHeight / closetBaseHeight
+        let targetWidth = closetBaseWidth * scale
 
         return HStack {
             Spacer(minLength: 0)
@@ -392,7 +451,8 @@ struct HomeView: View {
             closetView(
                 items: items,
                 ownerId: ownerId,
-                ownerName: ownerName
+                ownerName: ownerName,
+                usesSmallClosetStyle: usesSmallClosetStyle
             )
             .scaleEffect(scale, anchor: .top)
             .frame(
@@ -411,15 +471,19 @@ struct HomeView: View {
     private func closetView(
         items: HomeClosetItems,
         ownerId: UUID?,
-        ownerName: String
+        ownerName: String,
+        usesSmallClosetStyle: Bool
     ) -> some View {
-        ZStack {
-            Image("MyCloset")
+        let closetBaseWidth: CGFloat = 356.4
+        let closetBaseHeight: CGFloat = usesSmallClosetStyle ? 466.67 : 542.14
+
+        return ZStack {
+            Image(usesSmallClosetStyle ? "MyClosetSmall" : "MyCloset")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 356.4, height: 542.14)
+                .frame(width: closetBaseWidth, height: closetBaseHeight)
 
-            VStack(spacing: 0) {
+            VStack(spacing: usesSmallClosetStyle ? 12 : 0) {
                 MyClosetSectionView(
                     title: "상의",
                     items: items.topItems,
@@ -428,7 +492,7 @@ struct HomeView: View {
                         isRentalViewPresented = true
                     }
                 ) {
-                    print("상의 더보기")
+                    isUnavailableClosetAlertPresented = true
                 }
                 .frame(width: 307, height: 136)
 
@@ -440,21 +504,23 @@ struct HomeView: View {
                         isRentalViewPresented = true
                     }
                 ) {
-                    print("하의 더보기")
+                    isUnavailableClosetAlertPresented = true
                 }
                 .frame(width: 307, height: 136)
 
-                MyClosetSectionView(
-                    title: "기타",
-                    items: items.otherItems,
-                    onItemTap: { item in
-                        selectedRentalItem = item
-                        isRentalViewPresented = true
+                if !usesSmallClosetStyle {
+                    MyClosetSectionView(
+                        title: "기타",
+                        items: items.otherItems,
+                        onItemTap: { item in
+                            selectedRentalItem = item
+                            isRentalViewPresented = true
+                        }
+                    ) {
+                        isUnavailableClosetAlertPresented = true
                     }
-                ) {
-                    print("기타 더보기")
+                    .frame(width: 307, height: 124)
                 }
-                .frame(width: 307, height: 124)
 
                 MyClosetButton(title: "옷장 전체 보기") {
                     guard let ownerId else {
@@ -465,11 +531,18 @@ struct HomeView: View {
                     selectedClosetOwnerName = ownerName
                     isClosetAllViewPresented = true
                 }
-                .padding(.top, 8.87)
+                .padding(.top, usesSmallClosetStyle ? 2 : 8.87)
             }
-            .padding(.bottom, 30)
+            .padding(.top, usesSmallClosetStyle ? 0 : 0)
+            .padding(.bottom, usesSmallClosetStyle ? 30 : 30)
         }
-        .frame(width: 356.4, height: 542.14)
+        .frame(width: closetBaseWidth, height: closetBaseHeight)
+    }
+
+    private func formatNumber(_ num: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: num)) ?? "\(num)"
     }
 
     private var pageIndicator: some View {
@@ -490,6 +563,64 @@ private struct HomeClosetItems {
 
     var isEmpty: Bool {
         topItems.isEmpty && bottomItems.isEmpty && otherItems.isEmpty
+    }
+}
+
+private struct HomeThankYouLetterPreview: Identifiable {
+    var id: String {
+        imageName
+    }
+
+    let authorName: String
+    let imageName: String
+}
+
+private struct ReviewAuthorBadgeView: View {
+    let authorName: String
+
+    var body: some View {
+        Text(authorName)
+            .font(.system(size: 12, weight: .bold))
+            .foregroundStyle(Color("customWhite"))
+            .frame(width: 32, height: 32)
+            .background(Color("gray40"))
+            .clipShape(Circle())
+            .overlay {
+                Circle()
+                    .stroke(Color("customWhite"), lineWidth: 1.2)
+            }
+    }
+}
+
+private struct ThankYouLetterThumbnailView: View {
+    let imageName: String
+    let size: CGFloat
+
+    var body: some View {
+        Image(imageName)
+            .resizable()
+            .scaledToFill()
+            .frame(width: size, height: size)
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+    }
+}
+
+private struct ThankYouLetterPreviewCardView: View {
+    let preview: HomeThankYouLetterPreview
+    let cardSize: CGFloat
+
+    var body: some View {
+        ThankYouLetterThumbnailView(
+            imageName: preview.imageName,
+            size: max(cardSize - 8, CGFloat.zero)
+        )
+            .overlay(alignment: .topLeading) {
+                ReviewAuthorBadgeView(authorName: preview.authorName)
+                    .padding(.top, 4)
+                    .padding(.leading, 4)
+            }
+            .frame(width: cardSize, height: cardSize, alignment: .leading)
     }
 }
 

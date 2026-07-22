@@ -16,8 +16,9 @@ struct MyClosetSectionView: View {
     /// 카테고리 전체 보기 화면으로 이동할 때 사용
     let action: () -> Void
 
-    /// 현재 화살표 버튼으로 이동한 이미지 위치
-    @State private var currentIndex = 0
+    private var displayedItems: [ClothItem] {
+        Array(items.prefix(3))
+    }
 
     var body: some View {
         ZStack{
@@ -28,7 +29,7 @@ struct MyClosetSectionView: View {
                 
                 divider
                 
-                clothesScrollView
+                clothesPreviewView
                     .padding(.top, 3)
             }
             
@@ -57,69 +58,32 @@ struct MyClosetSectionView: View {
             .frame(height: 2)
     }
 
-    // MARK: - 가로 스크롤
+    // MARK: - 옷 미리보기
 
-    private var clothesScrollView: some View {
-        ScrollViewReader { proxy in
-            ZStack(alignment: .trailing) {
-                ScrollView(.horizontal) {
-                    LazyHStack(spacing: 0) {
-                        ForEach(
-                            Array(items.enumerated()),
-                            id: \.element.id
-                        ) { index, item in
-                            Button {
-                                onItemTap(item)
-                            } label: {
-                                MyClothThumbnailView(item: item)
-                            }
-                            .buttonStyle(.plain)
-                            .id(index)
-                        }
+    private var clothesPreviewView: some View {
+        ZStack(alignment: .trailing) {
+            HStack(spacing: 4) {
+                ForEach(displayedItems) { item in
+                    Button {
+                        onItemTap(item)
+                    } label: {
+                        MyClothThumbnailView(item: item)
+                            .scaleEffect(0.86)
+                            .frame(width: 82, height: 82)
                     }
-                }
-                .scrollIndicators(.hidden)
-
-                ZStack {
-                    LinearGradient(
-                        colors: [Color.customWhite.opacity(0), Color.customWhite],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                    .frame(width: 60)
-
-                    PrimaryIconButton(
-                        icon: Image(systemName: "chevron.right")
-                    ) {
-                        moveToNextItem(using: proxy)
-                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .clipped()
-        }
-    }
+            .padding(.leading, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-    // MARK: - 다음 이미지로 이동
-
-    private func moveToNextItem(
-        using proxy: ScrollViewProxy
-    ) {
-        guard !items.isEmpty else {
-            return
+            PrimaryIconButton(
+                icon: Image(systemName: "chevron.right")
+            ) {
+                action()
+            }
         }
-
-        if currentIndex < items.count - 1 {
-            currentIndex += 1
-        } else {
-            currentIndex = 0
-        }
-
-        withAnimation(.easeInOut(duration: 0.3)) {
-            proxy.scrollTo(
-                currentIndex,
-                anchor: .center
-            )
-        }
+        .clipped()
     }
 }
 
