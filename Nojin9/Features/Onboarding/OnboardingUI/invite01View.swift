@@ -66,9 +66,16 @@ struct invite01View: View {
             
             // 4. 초대 코드 입력 필드 영역
             ZStack {
-                TextField("초대 코드를 입력해 주세요", text: $inviteCode)
+                TextField(
+                    "",
+                    text: $inviteCode,
+                    prompt: Text("초대 코드를 입력해 주세요")
+                        .foregroundStyle(Color.gray60)
+                )
                     .multilineTextAlignment(.center)
                     .font(.appBody)
+                    .foregroundStyle(Color.customBlack)
+                    .tint(Color.brandPrimary)
                     .onChange(of: inviteCode) { newValue in
                         if newValue.count > 6 {
                             inviteCode = String(newValue.prefix(6))
@@ -123,6 +130,8 @@ struct invite01View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.customWhite.ignoresSafeArea())
     }
 }
 

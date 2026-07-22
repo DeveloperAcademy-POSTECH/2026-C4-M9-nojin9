@@ -30,7 +30,7 @@ struct SignupkakaoView: View {
     
     var body: some View {
         ZStack {
-            Color.black.opacity(0.65)
+            Color.customBlack.opacity(0.65)
                 .ignoresSafeArea()
             
             VStack(spacing: 24) {
@@ -39,7 +39,7 @@ struct SignupkakaoView: View {
                     // 1. 헤더 영역 (서비스 명)
                     HStack(spacing: 12) {
                         RoundedRectangle(cornerRadius: 11)
-                            .fill(Color(UIColor.systemGray5))
+                            .fill(Color.gray10)
                             .frame(width: 48, height: 48)
                         
                         VStack(alignment: .leading, spacing: 2) {
@@ -48,7 +48,7 @@ struct SignupkakaoView: View {
                                 .fontWeight(.bold)
                             Text("Sister Share Cloth")
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color.gray60)
                         }
                         Spacer()
                     }
@@ -62,18 +62,18 @@ struct SignupkakaoView: View {
                             ZStack {
                                 Circle()
                                     // 모두 동의되었을 때만 노란색, 아니면 회색 배경
-                                    .fill(isAllAgreed ? themeYellow : Color(UIColor.systemGray5))
+                                    .fill(isAllAgreed ? themeYellow : Color.gray10)
                                     .frame(width: 24, height: 24)
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 12, weight: .bold))
                                     // 모두 동의되었을 때만 검은색, 아니면 회색 체크
-                                    .foregroundColor(isAllAgreed ? .black : Color.gray.opacity(0.5))
+                                    .foregroundColor(isAllAgreed ? Color.customBlack : Color.gray60.opacity(0.5))
                             }
                             
                             Text("전체 동의하기")
                                 .font(.headline)
                                 .fontWeight(.bold)
-                                .foregroundColor(.black)
+                                .foregroundColor(Color.customBlack)
                             Spacer()
                         }
                         .padding(20)
@@ -85,7 +85,7 @@ struct SignupkakaoView: View {
                     VStack(alignment: .leading, spacing: 18) {
                         Text("서비스 동의")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color.gray60)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.bottom, 4)
                         
@@ -102,7 +102,7 @@ struct SignupkakaoView: View {
                         HStack(alignment: .top, spacing: 12) {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(isKakaoAgreed ? .black : Color(UIColor.systemGray4))
+                                .foregroundColor(isKakaoAgreed ? Color.customBlack : Color.gray20)
                                 .padding(.top, 2)
                                 .onTapGesture {
                                     isKakaoAgreed.toggle()
@@ -114,7 +114,7 @@ struct SignupkakaoView: View {
                                     .lineSpacing(4)
                             }
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color.gray60)
                             .onTapGesture {
                                 isKakaoAgreed.toggle()
                             }
@@ -141,13 +141,13 @@ struct SignupkakaoView: View {
                     }) {
                         Text("동의하고 계속하기")
                             .font(.headline)
-                            .foregroundColor(isAllAgreed ? .black : Color.gray)
+                            .foregroundColor(isAllAgreed ? Color.customBlack : Color.gray60)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 18)
-                            .background(isAllAgreed ? themeYellow : Color(UIColor.systemGray5))
+                            .background(isAllAgreed ? themeYellow : Color.gray10)
                     }
                 }
-                .background(Color.white)
+                .background(Color.customWhite)
                 .cornerRadius(16)
                 .padding(.horizontal, 24)
                 
@@ -157,7 +157,7 @@ struct SignupkakaoView: View {
                 }) {
                     Text("취소")
                         .font(.subheadline)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.customWhite)
                         .underline()
                 }
             }
@@ -199,12 +199,12 @@ struct AgreementRow: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "checkmark")
                 .font(.system(size: 14, weight: .bold))
-                .foregroundColor(isAgreed ? .black : Color(UIColor.systemGray4))
+                .foregroundColor(isAgreed ? Color.customBlack : Color.gray20)
                 .padding(.top, 2)
             
             Text(title)
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(Color.gray60)
                 .fixedSize(horizontal: false, vertical: true)
             
             Spacer()
@@ -215,7 +215,7 @@ struct AgreementRow: View {
                 }) {
                     Text("보기")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.gray60)
                         .underline()
                 }
             }

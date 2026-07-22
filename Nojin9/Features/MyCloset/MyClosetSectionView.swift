@@ -43,7 +43,7 @@ struct MyClosetSectionView: View {
         HStack {
             Text(title)
                 .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(.black)
+                .foregroundStyle(Color.customBlack)
         }
         .padding(.horizontal, 10)
             .padding(.top, 8)
@@ -54,7 +54,7 @@ struct MyClosetSectionView: View {
 
     private var divider: some View {
         Rectangle()
-            .fill(.black)
+            .fill(Color.customBlack)
             .frame(height: 2)
     }
 

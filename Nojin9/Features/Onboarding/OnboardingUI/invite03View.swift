@@ -68,9 +68,16 @@ struct invite03View: View {
                 
                 // 초대 코드 필드 (이전 화면의 형태만 유지하고 비활성화)
                 ZStack {
-                    TextField("초대 코드를 입력해 주세요", text: $inviteCode)
+                    TextField(
+                        "",
+                        text: $inviteCode,
+                        prompt: Text("초대 코드를 입력해 주세요")
+                            .foregroundStyle(Color.gray60)
+                    )
                         .multilineTextAlignment(.center)
                         .font(.appBody)
+                        .foregroundStyle(Color.customBlack)
+                        .tint(Color.brandPrimary)
                         .disabled(true) // 입력 불가 처리
                 }
                 .padding(.vertical, 11.5)
@@ -105,9 +112,15 @@ struct invite03View: View {
                 HStack {
                     // 이름 텍스트필드 & 수정(연필) 아이콘
                     HStack(spacing: 6) {
-                        TextField("이름", text: $userName)
+                        TextField(
+                            "",
+                            text: $userName,
+                            prompt: Text("이름")
+                                .foregroundStyle(Color.gray60)
+                        )
                             .font(.appBody)
-                            .foregroundStyle(Color.gray60)
+                            .foregroundStyle(Color.customBlack)
+                            .tint(Color.brandPrimary)
                             .focused($isNameFocused) // ✅ 터치 시 키보드 활성화 연결
                             .fixedSize(horizontal: true, vertical: false) // 이름 길이에 맞춰 TextField 크기 조절
                         
@@ -165,7 +178,6 @@ struct invite03View: View {
         .onTapGesture {
             isNameFocused = false
         }
-        .navigationBarBackButtonHidden(true)
     }
 }
 

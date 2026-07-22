@@ -10,20 +10,6 @@ struct AllReviewView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // MARK: - Navigation Bar[cite: 19]
-            HStack {
-                BackButton {
-                    
-                }
-                Spacer()
-                Text("감사 편지").bodyBoldStyle()
-                Spacer()
-                Color.clear.frame(width: 36, height: 36)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 0)
-            .padding(.bottom, 18)
-            
             ZStack(alignment: .bottom) {
                 // MARK: - Scroll Content
                 ScrollView {
@@ -132,6 +118,9 @@ struct AllReviewView: View {
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
         )
+        .navigationTitle("감사 편지")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .sheet(item: $selectedReview) { reviewData in
             EachReview01(review: reviewData)
                 .presentationDetents([.height(UIScreen.main.bounds.height - 154)])

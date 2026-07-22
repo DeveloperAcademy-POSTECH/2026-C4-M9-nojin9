@@ -10,7 +10,6 @@ import SwiftUI
 
 struct ReturnView: View {
     @EnvironmentObject private var store: AppDataStore
-    @Environment(\.dismiss) private var dismiss
     let onHomeButtonTapped: () -> Void
 
     init(onHomeButtonTapped: @escaping () -> Void = { }) {
@@ -52,8 +51,6 @@ struct ReturnView: View {
             
             
             VStack(spacing: 0) {
-                navigationBar
-                
                 ScrollView {
                     VStack(spacing: 0) {
                         if activeRentals.isEmpty {
@@ -81,7 +78,9 @@ struct ReturnView: View {
                 
             }
         }
-        .navigationBarBackButtonHidden()
+        .navigationTitle("돌려주기")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .navigationDestination(isPresented: $isShowingReturnDetail) {
             if let selectedRental, let selectedItem {
                 ReturnDetailView(
@@ -94,20 +93,15 @@ struct ReturnView: View {
     }
     
     private var backgroundView: some View {
-        Image("Background")
-            .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-            .frame(width: .infinity, height: 300)
-    }
-    
-    private var navigationBar: some View {
-        ToolbarUI(
-            mode: .returnRequest,
-            onBack: {
-                dismiss()
-            }
-        )
+        ZStack {
+            Color.customWhite.ignoresSafeArea()
+
+            Image("Background")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                .frame(width: .infinity, height: 300)
+        }
     }
     
     @ViewBuilder
@@ -119,6 +113,7 @@ struct ReturnView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(title)
                     .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(Color.customBlack)
                 
                 ForEach(rentals) { rental in
                     if let item = store.clothItem(id: rental.clothItemId) {
@@ -141,14 +136,15 @@ struct ReturnView: View {
         VStack(spacing: 14) {
             Image(systemName: "shippingbox")
                 .font(.system(size: 42))
-                .foregroundStyle(.gray)
+                .foregroundStyle(Color.gray60)
             
             Text("돌려줄 물품이 없어요")
                 .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(Color.customBlack)
             
             Text("대여 중인 물품이 생기면 여기에 표시돼요.")
                 .font(.system(size: 14))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.gray60)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 150)

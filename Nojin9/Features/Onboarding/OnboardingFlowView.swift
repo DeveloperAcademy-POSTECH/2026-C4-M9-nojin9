@@ -56,6 +56,8 @@ struct OnboardingFlowView: View {
                     }
                 }
         }
+        .background(Color.customWhite.ignoresSafeArea())
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
 }
 

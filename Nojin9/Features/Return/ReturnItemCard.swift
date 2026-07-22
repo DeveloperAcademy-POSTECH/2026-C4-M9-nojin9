@@ -74,7 +74,7 @@ struct ReturnItemCard: View {
 
                 Text(rentalPeriodText)
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.gray60)
             }
         }
     }
@@ -135,7 +135,7 @@ struct ReturnItemCard: View {
             return .customBlack
         }
 
-        return dueAt < Date() ? .brandPrimary : .secondary
+        return dueAt < Date() ? Color.brandPrimary : Color.gray60
     }
 }
 
