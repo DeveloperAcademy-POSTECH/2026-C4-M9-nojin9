@@ -132,57 +132,30 @@ enum ReceivedReviewSeed {
 }
 
 struct EachReview01: View {
+    @EnvironmentObject private var store: AppDataStore
     @Environment(\.dismiss) var dismiss
     let review: ReviewData
+    let onMoveToClothItem: (ClothItem) -> Void
     
     @State private var currentIndex = 0
-    
+
+    private var reviewedClothItem: ClothItem? {
+        store.clothItem(imageName: review.clothesImageName)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            
             Capsule()
                 .fill(Color(.gray40))
                 .frame(width: 40, height: 4)
                 .padding(.top, 14)
                 .padding(.bottom, 14)
-            
+
             // MARK: - 스크롤 가능한 본문 내용
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    
-                    HStack(spacing: 16) {
-                        Image(review.clothesImageName)
-                            .resizable()
-                            .scaledToFit()
-                            .padding(.horizontal, 13)
-                            .padding(.vertical, 8)
-                            .frame(width: 60, height: 60)
-                            .background(Color(.brandPrimary10))
-                            .cornerRadius(2.79)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(review.clothesName)
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.customBlack)
-                            Text(review.dateRange)
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(.gray60)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.customWhite)
-                            .frame(width: 24, height: 24)
-                            .background(Color(.brandPrimary))
-                            .clipShape(Circle())
-                    }
-                    .padding()
-                    .background(Color.customWhite)
-                    .cornerRadius(5)
-                    .shadow(color: Color.customBlack.opacity(0.05), radius: 5, x: 0, y: 2)
-                    .padding(.top, 10)
-                    .padding(.bottom, 12)
-                    
+                    productInfoSection
+
                     VStack(spacing: 12) {
                         TabView(selection: $currentIndex) {
                             ForEach(0..<review.mainImageNames.count, id: \.self) { index in
@@ -238,6 +211,59 @@ struct EachReview01: View {
         .background(Color(.gray5))
         .ignoresSafeArea(edges: .bottom)
     }
+
+    private var productInfoSection: some View {
+        Group {
+            if let reviewedClothItem {
+                Button {
+                    dismiss()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        onMoveToClothItem(reviewedClothItem)
+                    }
+                } label: {
+                    productInfoCard
+                }
+                .buttonStyle(.plain)
+            } else {
+                productInfoCard
+            }
+        }
+        .padding(.top, 10)
+        .padding(.bottom, 12)
+    }
+
+    private var productInfoCard: some View {
+        HStack(spacing: 16) {
+            Image(review.clothesImageName)
+                .resizable()
+                .scaledToFit()
+                .padding(.horizontal, 13)
+                .padding(.vertical, 8)
+                .frame(width: 60, height: 60)
+                .background(Color(.brandPrimary10))
+                .cornerRadius(2.79)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(review.clothesName)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.customBlack)
+                Text(review.dateRange)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.gray60)
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.customWhite)
+                .frame(width: 24, height: 24)
+                .background(Color(.brandPrimary))
+                .clipShape(Circle())
+        }
+        .padding()
+        .background(Color.customWhite)
+        .cornerRadius(5)
+        .shadow(color: Color.customBlack.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
 }
 #Preview {
     EachReview01(review: ReviewData(
@@ -248,5 +274,8 @@ struct EachReview01: View {
         clothesImageName: "여기에 옷 Assets 이름 적어줘!!!",
         clothesName: "브라운 리본 민소매",
         dateRange: "26.06.12 ~ 26.06.18"
-    ))
+    ), onMoveToClothItem: { item in
+        print("\(item.name) 상품 화면으로 이동")
+    })
+    .environmentObject(AppDataStore())
 }

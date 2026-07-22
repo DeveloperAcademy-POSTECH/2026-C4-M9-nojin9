@@ -5,20 +5,6 @@
 //  Created by 김가은 on 7/15/26.
 //
 
-//
-//  MyPageView.swift
-//  Nojin9
-//
-//  Created by 김가은 on 7/15/26.
-//
-
-//
-//  MyPageView.swift
-//  Nojin9
-//
-//  Created by 김가은 on 7/15/26.
-//
-
 import SwiftUI
 
 struct MyPageView: View {

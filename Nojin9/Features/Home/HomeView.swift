@@ -2,6 +2,12 @@ import Foundation
 import SwiftUI
 import UIKit
 
+private enum ReviewRoute: Hashable {
+    case allReview
+    case itemSelection
+    case writing(rentalId: UUID, itemId: UUID)
+}
+
 struct HomeView: View {
     @EnvironmentObject private var store: AppDataStore
 
@@ -17,7 +23,7 @@ struct HomeView: View {
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
     @State private var isClosetAllViewPresented = false
-    @State private var isAllReviewViewPresented = false
+    @State private var reviewPath = NavigationPath()
     @State private var selectedClosetOwnerId: UUID?
     @State private var selectedClosetOwnerName = ""
     @State private var selectedClosetCategory: MyClosetCategory = .all
@@ -33,7 +39,7 @@ struct HomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $reviewPath) {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
                     backgroundView
@@ -151,20 +157,56 @@ struct HomeView: View {
                     )
                 }
             }
-            .navigationDestination(
-                isPresented: $isAllReviewViewPresented
-            ) {
-                AllReviewView(
-                    onMoveToWriteReview: {
-                        print("감사 편지 작성 화면으로 이동")
-                    },
-                    onMoveToHome: {
-                        isAllReviewViewPresented = false
+            .navigationDestination(for: ReviewRoute.self) { route in
+                switch route {
+                case .allReview:
+                    AllReviewView(
+                        onMoveToWriteReview: {
+                            reviewPath.append(ReviewRoute.itemSelection)
+                        },
+                        onMoveToClothItem: { item in
+                            moveToClothItem(item)
+                        }
+                    )
+
+                case .itemSelection:
+                    ReviewItemSelectionView(
+                        onStartWriting: { rental, item in
+                            reviewPath.append(
+                                ReviewRoute.writing(
+                                    rentalId: rental.id,
+                                    itemId: item.id
+                                )
+                            )
+                        },
+                        onMoveToHome: {
+                            reviewPath = NavigationPath()
+                        }
+                    )
+
+                case let .writing(rentalId, itemId):
+                    if let rental = store.rental(id: rentalId),
+                       let item = store.clothItem(id: itemId) {
+                        ReviewWritingView(
+                            rental: rental,
+                            item: item,
+                            onMoveToReviewList: {
+                                reviewPath.removeLast()
+                            },
+                            onMoveToHome: {
+                                reviewPath = NavigationPath()
+                            }
+                        )
                     }
-                )
+                }
             }
             .sheet(item: $selectedReview) { reviewData in
-                EachReview01(review: reviewData)
+                EachReview01(
+                    review: reviewData,
+                    onMoveToClothItem: { item in
+                        moveToClothItem(item)
+                    }
+                )
                     .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
                     .presentationDragIndicator(.hidden)
             }
@@ -220,6 +262,11 @@ struct HomeView: View {
         uploadPickedColor = nil
     }
 
+    private func moveToClothItem(_ item: ClothItem) {
+        selectedRentalItem = item
+        isRentalViewPresented = true
+    }
+
     private var myClosetItems: HomeClosetItems {
         guard let currentUser = store.currentUser else {
             return fallbackClosetItems
@@ -272,6 +319,9 @@ struct HomeView: View {
             mode: .home,
             onAdd: {
                 startUploadFlow()
+            },
+            onLetter: {
+                reviewPath.append(ReviewRoute.allReview)
             },
             onProfile: {
                 isMyPageViewPresented = true
@@ -460,7 +510,7 @@ struct HomeView: View {
                         PrimaryIconButton(
                             icon: Image(systemName: "chevron.right")
                         ) {
-                            isAllReviewViewPresented = true
+                            moveToNextReview(using: proxy)
                         }
                     }
                 }
