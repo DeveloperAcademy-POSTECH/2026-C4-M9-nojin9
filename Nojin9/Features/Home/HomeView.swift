@@ -11,6 +11,7 @@ struct HomeView: View {
     @State private var isClosetAllViewPresented = false
     @State private var selectedClosetOwnerId: UUID?
     @State private var selectedClosetOwnerName = ""
+    @State private var selectedClosetCategory: MyClosetCategory = .all
 
     @State private var isRentalViewPresented = false
     @State private var selectedRentalItem: ClothItem?
@@ -130,7 +131,8 @@ struct HomeView: View {
                 if let selectedClosetOwnerId {
                     MyClosetAllView(
                         ownerId: selectedClosetOwnerId,
-                        ownerName: selectedClosetOwnerName
+                        ownerName: selectedClosetOwnerName,
+                        initialCategory: selectedClosetCategory
                     )
                 }
             }
@@ -148,8 +150,6 @@ struct HomeView: View {
     private func bottomContentInset(for geometry: GeometryProxy) -> CGFloat {
         geometry.safeAreaInsets.bottom + 42
     }
-
-    // MARK: - Data
 
     private var myClosetItems: HomeClosetItems {
         guard let currentUser = store.currentUser else {
@@ -189,8 +189,6 @@ struct HomeView: View {
         return items
     }
 
-    // MARK: - Background
-
     private var backgroundView: some View {
         ZStack {
             Image("Background")
@@ -199,8 +197,6 @@ struct HomeView: View {
                 .ignoresSafeArea()
         }
     }
-
-    // MARK: - Top Menu
 
     private var topMenuView: some View {
         ToolbarUI(
@@ -216,8 +212,6 @@ struct HomeView: View {
             }
         )
     }
-
-    // MARK: - Closet Page
 
     private func closetPage(
         mainTitle: String,
@@ -353,8 +347,6 @@ struct HomeView: View {
         .padding(.bottom, 2)
     }
 
-    // MARK: - Review
-
     private var reviewView: some View {
         reviewScrollView
     }
@@ -431,8 +423,6 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Closet
-
     private func centeredClosetView(
         items: HomeClosetItems,
         targetHeight: CGFloat,
@@ -492,7 +482,14 @@ struct HomeView: View {
                         isRentalViewPresented = true
                     }
                 ) {
-                    isUnavailableClosetAlertPresented = true
+                    guard let ownerId else {
+                        return
+                    }
+                    
+                    selectedClosetOwnerId = ownerId
+                    selectedClosetOwnerName = ownerName
+                    selectedClosetCategory = .top
+                    isClosetAllViewPresented = true
                 }
                 .frame(width: 307, height: 136)
 
@@ -504,7 +501,14 @@ struct HomeView: View {
                         isRentalViewPresented = true
                     }
                 ) {
-                    isUnavailableClosetAlertPresented = true
+                    guard let ownerId else {
+                        return
+                    }
+                    
+                    selectedClosetOwnerId = ownerId
+                    selectedClosetOwnerName = ownerName
+                    selectedClosetCategory = .bottom
+                    isClosetAllViewPresented = true
                 }
                 .frame(width: 307, height: 136)
 
@@ -517,7 +521,14 @@ struct HomeView: View {
                             isRentalViewPresented = true
                         }
                     ) {
-                        isUnavailableClosetAlertPresented = true
+                        guard let ownerId else {
+                            return
+                        }
+                        
+                        selectedClosetOwnerId = ownerId
+                        selectedClosetOwnerName = ownerName
+                        selectedClosetCategory = .other
+                        isClosetAllViewPresented = true
                     }
                     .frame(width: 307, height: 124)
                 }
@@ -529,6 +540,7 @@ struct HomeView: View {
 
                     selectedClosetOwnerId = ownerId
                     selectedClosetOwnerName = ownerName
+                    selectedClosetCategory = .all
                     isClosetAllViewPresented = true
                 }
                 .padding(.top, usesSmallClosetStyle ? 2 : 8.87)
