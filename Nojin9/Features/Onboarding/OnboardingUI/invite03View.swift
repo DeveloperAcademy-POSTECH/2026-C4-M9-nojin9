@@ -164,13 +164,29 @@ struct invite03View: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
                 
-                // 다음 버튼
-                PrimaryButton(title: "다음") {
-                    // ✅ 다음 버튼 터치 시 invite04View로 이동합니다.
-                    navManager.push(.invite04)
+                HStack(spacing: 8) {
+                    SecondaryButton(title: "이전") {
+                        navManager.pop()
+                    }
+
+                    if userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        PrimaryDisabledButton(title: "다음") { }
+                    } else {
+                        Button(action: {
+                            navManager.push(.invite04)
+                        }) {
+                            Text("다음")
+                                .font(.appButton)
+                                .foregroundStyle(Color.customWhite)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(Color.brandPrimary)
+                                .clipShape(RoundedRectangle(cornerRadius: 5))
+                        }
+                    }
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 16)
+                .padding(.horizontal, 26)
+                .padding(.bottom, 13)
             }
         }
         // ✅ 빈 배경 터치 시 키보드를 자연스럽게 내리는 로직
@@ -178,6 +194,7 @@ struct invite03View: View {
         .onTapGesture {
             isNameFocused = false
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

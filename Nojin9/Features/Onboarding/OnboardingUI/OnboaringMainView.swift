@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OnboardingMainView: View {
     @EnvironmentObject var navManager: OnboardingNavigationManager
+    @State private var showingNotImplementedAlert = false
     
     var body: some View {
         ZStack {
@@ -42,7 +43,7 @@ struct OnboardingMainView: View {
                     }
                     
                     Button(action: {
-                        // 로그인 화면 라우트 추가 시 처리 가능
+                        showingNotImplementedAlert = true
                     }) {
                         Text("로그인")
                             .font(.appButton)
@@ -56,6 +57,11 @@ struct OnboardingMainView: View {
                 }
                 .padding(.bottom, 15)
             }
+        }
+        .alert("알림", isPresented: $showingNotImplementedAlert) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text("아직 구현 전 입니다")
         }
     }
 }
