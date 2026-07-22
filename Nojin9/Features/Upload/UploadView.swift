@@ -697,8 +697,8 @@ struct CameraPickerView: UIViewControllerRepresentable {
     }
 }
 
-//#Preview {
-//    NavigationStack {
-//        UploadView()
-//    }
-//}
+#Preview {
+    NavigationStack {
+        UploadView()
+    }
+}
