@@ -14,6 +14,7 @@ struct ReviewWritingView: View {
 
     let rental: Rental
     let item: ClothItem
+    let onHomeButtonTapped: () -> Void
 
     @State private var message = ""
 
@@ -33,14 +34,18 @@ struct ReviewWritingView: View {
             .isEmpty
     }
     
-    init(rental: Rental, item: ClothItem) {
+    init(
+        rental: Rental,
+        item: ClothItem,
+        onHomeButtonTapped: @escaping () -> Void
+    ) {
         self.rental = rental
         self.item = item
+        self.onHomeButtonTapped = onHomeButtonTapped
 
         UIPageControl.appearance().currentPageIndicatorTintColor = UIColor(
             Color.brandPrimary
         )
-
         UIPageControl.appearance().pageIndicatorTintColor = UIColor.systemGray4
     }
 
@@ -69,8 +74,15 @@ struct ReviewWritingView: View {
             }
 
             if isCompleted {
-                ReviewCompletionOverlay()
-                    .transition(.opacity)
+                ReviewCompletionOverlay(
+                    onMoveToReviewList: {
+                        moveToReviewList()
+                    },
+                    onMoveToHome: {
+                        moveToHome()
+                    }
+                )
+                .transition(.opacity)
             }
         }
         .navigationBarBackButtonHidden()
@@ -402,6 +414,14 @@ struct ReviewWritingView: View {
     }
 
     // MARK: - Register
+    
+    private func moveToHome() {
+        dismiss()
+
+        DispatchQueue.main.async {
+            onHomeButtonTapped()
+        }
+    }
 
     private func registerReview() {
         guard canSubmit else {
@@ -423,13 +443,20 @@ struct ReviewWritingView: View {
             isCompleted = true
         }
     }
+    
+    private func moveToReviewList() {
+        dismiss()
+    }
 }
 
 #Preview {
     NavigationStack {
         ReviewWritingView(
             rental: MockData.snapshot.rentals.first!,
-            item: MockData.snapshot.clothItems.first!
+            item: MockData.snapshot.clothItems.first!,
+            onHomeButtonTapped: {
+                print("홈으로 이동")
+            }
         )
         .environmentObject(
             AppDataStore(snapshot: MockData.snapshot)

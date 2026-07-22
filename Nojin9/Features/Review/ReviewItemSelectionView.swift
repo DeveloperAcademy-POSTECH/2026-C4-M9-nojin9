@@ -12,6 +12,8 @@ struct ReviewItemSelectionView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedRentalId: UUID?
+    @State private var selectedItem: ClothItem?
+    @State private var isWritingPresented = false
 
     private var selectedRental: Rental? {
         store.reviewableRentals.first {
@@ -111,30 +113,46 @@ struct ReviewItemSelectionView: View {
     }
 
     private var nextButton: some View {
-        NavigationLink {
-            if let selectedRental,
-               let item = store.clothItem(id: selectedRental.clothItemId) {
-                ReviewWritingView(
-                    rental: selectedRental,
-                    item: item
-                )
+        Button {
+            guard let rental = selectedRental,
+                  let item = store.clothItem(id: rental.clothItemId) else {
+                return
             }
+
+            selectedItem = item
+            isWritingPresented = true
         } label: {
             Text("작성하기")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.customWhite)
                 .frame(maxWidth: .infinity)
-                .frame(height: 52)
+                .frame(height: 47)
                 .background(
                     selectedRental == nil
-                    ? Color.gray40
-                    : Color.brandPrimary
+                        ? Color.gray20
+                        : Color.brandPrimary
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .clipShape(RoundedRectangle(cornerRadius: 5))
         }
         .disabled(selectedRental == nil)
-        .padding(.horizontal, 16)
-        .padding(.bottom, 12)
+        .navigationDestination(
+            isPresented: $isWritingPresented
+        ) {
+            if let rental = selectedRental,
+               let item = selectedItem {
+                ReviewWritingView(
+                    rental: rental,
+                    item: item,
+                    onHomeButtonTapped: {
+                        moveToHome()
+                    }
+                )
+            }
+        }
+    }
+    
+    private func moveToHome() {
+        dismiss()
     }
 }
 

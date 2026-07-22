@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct ReviewCompletionOverlay: View {
-    @Environment(\.dismiss) private var dismiss
+    let onMoveToReviewList: () -> Void
+    let onMoveToHome: () -> Void
+
     @State private var stickerScale: CGFloat = 0.5
+    @State private var stickerOpacity: Double = 0
 
     var body: some View {
         ZStack {
@@ -23,54 +26,77 @@ struct ReviewCompletionOverlay: View {
 
                 Spacer()
 
-                VStack(spacing: 8) {
-                    Button {
-                        // 감사 편지 목록 화면으로 이동하도록 추후 연결
-                        dismiss()
-                    } label: {
-                        Text("감사 편지 리스트로 가기")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.customWhite)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 46)
-                            .background(.brandPrimary)
-                            .clipShape(RoundedRectangle(cornerRadius: 5))
-                    }
-
-                    Button {
-                        // 현재 NavigationStack 구조에 따라
-                        // 홈으로 이동하는 상태값과 연결
-                        dismiss()
-                    } label: {
-                        Text("홈으로 돌아가기")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.brandPrimary)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 46)
-                            .background(Color.pink.opacity(0.13))
-                            .clipShape(RoundedRectangle(cornerRadius: 5))
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 22)
+                actionButtons
+            }
+        }
+        .onAppear {
+            withAnimation(
+                .spring(
+                    response: 0.45,
+                    dampingFraction: 0.65
+                )
+            ) {
+                stickerScale = 1
+                stickerOpacity = 1
             }
         }
     }
+
+    // MARK: - 완료 스티커
 
     private var completionSticker: some View {
-        ZStack {
-            Image("ReviewCompleteSticker")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 280, height: 280)
-                .scaleEffect(stickerScale)
-            }
-        }
+        Image("ReviewCompleteSticker")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 280, height: 280)
+            .scaleEffect(stickerScale)
+            .opacity(stickerOpacity)
     }
 
-#Preview {
-    NavigationStack {
-        ReviewItemSelectionView()
-            .environmentObject(AppDataStore())
+    // MARK: - 하단 버튼
+
+    private var actionButtons: some View {
+        VStack(spacing: 8) {
+            Button {
+                onMoveToReviewList()
+            } label: {
+                Text("감사 편지 리스트로 가기")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.customWhite)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 46)
+                    .background(.brandPrimary)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 5)
+                    )
+            }
+
+            Button {
+                onMoveToHome()
+            } label: {
+                Text("홈으로 돌아가기")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(.brandPrimary)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 47)
+                    .background(.brandPrimary10)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 5)
+                    )
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 22)
     }
+}
+
+#Preview {
+    ReviewCompletionOverlay(
+        onMoveToReviewList: {
+            print("감사 편지 리스트로 이동")
+        },
+        onMoveToHome: {
+            print("홈으로 이동")
+        }
+    )
 }
