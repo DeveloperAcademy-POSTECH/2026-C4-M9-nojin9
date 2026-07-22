@@ -27,6 +27,8 @@ struct ClothItem: Identifiable, Codable, Equatable {
     var category: ClothCategory
     var imageName: String?
     var cutoutImageName: String?
+    var keyColorName: String? = nil
+    var keyColorHex: String? = nil
     var pointCost: Int
     var description: String
     var condition: ClothCondition

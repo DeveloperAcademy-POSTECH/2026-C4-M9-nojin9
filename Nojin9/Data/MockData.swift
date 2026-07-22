@@ -15,7 +15,8 @@ struct ClosetRentalItemDetail: Identifiable {
     let categoryName: String           // 카테고리 텍스트 (예: "상의")
     let title: String                  // 옷 이름
     let isAvailable: Bool              // 빌려오기 가능 여부
-    let color: String                  // 색상
+    let color: String                  // 색상명
+    let colorHex: String?              // 표시용 hex 색상값
     let price: Int                     // 가격 (하트 개수)
     let notices: [String]              // 주의 사항 문구 배열
     let thankYouLetters: [ClosetThankYouLetter] // 각 스티커별 커스텀 감사 편지 데이터 세트
@@ -139,13 +140,17 @@ enum MockData {
         condition: ClothCondition = .good,
         isBorrowed: Bool = false
     ) -> ClothItem {
-        ClothItem(
+        let keyColor = ClosetStickerColorSeed.color(for: imageName)
+
+        return ClothItem(
             id: id,
             ownerId: ownerId,
             name: name,
             category: category,
             imageName: imageName,
             cutoutImageName: nil,
+            keyColorName: keyColor?.name,
+            keyColorHex: keyColor?.hex,
             pointCost: pointCost,
             description: description,
             condition: condition,
@@ -195,7 +200,9 @@ struct RentalMockData {
             
             // item.name이 nil일 경우를 대비해 기본값 처리
             let itemName = item.name ?? "이름 없는 옷"
-            let mappedColor = extractColor(from: itemName)
+            let seededColor = ClosetStickerColorSeed.color(for: item.imageName)
+            let mappedColor = item.keyColorName ?? seededColor?.name ?? "기본색"
+            let mappedColorHex = item.keyColorHex ?? seededColor?.hex
             
             let config = staticConfig[key] ?? (notices: [], letters: [])
             
@@ -206,20 +213,13 @@ struct RentalMockData {
                 title: itemName,
                 isAvailable: !item.isBorrowed,
                 color: mappedColor,
+                colorHex: mappedColorHex,
                 price: item.pointCost,
                 notices: config.notices,
                 thankYouLetters: config.letters
             )
         }
         return dict
-    }
-    
-    private static func extractColor(from name: String) -> String {
-        let colors = ["연회색", "진회색", "카키색", "검정색", "블랙", "연갈색", "고동색", "스페이스 그레이"]
-        for color in colors {
-            if name.contains(color) { return color }
-        }
-        return "기본색"
     }
     
     // 회원님이 기존에 선언해 두었던 감사 편지 및 주의사항 리스트 데이터 결합 테이블
