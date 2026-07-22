@@ -107,63 +107,80 @@ final class VisionClothCutoutService:
     }
     
     // 누끼 이미지의 알파 영역을 확장해 흰색 외곽선을 생성
-        private static func addingWhiteOutline(
-            to image: CIImage,
-            radius: Float = 12
-        ) -> CIImage {
-            let extent = image.extent
+    private static func addingWhiteOutline(
+        to image: CIImage,
+        radius: Float = 12
+    ) -> CIImage {
+        let extent = image.extent.integral
 
-            // 이미지의 알파 채널을 마스크로 변환
-            let alphaMask = image
-                .applyingFilter("CIMaskToAlpha")
-                .cropped(to: extent)
-
-            // 마스크를 확장해서 외곽선 영역 생성
-            let expandedMask = alphaMask
-                .applyingFilter(
-                    "CIMorphologyMaximum",
-                    parameters: [
-                        kCIInputRadiusKey: radius
-                    ]
-                )
-                .cropped(to: extent)
-
-            // 흰색 이미지
-            let whiteImage = CIImage(
-                color: CIColor(
-                    red: 1,
-                    green: 1,
-                    blue: 1,
-                    alpha: 1
-                )
+        // 원본 이미지의 알파 채널만 추출
+        let alphaMask = image
+            .applyingFilter(
+                "CIColorMatrix",
+                parameters: [
+                    "inputRVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+                    "inputGVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+                    "inputBVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+                    "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 1)
+                ]
             )
             .cropped(to: extent)
 
-            // 투명 배경 이미지
-            let transparentImage = CIImage(
-                color: CIColor(
-                    red: 0,
-                    green: 0,
-                    blue: 0,
-                    alpha: 0
-                )
+        // 알파 영역 확장
+        let expandedMask = alphaMask
+            .applyingFilter(
+                "CIMorphologyMaximum",
+                parameters: [
+                    kCIInputRadiusKey: radius
+                ]
             )
             .cropped(to: extent)
 
-            // 확장된 마스크 영역에 흰색 적용
-            let whiteSilhouette = whiteImage
-                .applyingFilter(
-                    "CIBlendWithMask",
-                    parameters: [
-                        kCIInputBackgroundImageKey: transparentImage,
-                        kCIInputMaskImageKey: expandedMask
-                    ]
-                )
-                .cropped(to: extent)
+        // 확장된 마스크 - 원본 마스크
+        // 즉, 바깥쪽 테두리 영역만 남김
+        let outlineMask = expandedMask
+            .applyingFilter(
+                "CISubtractBlendMode",
+                parameters: [
+                    kCIInputBackgroundImageKey: alphaMask
+                ]
+            )
+            .cropped(to: extent)
 
-            // 흰색 실루엣 위에 원본 누끼 이미지 합성
-            return image
-                .composited(over: whiteSilhouette)
-                .cropped(to: extent)
-        }
+        let whiteImage = CIImage(
+            color: CIColor(
+                red: 1,
+                green: 1,
+                blue: 1,
+                alpha: 1
+            )
+        )
+        .cropped(to: extent)
+
+        let transparentImage = CIImage(
+            color: CIColor(
+                red: 0,
+                green: 0,
+                blue: 0,
+                alpha: 0
+            )
+        )
+        .cropped(to: extent)
+
+        // 외곽선 영역에만 흰색 적용
+        let outlineImage = whiteImage
+            .applyingFilter(
+                "CIBlendWithAlphaMask",
+                parameters: [
+                    kCIInputBackgroundImageKey: transparentImage,
+                    kCIInputMaskImageKey: outlineMask
+                ]
+            )
+            .cropped(to: extent)
+
+        // 외곽선 위에 실제 옷 이미지 합성
+        return image
+            .composited(over: outlineImage)
+            .cropped(to: extent)
+    }
     }

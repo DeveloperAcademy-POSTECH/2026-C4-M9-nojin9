@@ -316,8 +316,7 @@ struct MyClosetAllView: View {
         _ item: ClothItem
     ) -> some View {
         if let imageName = item.cutoutImageName ?? item.imageName {
-            Image(imageName)
-                .resizable()
+            ClothImageView(imageName: imageName)
                 .scaledToFit()
                 .padding(6)
         } else {
@@ -328,7 +327,6 @@ struct MyClosetAllView: View {
                 .padding(28)
         }
     }
-
     // MARK: - Sticker
 
     private func borrowedSticker(

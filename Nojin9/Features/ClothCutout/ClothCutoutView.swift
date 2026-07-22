@@ -146,11 +146,6 @@ struct ClothCutoutView: View {
 
     @MainActor
     private func generateCutout() async {
-        guard let cgImage = originalImage.cgImage else {
-            errorMessage = "이미지를 불러오지 못했어요."
-            return
-        }
-
         isLoading = true
         errorMessage = nil
 
@@ -159,13 +154,23 @@ struct ClothCutoutView: View {
         }
 
         do {
+            let normalizedImage = originalImage.normalizedOrientation()
+
+            guard let cgImage = normalizedImage.cgImage else {
+                throw ImageNormalizationError.cgImageCreationFailed
+            }
+
             let result = try await cutoutService.generateCutout(
-                from: cgImage,
+                from: cgImage
             )
 
             try Task.checkCancellation()
 
-            cutoutImage = UIImage(cgImage: result)
+            cutoutImage = UIImage(
+                cgImage: result,
+                scale: normalizedImage.scale,
+                orientation: .up
+            )
         } catch is CancellationError {
             return
         } catch {
@@ -179,7 +184,46 @@ struct ClothCutoutView: View {
             errorMessage = error.localizedDescription
         }
     }
+} // 여기서 ClothCutoutView가 완전히 끝나야 함
+
+
+// MARK: - Image Normalization
+
+private enum ImageNormalizationError: LocalizedError {
+    case cgImageCreationFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .cgImageCreationFailed:
+            return "사진의 방향을 보정하지 못했어요."
+        }
+    }
 }
+
+private extension UIImage {
+    func normalizedOrientation() -> UIImage {
+        guard imageOrientation != .up else {
+            return self
+        }
+
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = scale
+        format.opaque = false
+
+        return UIGraphicsImageRenderer(
+            size: size,
+            format: format
+        ).image { _ in
+            draw(
+                in: CGRect(
+                    origin: .zero,
+                    size: size
+                )
+            )
+        }
+    }
+}
+
 
 #Preview {
     ClothCutoutView(
