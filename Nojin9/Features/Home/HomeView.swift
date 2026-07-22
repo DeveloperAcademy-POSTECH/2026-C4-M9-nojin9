@@ -163,7 +163,7 @@ struct HomeView: View {
                     AllReviewView(
                         onMoveToWriteReview: {
                             reviewPath.append(ReviewRoute.itemSelection)
-                        },
+                                        },
                         onMoveToClothItem: { item in
                             moveToClothItem(item)
                         }
@@ -171,14 +171,6 @@ struct HomeView: View {
 
                 case .itemSelection:
                     ReviewItemSelectionView(
-                        onStartWriting: { rental, item in
-                            reviewPath.append(
-                                ReviewRoute.writing(
-                                    rentalId: rental.id,
-                                    itemId: item.id
-                                )
-                            )
-                        },
                         onMoveToHome: {
                             reviewPath = NavigationPath()
                         }
@@ -207,8 +199,8 @@ struct HomeView: View {
                         moveToClothItem(item)
                     }
                 )
-                    .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
-                    .presentationDragIndicator(.hidden)
+                .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
+                .presentationDragIndicator(.hidden)
             }
             .onChange(of: isUploadViewPresented) { oldValue, newValue in
                 guard oldValue, !newValue, shouldConfirmUploadExit else {
@@ -427,7 +419,7 @@ struct HomeView: View {
 
                 if let subTitle {
                     Text(subTitle)
-                        .font(.appSubtitle)
+                        .font(.system(size: 24))
                         .foregroundStyle(Color.gray60)
                 }
             }
@@ -479,19 +471,19 @@ struct HomeView: View {
                 ZStack(alignment: .trailing) {
                     ScrollView(.horizontal) {
                         LazyHStack(spacing: 0) {
-	                            ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
-	                                Button {
-	                                    selectedReview = preview.review
-	                                } label: {
-	                                    ThankYouLetterPreviewCardView(
-	                                        preview: preview,
-	                                        cardSize: cardSize
-	                                    )
-	                                }
-	                                .buttonStyle(.plain)
-	                                .id(index)
-	                                .frame(width: cardSize, height: cardSize)
-	                            }
+                                ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
+                                    Button {
+                                        selectedReview = preview.review
+                                    } label: {
+                                        ThankYouLetterPreviewCardView(
+                                            preview: preview,
+                                            cardSize: cardSize
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                    .id(index)
+                                    .frame(width: cardSize, height: cardSize)
+                                }
                         }
                     }
                     .scrollIndicators(.hidden)
@@ -510,7 +502,7 @@ struct HomeView: View {
                         PrimaryIconButton(
                             icon: Image(systemName: "chevron.right")
                         ) {
-                            moveToNextReview(using: proxy)
+                            reviewPath.append(ReviewRoute.allReview)
                         }
                     }
                 }
