@@ -119,7 +119,9 @@ final class AppDataStore: ObservableObject {
         description: String,
         pointCost: Int = 0,
         imageName: String? = nil,
-        cutoutImageName: String? = nil
+        cutoutImageName: String? = nil,
+        keyColorName: String? = nil,
+        keyColorHex: String? = nil
     ) {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else { return }
@@ -132,6 +134,8 @@ final class AppDataStore: ObservableObject {
                 category: category,
                 imageName: imageName,
                 cutoutImageName: cutoutImageName,
+                keyColorName: keyColorName,
+                keyColorHex: keyColorHex,
                 pointCost: pointCost,
                 description: description.trimmingCharacters(in: .whitespacesAndNewlines),
                 condition: .good,

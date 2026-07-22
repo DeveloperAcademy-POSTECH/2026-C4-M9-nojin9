@@ -9,6 +9,8 @@ import UIKit
 
 struct UploadView: View {
     private let cutoutService = VisionClothCutoutService()
+    private let photoAreaHeight: CGFloat = 240
+    private let selectedImagePadding: CGFloat = 12
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: AppDataStore
@@ -20,6 +22,7 @@ struct UploadView: View {
     @State private var isShowingImageSource = false
     
     @State private var selectedImage: UIImage?
+    @State private var pickedColor: PickedClothColor?
     @State private var isCutoutProcessing = false
     @State private var cutoutErrorMessage: String?
     @State private var isShowingCutoutError = false
@@ -40,6 +43,7 @@ struct UploadView: View {
     private func processImage(_ originalImage: UIImage) async {
         isCutoutProcessing = true
         selectedImage = nil
+        pickedColor = nil
 
         defer {
             isCutoutProcessing = false
@@ -56,11 +60,14 @@ struct UploadView: View {
                 from: originalCGImage
             )
 
-            selectedImage = UIImage(
+            let cutoutImage = UIImage(
                 cgImage: cutoutCGImage,
                 scale: originalImage.scale,
                 orientation: .up
             )
+
+            selectedImage = cutoutImage
+            pickedColor = ClothColorPickerAnalyzer.initialPick(in: cutoutImage)
         } catch {
             cutoutErrorMessage = error.localizedDescription
             isShowingCutoutError = true
@@ -78,6 +85,7 @@ struct UploadView: View {
                     
                     VStack(alignment: .leading, spacing: 22) {
                         photoSection
+                        pointColorSection
                         divider
                         itemNameSection
                         categorySection
@@ -231,55 +239,31 @@ private extension UploadView {
     var photoSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             requiredTitle("물품 사진")
-            
-            Button {
-                isShowingImageSource = true
-            } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 5)
-                        .fill(.brandPrimary10)
-                    
-                    RoundedRectangle(cornerRadius: 5)
-                        .stroke(.gray10)
-                    
-                    if isCutoutProcessing {
-                        VStack(spacing: 14) {
-                            ProgressView()
-                                .tint(.brandPrimary)
-                                .scaleEffect(1.2)
 
-                            Text("사진 배경을 제거하고 있어요")
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundStyle(.brandPrimary)
-                        }
-                    } else if let selectedImage {
-                        Image(uiImage: selectedImage)
-                            .resizable()
-                            .scaledToFit()
-                            .padding(12)
-                    } else {
-                        VStack(spacing: 18) {
-                            ZStack {
-                                Circle()
-                                    .fill(.brandPrimary)
-                                    .opacity(0.2)
-                                    .frame(width: 98, height: 98)
+            ZStack {
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(.brandPrimary10)
 
-                                Image(systemName: "camera.fill")
-                                    .font(.system(size: 50))
-                                    .foregroundStyle(.brandPrimary)
-                            }
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(.gray10)
 
-                            Text("사진 첨부하기")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundStyle(.brandPrimary)
-                        }
-                    }
+                if isCutoutProcessing {
+                    cutoutProgressView
+                } else if let selectedImage {
+                    selectedPhotoView(selectedImage)
+                } else {
+                    emptyPhotoView
                 }
-                .frame(height: 240)
             }
-            .buttonStyle(.plain)
-            .disabled(isCutoutProcessing)
+            .frame(height: photoAreaHeight)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                guard selectedImage == nil, !isCutoutProcessing else {
+                    return
+                }
+
+                isShowingImageSource = true
+            }
             
             HStack{
                 Image(systemName: "checkmark")
@@ -290,6 +274,185 @@ private extension UploadView {
                     .foregroundStyle(.gray60)
             }
             .padding(.leading, 10)
+        }
+    }
+
+    var cutoutProgressView: some View {
+        VStack(spacing: 14) {
+            ProgressView()
+                .tint(.brandPrimary)
+                .scaleEffect(1.2)
+
+            Text("사진 배경을 제거하고 있어요")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(.brandPrimary)
+        }
+    }
+
+    var emptyPhotoView: some View {
+        VStack(spacing: 18) {
+            ZStack {
+                Circle()
+                    .fill(.brandPrimary)
+                    .opacity(0.2)
+                    .frame(width: 98, height: 98)
+
+                Image(systemName: "camera.fill")
+                    .font(.system(size: 50))
+                    .foregroundStyle(.brandPrimary)
+            }
+
+            Text("사진 첨부하기")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(.brandPrimary)
+        }
+    }
+
+    func selectedPhotoView(_ image: UIImage) -> some View {
+        GeometryReader { geometry in
+            let imageRect = fittedImageRect(
+                image: image,
+                in: geometry.size,
+                padding: selectedImagePadding
+            )
+
+            ZStack(alignment: .topLeading) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: imageRect.width, height: imageRect.height)
+                    .position(x: imageRect.midX, y: imageRect.midY)
+
+                if let pickedColor {
+                    colorPickerCircle(color: pickedColor.uiColor)
+                        .position(
+                            pickerPoint(
+                                for: pickedColor.normalizedPosition,
+                                in: imageRect
+                            )
+                        )
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    updatePickedColor(
+                                        at: value.location,
+                                        imageRect: imageRect,
+                                        image: image
+                                    )
+                                }
+                        )
+                }
+
+                Button {
+                    isShowingImageSource = true
+                } label: {
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.brandPrimary)
+                        .frame(width: 34, height: 34)
+                        .background(Color.customWhite.opacity(0.92))
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.12), radius: 4, x: 0, y: 2)
+                }
+                .buttonStyle(.plain)
+                .position(x: geometry.size.width - 28, y: 28)
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+        }
+    }
+
+    func colorPickerCircle(color: UIColor) -> some View {
+        Circle()
+            .fill(Color(color))
+            .frame(width: 30, height: 30)
+            .overlay {
+                Circle()
+                    .stroke(Color.white, lineWidth: 4)
+            }
+            .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 2)
+            .contentShape(Circle())
+    }
+
+    func updatePickedColor(
+        at location: CGPoint,
+        imageRect: CGRect,
+        image: UIImage
+    ) {
+        let normalizedPosition = CGPoint(
+            x: (location.x - imageRect.minX) / max(imageRect.width, 1),
+            y: (location.y - imageRect.minY) / max(imageRect.height, 1)
+        )
+
+        guard let nextColor = ClothColorPickerAnalyzer.pick(
+            in: image,
+            normalizedPosition: normalizedPosition
+        ) else {
+            return
+        }
+
+        pickedColor = nextColor
+    }
+
+    func pickerPoint(for normalizedPosition: CGPoint, in imageRect: CGRect) -> CGPoint {
+        CGPoint(
+            x: imageRect.minX + imageRect.width * normalizedPosition.x,
+            y: imageRect.minY + imageRect.height * normalizedPosition.y
+        )
+    }
+
+    func fittedImageRect(
+        image: UIImage,
+        in containerSize: CGSize,
+        padding: CGFloat
+    ) -> CGRect {
+        let availableWidth = max(containerSize.width - padding * 2, 1)
+        let availableHeight = max(containerSize.height - padding * 2, 1)
+        let imageSize = image.size
+        let scale = min(
+            availableWidth / max(imageSize.width, 1),
+            availableHeight / max(imageSize.height, 1)
+        )
+        let fittedSize = CGSize(
+            width: imageSize.width * scale,
+            height: imageSize.height * scale
+        )
+
+        return CGRect(
+            x: (containerSize.width - fittedSize.width) / 2,
+            y: (containerSize.height - fittedSize.height) / 2,
+            width: fittedSize.width,
+            height: fittedSize.height
+        )
+    }
+}
+
+// MARK: - 포인트 색상
+
+private extension UploadView {
+    @ViewBuilder
+    var pointColorSection: some View {
+        if let pickedColor {
+            HStack(spacing: 8) {
+                Text("이 옷의 포인트 색깔은")
+                    .font(.system(size: 15))
+                    .foregroundStyle(.customBlack)
+
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color(pickedColor.uiColor))
+                    .frame(width: 28, height: 18)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 3)
+                            .stroke(Color.gray.opacity(0.25), lineWidth: 1)
+                    }
+                    .accessibilityHidden(true)
+
+                Text("\(pickedColor.name) 입니다.")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.customBlack)
+            }
+            .padding(.horizontal, 10)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("이 옷의 포인트 색깔은 \(pickedColor.name) 입니다.")
         }
     }
 }
@@ -468,7 +631,9 @@ private extension UploadView {
                 category: selectedCategory,
                 description: precautions,
                 imageName: storedImageName,
-                cutoutImageName: storedImageName
+                cutoutImageName: storedImageName,
+                keyColorName: pickedColor?.name,
+                keyColorHex: pickedColor?.hex
             )
             dismiss()
         } catch {
