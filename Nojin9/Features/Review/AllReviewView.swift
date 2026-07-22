@@ -44,7 +44,7 @@ struct AllReviewView: View {
                 .padding(.bottom, 100)
             }
 
-            // MARK: - Floating Button[cite: 19]
+            // MARK: - Floating Button
             PrimaryButton(title: "감사 편지 작성하기") {
                 onMoveToWriteReview()
             }
@@ -56,8 +56,6 @@ struct AllReviewView: View {
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
         )
-        .navigationTitle("감사 편지")
-        .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .sheet(item: $selectedReview) { reviewData in
             EachReview01(
@@ -70,7 +68,7 @@ struct AllReviewView: View {
     }
 }
 
-// MARK: - 봉투 카드 컴포넌트[cite: 19]
+// MARK: - 봉투 카드 컴포넌트
 struct EnvelopeCardView: View {
     let name: String
     let imageName: String

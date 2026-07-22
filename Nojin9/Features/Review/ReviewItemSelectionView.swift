@@ -11,10 +11,14 @@ struct ReviewItemSelectionView: View {
     @EnvironmentObject private var store: AppDataStore
     @Environment(\.dismiss) private var dismiss
 
-    let onStartWriting: (Rental, ClothItem) -> Void
     let onMoveToHome: () -> Void
 
     @State private var selectedRentalId: UUID?
+
+    // MARK: - 화면 이동 및 데이터 전달을 위한 State
+    @State private var isShowingWritingView = false
+    @State private var targetRental: Rental?
+    @State private var targetItem: ClothItem?
 
     private var selectedRental: Rental? {
         store.reviewableRentals.first {
@@ -120,14 +124,17 @@ struct ReviewItemSelectionView: View {
                 return
             }
 
-            onStartWriting(rental, item)
+            // 전달할 데이터를 저장하고 화면 이동 트리거
+            targetRental = rental
+            targetItem = item
+            isShowingWritingView = true
 
         } label: {
             Text("작성하기")
-                .font(.system(size: 16, weight: .semibold))
+                .font(.appButton)
                 .foregroundStyle(.customWhite)
                 .frame(maxWidth: .infinity)
-                .frame(height: 47)
+                .frame(height: 56)
                 .background(
                     selectedRental == nil
                         ? Color.gray20
@@ -135,7 +142,22 @@ struct ReviewItemSelectionView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         }
+        .frame(width: 332, height: 46)
         .disabled(selectedRental == nil)
+        // MARK: - 네비게이션 목적지 설정
+        .navigationDestination(isPresented: $isShowingWritingView) {
+            if let rental = targetRental, let item = targetItem {
+                ReviewWritingView(
+                    rental: rental,
+                    item: item,
+                    onMoveToReviewList: {
+                        isShowingWritingView = false
+                        dismiss() // 리뷰 작성 완료 후 선택화면도 닫기
+                    },
+                    onMoveToHome: onMoveToHome
+                )
+            }
+        }
     }
     
     private func moveToHome() {
@@ -146,9 +168,6 @@ struct ReviewItemSelectionView: View {
 #Preview {
     NavigationStack {
         ReviewItemSelectionView(
-            onStartWriting: { rental, item in
-                print("\(item.name) 감사 편지 작성")
-            },
             onMoveToHome: {
                 print("홈으로 이동")
             }
