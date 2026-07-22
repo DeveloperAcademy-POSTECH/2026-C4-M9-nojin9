@@ -137,7 +137,6 @@ struct AllReviewView: View {
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
         )
-        .navigationTitle("감사 편지")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .sheet(item: $selectedReview) { reviewData in
