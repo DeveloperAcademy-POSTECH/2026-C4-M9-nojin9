@@ -54,6 +54,10 @@ final class AppDataStore: ObservableObject {
         snapshot.rentals.filter { $0.clothItemId == clothItemId }
     }
 
+    func rental(id: UUID) -> Rental? {
+        snapshot.rentals.first {$0.id == id}
+    }
+    
     func activeRental(for clothItemId: UUID) -> Rental? {
         snapshot.rentals.first {
             $0.clothItemId == clothItemId && $0.status == .borrowed
@@ -174,5 +178,53 @@ final class AppDataStore: ObservableObject {
         let days = calendar.dateComponents([.day], from: start, to: end).day ?? 0
 
         return max(days + 1, 1)
+    }
+}
+
+extension AppDataStore {
+
+    /// 현재 사용자가 빌렸고 감사 편지를 아직 작성하지 않은 대여 목록
+    var reviewableRentals: [Rental] {
+        guard let currentUserId = currentUser?.id else {
+            return []
+        }
+
+        return snapshot.rentals.filter { rental in
+            rental.borrowerId == currentUserId
+                && rental.status == .returned
+                && !snapshot.reviews.contains {
+                    $0.rentalId == rental.id
+                }
+        }
+    }
+
+    func review(for rentalId: UUID) -> Review? {
+        snapshot.reviews.first {
+            $0.rentalId == rentalId
+        }
+    }
+
+    func addReview(
+        rental: Rental,
+        item: ClothItem,
+        message: String,
+        photoDataList: [Data]
+    ) {
+        guard let currentUserId = currentUser?.id else {
+            return
+        }
+
+        let review = Review(
+            id: UUID(),
+            rentalId: rental.id,
+            clothItemId: item.id,
+            writerId: currentUserId,
+            receiverId: item.ownerId,
+            message: message,
+            photoDataList: photoDataList,
+            createdAt: Date()
+        )
+
+        snapshot.reviews.append(review)
     }
 }

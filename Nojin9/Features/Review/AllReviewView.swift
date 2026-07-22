@@ -1,15 +1,32 @@
 import SwiftUI
 
 struct AllReviewView: View {
+    let onMoveToWriteReview: () -> Void
+    let onMoveToHome: () -> Void
+
     let columns = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
     ]
-    
+
     @State private var selectedReview: ReviewData? = nil
     
     var body: some View {
         VStack(spacing: 0) {
+            // MARK: - Navigation Bar[cite: 19]
+            HStack {
+                BackButton {
+                    onMoveToHome()
+                }
+                Spacer()
+                Text("감사 편지").bodyBoldStyle()
+                Spacer()
+                Color.clear.frame(width: 36, height: 36)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 0)
+            .padding(.bottom, 18)
+            
             ZStack(alignment: .bottom) {
                 // MARK: - Scroll Content
                 ScrollView {
@@ -108,10 +125,12 @@ struct AllReviewView: View {
                 
                 // MARK: - Floating Button[cite: 19]
                 PrimaryButton(title: "감사 편지 작성하기") {
+                    onMoveToWriteReview()
                 }
                 .padding(.bottom, 10)
             }
         }
+        .navigationBarBackButtonHidden(true)
         .background(
             Image("Background")
                 .resizable()
@@ -156,6 +175,4 @@ struct EnvelopeCardView: View {
     }
 }
 
-#Preview {
-    AllReviewView()
-}
+#Preview { AllReviewView( onMoveToWriteReview: { print("감사 편지 작성 화면으로 이동") }, onMoveToHome: { print("홈으로 이동") } ) }
