@@ -36,7 +36,6 @@ struct ReturnDetailView: View {
             backgroundView
             
             VStack(spacing: 0) {
-                navigationBar
                 VStack(spacing: 0) {
                     itemCard
                     
@@ -58,30 +57,27 @@ struct ReturnDetailView: View {
             .spring(response: 0.4, dampingFraction: 0.75),
             value: isReturnCompleted
         )
-        .navigationBarBackButtonHidden()
+        .navigationTitle("돌려주기")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
-    
+
     private var backgroundView: some View {
-        Image("Background")
-            .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-    }
-    
-    private var navigationBar: some View {
-        ToolbarUI(
-            mode: .returnRequest,
-            onBack: {
-                dismiss()
-            }
-        )
-        .padding(.top, 10)
+        ZStack {
+            Color.customWhite.ignoresSafeArea()
+
+            Image("Background")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+        }
     }
     
     private var itemCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("반납 물품")
                 .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(Color.customBlack)
                 .padding(.top, 10)
                 .padding(.leading, 16)
             HStack(spacing: 12) {
@@ -104,21 +100,22 @@ struct ReturnDetailView: View {
                     HStack {
                         Text(item.name)
                             .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(Color.customBlack)
                         
                         Spacer()
                         
                         Text(dDayText)
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.pink)
+                            .foregroundStyle(Color.brandPrimary)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(Color.pink.opacity(0.12))
+                            .background(Color.brandPrimary.opacity(0.12))
                             .clipShape(Capsule())
                     }
                     
                     Text(rentalPeriodText)
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.gray60)
                 }
             }
             .padding(12)
@@ -126,7 +123,7 @@ struct ReturnDetailView: View {
             .clipShape(RoundedRectangle(cornerRadius: 5))
             .overlay {
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    .stroke(Color.gray60.opacity(0.2), lineWidth: 1)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 10)
@@ -142,9 +139,10 @@ struct ReturnDetailView: View {
                 
                 Text("돌려줄 물건을 훼손하셨나요?")
                     .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.customBlack)
             }
         }
-        .tint(.green)
+        .tint(Color.brandPrimary)
         .padding(.horizontal, 16)
         .padding(.bottom, 18)
         .onChange(of: isDamaged) { _, newValue in

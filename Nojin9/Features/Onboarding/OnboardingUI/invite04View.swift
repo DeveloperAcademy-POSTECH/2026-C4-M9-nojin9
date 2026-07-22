@@ -84,9 +84,16 @@ struct invite04View: View {
                 }
                 
                 // 닉네임 입력 필드
-                TextField("닉네임을 입력해주세요", text: $nickname)
+                TextField(
+                    "",
+                    text: $nickname,
+                    prompt: Text("닉네임을 입력해주세요")
+                        .foregroundStyle(Color.gray60)
+                )
                     .multilineTextAlignment(.center)
                     .font(.appBody)
+                    .foregroundStyle(Color.customBlack)
+                    .tint(Color.brandPrimary)
                     .focused($isFocused)
                     .padding(.vertical, 16)
                     .background(
@@ -128,7 +135,8 @@ struct invite04View: View {
         .onTapGesture {
             isFocused = false
         }
-        .navigationBarBackButtonHidden(true)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.customWhite.ignoresSafeArea())
     }
 }
 

@@ -59,7 +59,7 @@ struct EachReview01: View {
                     .padding()
                     .background(Color.customWhite)
                     .cornerRadius(5)
-                    .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+                    .shadow(color: Color.customBlack.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.top, 10)
                     .padding(.bottom, 12)
                     

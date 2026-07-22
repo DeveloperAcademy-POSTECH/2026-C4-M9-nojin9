@@ -86,16 +86,16 @@ struct ClothCutoutView: View {
     private var loadingView: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.black)
+                .fill(Color.customBlack)
 
             VStack(spacing: 16) {
                 ProgressView()
                     .controlSize(.large)
-                    .tint(.white)
+                    .tint(Color.customWhite)
 
                 Text("배경을 제거하고 있어요")
                     .font(.subheadline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.customWhite)
             }
         }
         .frame(maxWidth: .infinity)
@@ -113,7 +113,7 @@ struct ClothCutoutView: View {
             .frame(height: 500)
             .background {
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.black)
+                    .fill(Color.customBlack)
             }
             .clipShape(
                 RoundedRectangle(cornerRadius: 20)
@@ -131,7 +131,7 @@ struct ClothCutoutView: View {
             Text(message)
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.gray60)
 
             Button("다시 시도") {
                 Task {

@@ -36,7 +36,7 @@ struct ReceiptSuccessView: View {
             // MARK: 1. 배경 딤(Dim) 레이어
             // -----------------------------------------------
             if isPresented {
-                Color.black.opacity(showCompleteOverlay ? 0.8 : 0.6)
+                Color.customBlack.opacity(showCompleteOverlay ? 0.8 : 0.6)
                     .ignoresSafeArea()
             }
             
@@ -85,11 +85,11 @@ struct ReceiptSuccessView: View {
                             }
                             .padding(.horizontal, 60)
                         }
-                        .foregroundStyle(Color.black.opacity(0.8))
+                        .foregroundStyle(Color.customBlack.opacity(0.8))
                         .offset(y: 40) // 기존 오프셋 완벽히 유지
                     }
                 }
-                .background(Color.white.opacity(0.01))
+                .background(Color.customWhite.opacity(0.01))
                 .offset(y: animateReceipt ? 0 : UIScreen.main.bounds.height)
                 .onTapGesture {
                     if !showCompleteOverlay {
@@ -138,7 +138,7 @@ struct ReceiptSuccessView: View {
                     .padding(.bottom, 34)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.black.opacity(0.4))
+                .background(Color.customBlack.opacity(0.4))
                 .ignoresSafeArea()
             }
         }
@@ -153,7 +153,7 @@ struct ReceiptSuccessView: View {
         HStack {
             Text(title)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.gray.opacity(0.9))
+                .foregroundStyle(Color.gray60.opacity(0.9))
             Spacer()
             Text(value)
                 .font(.system(size: 12, weight: .semibold))
