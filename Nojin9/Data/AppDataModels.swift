@@ -53,6 +53,17 @@ extension ClothCategory {
             return "기타"
         }
     }
+
+    var defaultPointCost: Int {
+        switch self {
+        case .top:
+            return 2500
+        case .bottom:
+            return 1500
+        case .accessory:
+            return 1000
+        }
+    }
 }
 
 enum ClothCondition: String, Codable, Equatable {
