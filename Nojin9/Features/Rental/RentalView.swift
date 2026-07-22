@@ -119,10 +119,29 @@ struct RentalView: View {
             }
             .padding(.top, 8)
 
-            Text("색상  \(colorText(for: item))")
-                .font(.system(size: 15))
-                .foregroundStyle(Color("customBlack"))
-                .padding(.top, 10)
+            HStack(spacing: 8) {
+                Text("색상")
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color("customBlack"))
+
+                if let swatchColor = swatchColor(for: item) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(swatchColor)
+                        .frame(width: 28, height: 18)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 3)
+                                .stroke(Color.gray.opacity(0.25), lineWidth: 1)
+                        }
+                        .accessibilityHidden(true)
+                } else {
+                    Text(colorText(for: item))
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color("customBlack"))
+                }
+            }
+            .padding(.top, 10)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("색상 \(colorText(for: item))")
 
             Divider()
                 .background(Color("gray10"))
@@ -403,7 +422,19 @@ struct RentalView: View {
         item.imageName ?? item.cutoutImageName
     }
 
+    private func swatchColor(for item: ClothItem) -> Color? {
+        guard let keyColorHex = item.keyColorHex, !keyColorHex.isEmpty else {
+            return nil
+        }
+
+        return Color(hex: keyColorHex)
+    }
+
     private func colorText(for item: ClothItem) -> String {
+        if let keyColorName = item.keyColorName, !keyColorName.isEmpty {
+            return keyColorName
+        }
+
         let colors = ["아이보리", "스카이블루", "크림", "블랙", "연회색", "진회색", "카키색", "검정색", "연갈색", "고동색", "스페이스 그레이"]
         let title = itemTitle(for: item)
 
@@ -434,6 +465,22 @@ private extension View {
             self
             Spacer()
         }
+    }
+}
+
+private extension Color {
+    init?(hex: String) {
+        let sanitizedHex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        guard sanitizedHex.count == 6,
+              let int = UInt64(sanitizedHex, radix: 16) else {
+            return nil
+        }
+
+        let red = Double((int >> 16) & 0xFF) / 255
+        let green = Double((int >> 8) & 0xFF) / 255
+        let blue = Double(int & 0xFF) / 255
+
+        self.init(red: red, green: green, blue: blue)
     }
 }
 
