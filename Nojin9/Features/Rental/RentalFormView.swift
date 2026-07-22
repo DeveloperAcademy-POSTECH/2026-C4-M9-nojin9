@@ -5,10 +5,10 @@ struct RentalFormView: View {
     @EnvironmentObject private var store: AppDataStore
 
     let clothItemId: UUID
-
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-    @State private var isAgreed = false
+    @Binding var startDate: Date
+    @Binding var endDate: Date
+    @Binding var isAgreed: Bool
+    let onRentalFlowFinished: () -> Void
 
     @State private var isShowingReceipt = false
 
@@ -283,6 +283,7 @@ struct RentalFormView: View {
                 ReceiptSuccessView(
                     isPresented: $isShowingReceipt,
                     onHomeButtonTapped: {
+                        onRentalFlowFinished()
                         dismiss()
                     },
                     itemImageName: imageName(for: currentItem) ?? "",  // 현재 아이템 이미지 키값
@@ -356,7 +357,13 @@ struct RentalFormView: View {
 // ==========================================
 #Preview {
     NavigationStack {
-        RentalFormView(clothItemId: MockData.returnedRentalClothItemId)
+        RentalFormView(
+            clothItemId: MockData.returnedRentalClothItemId,
+            startDate: .constant(Date()),
+            endDate: .constant(Date()),
+            isAgreed: .constant(false),
+            onRentalFlowFinished: {}
+        )
     }
     .environmentObject(AppDataStore())
 }
