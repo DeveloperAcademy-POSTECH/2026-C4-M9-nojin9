@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AllReviewView: View {
     let onMoveToWriteReview: () -> Void
-    let onMoveToHome: () -> Void
+    let onMoveToClothItem: (ClothItem) -> Void
 
     let columns = [
         GridItem(.flexible(), spacing: 16),
@@ -12,71 +12,58 @@ struct AllReviewView: View {
     @State private var selectedReview: ReviewData? = nil
     
     var body: some View {
-        VStack(spacing: 0) {
-            // MARK: - Navigation Bar[cite: 19]
-            HStack {
-                BackButton {
-                    onMoveToHome()
-                }
-                Spacer()
-                Text("감사 편지").bodyBoldStyle()
-                Spacer()
-                Color.clear.frame(width: 36, height: 36)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 0)
-            .padding(.bottom, 18)
-            
-            ZStack(alignment: .bottom) {
-                // MARK: - Scroll Content
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 30) {
-                        ForEach(ReceivedReviewSeed.monthSections) { section in
-                            VStack(alignment: .leading, spacing: 18) {
-                                Text(section.month).subtitleBoldStyle().padding(.horizontal, 16)
+        ZStack(alignment: .bottom) {
+            // MARK: - Scroll Content
+            ScrollView {
+                VStack(alignment: .leading, spacing: 30) {
+                    ForEach(ReceivedReviewSeed.monthSections) { section in
+                        VStack(alignment: .leading, spacing: 18) {
+                            Text(section.month).subtitleBoldStyle().padding(.horizontal, 16)
 
-                                LazyVGrid(columns: columns, spacing: 37.82) {
-                                    ForEach(section.previews) { preview in
-                                        Button {
-                                            selectedReview = preview.review
-                                        } label: {
-                                            EnvelopeCardView(
-                                                name: preview.authorName,
-                                                imageName: preview.imageName
-                                            )
-                                        }
-                                    }
-
-                                    if section.previews.count % 2 == 1 {
-                                        Color.clear
+                            LazyVGrid(columns: columns, spacing: 37.82) {
+                                ForEach(section.previews) { preview in
+                                    Button {
+                                        selectedReview = preview.review
+                                    } label: {
+                                        EnvelopeCardView(
+                                            name: preview.authorName,
+                                            imageName: preview.imageName
+                                        )
                                     }
                                 }
-                                .padding(.horizontal, 26)
+
+                                if section.previews.count % 2 == 1 {
+                                    Color.clear
+                                }
                             }
+                            .padding(.horizontal, 26)
                         }
                     }
-                    .padding(.vertical, 20)
-                    .padding(.bottom, 100)
                 }
-                
-                // MARK: - Floating Button[cite: 19]
-                PrimaryButton(title: "감사 편지 작성하기") {
-                    onMoveToWriteReview()
-                }
-                .padding(.bottom, 10)
+                .padding(.vertical, 20)
+                .padding(.bottom, 100)
             }
+
+            // MARK: - Floating Button[cite: 19]
+            PrimaryButton(title: "감사 편지 작성하기") {
+                onMoveToWriteReview()
+            }
+            .padding(.bottom, 10)
         }
-        .navigationBarBackButtonHidden(true)
         .background(
             Image("Background")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
         )
+        .navigationTitle("감사 편지")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .sheet(item: $selectedReview) { reviewData in
-            EachReview01(review: reviewData)
+            EachReview01(
+                review: reviewData,
+                onMoveToClothItem: onMoveToClothItem
+            )
                 .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
                 .presentationDragIndicator(.hidden)
         }
@@ -110,4 +97,9 @@ struct EnvelopeCardView: View {
     }
 }
 
-#Preview { AllReviewView( onMoveToWriteReview: { print("감사 편지 작성 화면으로 이동") }, onMoveToHome: { print("홈으로 이동") } ) }
+#Preview {
+    AllReviewView(
+        onMoveToWriteReview: { print("감사 편지 작성 화면으로 이동") },
+        onMoveToClothItem: { item in print("\(item.name) 상품 화면으로 이동") }
+    )
+}

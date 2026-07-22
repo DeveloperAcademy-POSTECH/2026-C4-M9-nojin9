@@ -164,8 +164,8 @@ struct HomeView: View {
                         onMoveToWriteReview: {
                             reviewPath.append(ReviewRoute.itemSelection)
                         },
-                        onMoveToHome: {
-                            reviewPath.removeLast()
+                        onMoveToClothItem: { item in
+                            moveToClothItem(item)
                         }
                     )
 
@@ -191,13 +191,9 @@ struct HomeView: View {
                             rental: rental,
                             item: item,
                             onMoveToReviewList: {
-                                // 작성 화면 한 단계만 제거
-                                // → ReviewItemSelectionView로 돌아감
                                 reviewPath.removeLast()
                             },
                             onMoveToHome: {
-                                // 리뷰 관련 화면을 전부 제거
-                                // → HomeView로 돌아감
                                 reviewPath = NavigationPath()
                             }
                         )
@@ -205,7 +201,12 @@ struct HomeView: View {
                 }
             }
             .sheet(item: $selectedReview) { reviewData in
-                EachReview01(review: reviewData)
+                EachReview01(
+                    review: reviewData,
+                    onMoveToClothItem: { item in
+                        moveToClothItem(item)
+                    }
+                )
                     .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
                     .presentationDragIndicator(.hidden)
             }
@@ -259,6 +260,11 @@ struct HomeView: View {
         uploadPrecautions = ""
         uploadSelectedImage = nil
         uploadPickedColor = nil
+    }
+
+    private func moveToClothItem(_ item: ClothItem) {
+        selectedRentalItem = item
+        isRentalViewPresented = true
     }
 
     private var myClosetItems: HomeClosetItems {
