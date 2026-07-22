@@ -275,8 +275,7 @@ struct MyClosetAllView: View {
         _ item: ClothItem
     ) -> some View {
         if let imageName = item.cutoutImageName ?? item.imageName {
-            Image(imageName)
-                .resizable()
+            ClothImageView(imageName: imageName)
                 .scaledToFit()
                 .padding(6)
         } else {
