@@ -97,6 +97,14 @@ struct UploadView: View {
             }
             .scrollDismissesKeyboard(.interactively)
         }
+        .onTapGesture {
+            UIApplication.shared.sendAction(
+                #selector(UIResponder.resignFirstResponder),
+                to: nil,
+                from: nil,
+                for: nil
+            )
+        }
         .navigationTitle("내 물품 등록하기")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
