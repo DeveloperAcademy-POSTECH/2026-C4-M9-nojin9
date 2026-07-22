@@ -102,7 +102,7 @@ enum MockData {
     
     static let snapshot = AppDataSnapshot(
         users: users, userSession: userSession, clothItems: clothItems, clothItemRequests: clothItemRequests,
-        friendships: friendships, rentals: rentals, reviewSamples: reviewSamples, thankYouLetters: thankYouLetters, savedAt: baseDate
+        friendships: friendships, rentals: rentals, reviewSamples: reviewSamples, reviews: [], thankYouLetters: thankYouLetters, savedAt: baseDate
     )
 
     private static func makeClothItem(

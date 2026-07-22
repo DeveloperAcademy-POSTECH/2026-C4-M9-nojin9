@@ -137,6 +137,22 @@ struct ReviewSample: Identifiable, Codable, Equatable {
     let createdAt: Date
 }
 
+struct Review: Identifiable, Codable, Equatable {
+    let id: UUID
+    let rentalId: UUID
+    let clothItemId: UUID
+
+    /// 감사 편지를 작성한 사람
+    let writerId: UUID
+
+    /// 옷의 주인
+    let receiverId: UUID
+
+    let message: String
+    let photoDataList: [Data]
+    let createdAt: Date
+}
+
 struct ThankYouLetter: Identifiable, Codable, Equatable {
     let id: UUID
     var rentalId: UUID

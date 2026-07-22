@@ -11,6 +11,7 @@ struct SignupView: View {
     @EnvironmentObject var navManager: OnboardingNavigationManager
     
     @State private var isShowingB2View = false
+    @State private var showingNotImplementedAlert = false
     
     var body: some View {
         ZStack {
@@ -55,7 +56,7 @@ struct SignupView: View {
                             .foregroundStyle(Color.gray40)
                         
                         Button(action: {
-                            navManager.pop()
+                            showingNotImplementedAlert = true
                         }) {
                             Text("로그인")
                                 .font(.appCaption)
@@ -86,7 +87,7 @@ struct SignupView: View {
                         .frame(width: 332, height: 56)
                         
                         Button(action: {
-                   
+                            showingNotImplementedAlert = true
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: "apple.logo")
@@ -111,6 +112,11 @@ struct SignupView: View {
         .fullScreenCover(isPresented: $isShowingB2View) {
             SignupkakaoView()
                 .presentationBackground(.clear)
+        }
+        .alert("알림", isPresented: $showingNotImplementedAlert) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text("아직 구현 전 입니다")
         }
     }
 }

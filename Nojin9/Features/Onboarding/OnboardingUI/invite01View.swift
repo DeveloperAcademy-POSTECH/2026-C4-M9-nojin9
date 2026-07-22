@@ -122,16 +122,33 @@ struct invite01View: View {
             
             Spacer()
             
-            // 6. 하단 다음 버튼 (항상 활성화 상태)
-            PrimaryButton(title: "다음") {
-                // ✅ 누르면 즉시 invite04로 이동
-                navManager.push(.invite04)
+            HStack(spacing: 8) {
+                SecondaryButton(title: "이전") {
+                    navManager.pop()
+                }
+
+                if inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    PrimaryDisabledButton(title: "다음") { }
+                } else {
+                    Button(action: {
+                        navManager.push(.invite04)
+                    }) {
+                        Text("다음")
+                            .font(.appButton)
+                            .foregroundStyle(Color.customWhite)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.brandPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                    }
+                }
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 16)
+            .padding(.horizontal, 26)
+            .padding(.bottom, 13)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.customWhite.ignoresSafeArea())
+        .navigationBarBackButtonHidden(true)
     }
 }
 
