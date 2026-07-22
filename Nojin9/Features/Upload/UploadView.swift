@@ -648,6 +648,7 @@ private extension UploadView {
                 name: itemName,
                 category: selectedCategory,
                 description: precautions,
+                pointCost: selectedCategory.defaultPointCost,
                 imageName: storedImageName,
                 cutoutImageName: storedImageName,
                 keyColorName: pickedColor?.name,

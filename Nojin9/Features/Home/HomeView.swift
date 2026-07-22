@@ -24,15 +24,11 @@ struct HomeView: View {
     @State private var selectedRentalItem: ClothItem?
     @State private var selectedClosetPage = 1
     @State private var currentReviewIndex = 0
+    @State private var selectedReview: ReviewData?
 
-    private let thankYouLetterPreviews: [HomeThankYouLetterPreview] = [
-        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_1_1"),
-        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_2_1"),
-        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_3_1"),
-        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_4_1"),
-        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_5_1"),
-        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_6_1")
-    ]
+    private let thankYouLetterPreviews = ReceivedReviewSeed.previews.map {
+        HomeThankYouLetterPreview(review: $0.review)
+    }
 
     var body: some View {
         NavigationStack(path: $reviewPath) {
@@ -189,6 +185,11 @@ struct HomeView: View {
                         )
                     }
                 }
+            }
+            .sheet(item: $selectedReview) { reviewData in
+                EachReview01(review: reviewData)
+                    .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
+                    .presentationDragIndicator(.hidden)
             }
         }
     }
@@ -417,14 +418,19 @@ struct HomeView: View {
                 ZStack(alignment: .trailing) {
                     ScrollView(.horizontal) {
                         LazyHStack(spacing: 0) {
-                            ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
-                                ThankYouLetterPreviewCardView(
-                                    preview: preview,
-                                    cardSize: cardSize
-                                )
-                                .id(index)
-                                .frame(width: cardSize, height: cardSize)
-                            }
+	                            ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
+	                                Button {
+	                                    selectedReview = preview.review
+	                                } label: {
+	                                    ThankYouLetterPreviewCardView(
+	                                        preview: preview,
+	                                        cardSize: cardSize
+	                                    )
+	                                }
+	                                .buttonStyle(.plain)
+	                                .id(index)
+	                                .frame(width: cardSize, height: cardSize)
+	                            }
                         }
                     }
                     .scrollIndicators(.hidden)
@@ -637,8 +643,15 @@ private struct HomeThankYouLetterPreview: Identifiable {
         imageName
     }
 
-    let authorName: String
-    let imageName: String
+    let review: ReviewData
+
+    var authorName: String {
+        review.badgeName
+    }
+
+    var imageName: String {
+        review.mainImageNames.first ?? review.clothesImageName
+    }
 }
 
 private struct ReviewAuthorBadgeView: View {
