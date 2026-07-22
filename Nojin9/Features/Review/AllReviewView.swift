@@ -130,6 +130,7 @@ struct AllReviewView: View {
                 .padding(.bottom, 10)
             }
         }
+        .navigationBarBackButtonHidden(true)
         .background(
             Image("Background")
                 .resizable()
@@ -171,13 +172,4 @@ struct EnvelopeCardView: View {
     }
 }
 
-#Preview {
-    AllReviewView(
-        onMoveToWriteReview: {
-            print("감사 편지 작성 화면으로 이동")
-        },
-        onMoveToHome: {
-            print("홈으로 이동")
-        }
-    )
-}
+#Preview { AllReviewView( onMoveToWriteReview: { print("감사 편지 작성 화면으로 이동") }, onMoveToHome: { print("홈으로 이동") } ) }
