@@ -137,6 +137,7 @@ struct invite04View: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.customWhite.ignoresSafeArea())
+        .navigationBarBackButtonHidden(true)
     }
 }
 
