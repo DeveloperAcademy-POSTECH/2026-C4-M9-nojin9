@@ -128,14 +128,14 @@ struct RentalView: View {
                         .frame(width: 28, height: 18)
                         .overlay {
                             RoundedRectangle(cornerRadius: 3)
-                                .stroke(Color.gray.opacity(0.25), lineWidth: 1)
+                                .stroke(Color("gray20"), lineWidth: 1)
                         }
                         .accessibilityHidden(true)
-                } else {
-                    Text(colorText(for: item))
-                        .font(.system(size: 15))
-                        .foregroundStyle(Color("customBlack"))
                 }
+
+                Text(colorText(for: item))
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color("customBlack"))
             }
             .padding(.top, 10)
             .accessibilityElement(children: .combine)
