@@ -9,6 +9,7 @@ struct HomeView: View {
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
     @State private var isClosetAllViewPresented = false
+    @State private var isAllReviewViewPresented = false // 💡 추가된 상태 변수
     @State private var selectedClosetOwnerId: UUID?
     @State private var selectedClosetOwnerName = ""
     @State private var selectedClosetCategory: MyClosetCategory = .all
@@ -135,6 +136,11 @@ struct HomeView: View {
                         initialCategory: selectedClosetCategory
                     )
                 }
+            }
+            .navigationDestination( // 💡 추가된 화면 전환
+                isPresented: $isAllReviewViewPresented
+            ) {
+                AllReviewView()
             }
         }
     }
@@ -389,7 +395,7 @@ struct HomeView: View {
                         PrimaryIconButton(
                             icon: Image(systemName: "chevron.right")
                         ) {
-                            moveToNextReview(using: proxy)
+                            isAllReviewViewPresented = true // 💡 수정된 버튼 동작 (AllReviewView로 화면 전환)
                         }
                     }
                 }
