@@ -91,6 +91,9 @@ struct UploadView: View {
             }
             .scrollDismissesKeyboard(.interactively)
         }
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
         .navigationBarBackButtonHidden()
         
         .confirmationDialog(
@@ -552,8 +555,8 @@ struct CameraPickerView: UIViewControllerRepresentable {
     }
 }
 
-//#Preview {
-//    NavigationStack {
-//        UploadView()
-//    }
-//}
+#Preview {
+    NavigationStack {
+        UploadView()
+    }
+}

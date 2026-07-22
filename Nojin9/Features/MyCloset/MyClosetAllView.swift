@@ -14,11 +14,17 @@ struct MyClosetAllView: View {
     let ownerId: UUID
     let ownerName: String
 
-    @State private var selectedCategory: MyClosetCategory = .all
+    @State private var selectedCategory: MyClosetCategory
     @State private var selectedRentalItem: ClothItem?
     @State private var isRentalViewPresented = false
 
     private let itemsPerRow = 3
+
+    init(ownerId: UUID, ownerName: String, initialCategory: MyClosetCategory = .all) {
+        self.ownerId = ownerId
+        self.ownerName = ownerName
+        self._selectedCategory = State(initialValue: initialCategory)
+    }
 
     var body: some View {
         ZStack {
@@ -57,8 +63,6 @@ struct MyClosetAllView: View {
             }
         }
     }
-
-    // MARK: - Data
     
     private func activeRental(
         for item: ClothItem
@@ -146,8 +150,6 @@ struct MyClosetAllView: View {
         filteredItems.chunked(into: itemsPerRow)
     }
 
-    // MARK: - Background
-
     private var backgroundView: some View {
         Image("Background")
             .resizable()
@@ -155,8 +157,6 @@ struct MyClosetAllView: View {
             .ignoresSafeArea()
             .frame(width: .infinity, height: 300)
     }
-
-    // MARK: - Navigation Bar
 
     private var navigationBar: some View {
         ZStack {
@@ -191,8 +191,6 @@ struct MyClosetAllView: View {
         .padding(.top, 8)
         .frame(height: 60)
     }
-
-    // MARK: - Category
 
     private var categoryButtons: some View {
         ScrollView(.horizontal) {
@@ -245,8 +243,6 @@ struct MyClosetAllView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - Closet Row
-
     private func closetRow(
         _ items: [ClothItem]
     ) -> some View {
@@ -283,8 +279,6 @@ struct MyClosetAllView: View {
             RoundedRectangle(cornerRadius: 6)
         )
     }
-
-    // MARK: - Cloth Item
 
     private func clothItemButton(
         _ item: ClothItem
@@ -329,8 +323,6 @@ struct MyClosetAllView: View {
         }
     }
 
-    // MARK: - Sticker
-
     private func borrowedSticker(
         rental: Rental
     ) -> some View {
@@ -360,9 +352,7 @@ struct MyClosetAllView: View {
     }
 }
 
-// MARK: - Category
-
-private enum MyClosetCategory: CaseIterable {
+enum MyClosetCategory: CaseIterable {
     case all
     case top
     case bottom
@@ -384,8 +374,6 @@ private enum MyClosetCategory: CaseIterable {
         }
     }
 }
-
-// MARK: - Array Extension
 
 private extension Array {
     func chunked(
