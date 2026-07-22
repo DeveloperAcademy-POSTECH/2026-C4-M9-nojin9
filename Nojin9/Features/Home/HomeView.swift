@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 private enum ReviewRoute: Hashable {
     case allReview
@@ -11,6 +12,13 @@ struct HomeView: View {
     @EnvironmentObject private var store: AppDataStore
 
     @State private var isUploadViewPresented = false
+    @State private var isShowingUploadBackConfirmation = false
+    @State private var shouldConfirmUploadExit = false
+    @State private var uploadItemName = ""
+    @State private var uploadSelectedCategory: ClothCategory?
+    @State private var uploadPrecautions = ""
+    @State private var uploadSelectedImage: UIImage?
+    @State private var uploadPickedColor: PickedClothColor?
     @State private var isUnavailableClosetAlertPresented = false
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
@@ -105,7 +113,17 @@ struct HomeView: View {
             .navigationDestination(
                 isPresented: $isUploadViewPresented
             ) {
-                UploadView()
+                UploadView(
+                    itemName: $uploadItemName,
+                    selectedCategory: $uploadSelectedCategory,
+                    precautions: $uploadPrecautions,
+                    selectedImage: $uploadSelectedImage,
+                    pickedColor: $uploadPickedColor,
+                    onUploadFinished: {
+                        resetUploadDraft()
+                        shouldConfirmUploadExit = false
+                    }
+                )
             }
             .navigationDestination(
                 isPresented: $isMyPageViewPresented
@@ -191,6 +209,29 @@ struct HomeView: View {
                     .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
                     .presentationDragIndicator(.hidden)
             }
+            .onChange(of: isUploadViewPresented) { oldValue, newValue in
+                guard oldValue, !newValue, shouldConfirmUploadExit else {
+                    return
+                }
+
+                shouldConfirmUploadExit = false
+                isShowingUploadBackConfirmation = true
+            }
+            .alert(
+                "정말 뒤로 가시겠습니까?",
+                isPresented: $isShowingUploadBackConfirmation
+            ) {
+                Button("뒤로가기", role: .destructive) {
+                    resetUploadDraft()
+                }
+
+                Button("이어서 작성하기", role: .cancel) {
+                    shouldConfirmUploadExit = true
+                    isUploadViewPresented = true
+                }
+            } message: {
+                Text("지금까지 작성한 정보는 저장되지 않아요.")
+            }
         }
     }
 
@@ -204,6 +245,20 @@ struct HomeView: View {
 
     private func bottomContentInset(for geometry: GeometryProxy) -> CGFloat {
         geometry.safeAreaInsets.bottom + 42
+    }
+
+    private func startUploadFlow() {
+        resetUploadDraft()
+        shouldConfirmUploadExit = true
+        isUploadViewPresented = true
+    }
+
+    private func resetUploadDraft() {
+        uploadItemName = ""
+        uploadSelectedCategory = nil
+        uploadPrecautions = ""
+        uploadSelectedImage = nil
+        uploadPickedColor = nil
     }
 
     private var myClosetItems: HomeClosetItems {
@@ -257,7 +312,7 @@ struct HomeView: View {
         ToolbarUI(
             mode: .home,
             onAdd: {
-                isUploadViewPresented = true
+                startUploadFlow()
             },
             onLetter: {
                 reviewPath.append(ReviewRoute.allReview)

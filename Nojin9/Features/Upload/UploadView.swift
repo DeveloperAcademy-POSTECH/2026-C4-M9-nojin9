@@ -14,15 +14,15 @@ struct UploadView: View {
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: AppDataStore
-    
-    @State private var itemName = ""
-    @State private var selectedCategory: ClothCategory?
-    @State private var precautions = ""
+
+    @Binding var itemName: String
+    @Binding var selectedCategory: ClothCategory?
+    @Binding var precautions: String
+    @Binding var selectedImage: UIImage?
+    @Binding var pickedColor: PickedClothColor?
+    let onUploadFinished: () -> Void
     
     @State private var isShowingImageSource = false
-    
-    @State private var selectedImage: UIImage?
-    @State private var pickedColor: PickedClothColor?
     @State private var isCutoutProcessing = false
     @State private var cutoutErrorMessage: String?
     @State private var isShowingCutoutError = false
@@ -654,6 +654,7 @@ private extension UploadView {
                 keyColorName: pickedColor?.name,
                 keyColorHex: pickedColor?.hex
             )
+            onUploadFinished()
             dismiss()
         } catch {
             cutoutErrorMessage = "이미지를 저장하지 못했어요. 다시 시도해 주세요."
@@ -738,6 +739,13 @@ struct CameraPickerView: UIViewControllerRepresentable {
 
 #Preview {
     NavigationStack {
-        UploadView()
+        UploadView(
+            itemName: .constant(""),
+            selectedCategory: .constant(nil),
+            precautions: .constant(""),
+            selectedImage: .constant(nil),
+            pickedColor: .constant(nil),
+            onUploadFinished: {}
+        )
     }
 }
