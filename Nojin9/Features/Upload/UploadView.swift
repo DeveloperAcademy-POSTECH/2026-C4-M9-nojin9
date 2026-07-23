@@ -49,20 +49,24 @@ struct UploadView: View {
             isCutoutProcessing = false
         }
 
-        guard let originalCGImage = originalImage.cgImage else {
-            cutoutErrorMessage = "선택한 사진을 불러오지 못했어요."
+        // UIImage의 orientation 메타데이터를 실제 픽셀에 한 번만 반영합니다.
+        // 이후 Vision과 결과 UIImage는 모두 .up 기준으로 처리합니다.
+        let normalizedImage = originalImage.normalizedUpImage()
+
+        guard let normalizedCGImage = normalizedImage.cgImage else {
+            cutoutErrorMessage = "선택한 사진의 방향을 보정하지 못했어요."
             isShowingCutoutError = true
             return
         }
 
         do {
             let cutoutCGImage = try await cutoutService.generateCutout(
-                from: originalCGImage
+                from: normalizedCGImage
             )
 
             let cutoutImage = UIImage(
                 cgImage: cutoutCGImage,
-                scale: originalImage.scale,
+                scale: normalizedImage.scale,
                 orientation: .up
             )
 
@@ -73,7 +77,7 @@ struct UploadView: View {
             isShowingCutoutError = true
         }
     }
-    
+
     var body: some View {
         ZStack {
             Color.customWhite
@@ -179,38 +183,6 @@ struct UploadView: View {
     }
 }
 
-private extension UIImage {
-    var cgImageOrientation: CGImagePropertyOrientation {
-        switch imageOrientation {
-        case .up:
-            return .up
-
-        case .upMirrored:
-            return .upMirrored
-
-        case .down:
-            return .down
-
-        case .downMirrored:
-            return .downMirrored
-
-        case .left:
-            return .left
-
-        case .leftMirrored:
-            return .leftMirrored
-
-        case .right:
-            return .right
-
-        case .rightMirrored:
-            return .rightMirrored
-
-        @unknown default:
-            return .up
-        }
-    }
-}
 
 // MARK: - 상단 메뉴
 

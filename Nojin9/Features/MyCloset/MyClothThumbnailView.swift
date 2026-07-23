@@ -61,7 +61,7 @@ struct MyClothThumbnailView: View {
     let item: ClothItem
 
     private var imageName: String? {
-        item.imageName ?? item.cutoutImageName
+        item.cutoutImageName ?? item.imageName
     }
 
     var body: some View {

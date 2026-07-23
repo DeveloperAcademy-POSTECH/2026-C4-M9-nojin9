@@ -6,6 +6,7 @@
 //
 
 import CoreGraphics
+import ImageIO
 
 protocol ClothCutoutService: Sendable {
     func generateCutout(

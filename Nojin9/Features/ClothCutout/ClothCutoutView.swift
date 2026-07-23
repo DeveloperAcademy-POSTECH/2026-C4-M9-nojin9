@@ -146,11 +146,6 @@ struct ClothCutoutView: View {
 
     @MainActor
     private func generateCutout() async {
-        guard let cgImage = originalImage.cgImage else {
-            errorMessage = "이미지를 불러오지 못했어요."
-            return
-        }
-
         isLoading = true
         errorMessage = nil
 
@@ -159,27 +154,80 @@ struct ClothCutoutView: View {
         }
 
         do {
+            let normalizedImage = originalImage.normalizedUpImage()
+
+            guard let cgImage = normalizedImage.cgImage else {
+                throw ImageNormalizationError.cgImageCreationFailed
+            }
+
             let result = try await cutoutService.generateCutout(
-                from: cgImage,
+                from: cgImage
             )
 
             try Task.checkCancellation()
 
-            cutoutImage = UIImage(cgImage: result)
+            cutoutImage = UIImage(
+                cgImage: result,
+                scale: normalizedImage.scale,
+                orientation: .up
+            )
         } catch is CancellationError {
             return
         } catch {
-            let nsError = error as NSError
-
             print("Vision 오류:", error)
-            print("오류 도메인:", nsError.domain)
-            print("오류 코드:", nsError.code)
-            print("오류 정보:", nsError.userInfo)
-
             errorMessage = error.localizedDescription
         }
     }
 }
+
+
+// MARK: - Image Normalization
+
+private enum ImageNormalizationError: LocalizedError {
+    case cgImageCreationFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .cgImageCreationFailed:
+            return "사진의 방향을 보정하지 못했어요."
+        }
+    }
+}
+
+private extension UIImage {
+    var cgImagePropertyOrientation: CGImagePropertyOrientation {
+        switch imageOrientation {
+        case .up:
+            return .up
+
+        case .upMirrored:
+            return .upMirrored
+
+        case .down:
+            return .down
+
+        case .downMirrored:
+            return .downMirrored
+
+        case .left:
+            return .left
+
+        case .leftMirrored:
+            return .leftMirrored
+
+        case .right:
+            return .right
+
+        case .rightMirrored:
+            return .rightMirrored
+
+        @unknown default:
+            return .up
+        }
+    }
+}
+
+
 
 #Preview {
     ClothCutoutView(

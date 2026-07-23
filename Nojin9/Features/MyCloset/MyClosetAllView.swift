@@ -287,6 +287,8 @@ struct MyClosetAllView: View {
         }
     }
 
+    // MARK: - Sticker
+
     private func borrowedSticker(
         rental: Rental
     ) -> some View {
