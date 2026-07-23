@@ -19,6 +19,9 @@ struct ReturnView: View {
     @State private var selectedRental: Rental?
     @State private var selectedItem: ClothItem?
     @State private var isShowingReturnDetail = false
+    @State private var selectedReviewRental: Rental?
+    @State private var selectedReviewItem: ClothItem?
+    @State private var isShowingReviewWriting = false
     
     private var activeRentals: [Rental] {
         store.snapshot.rentals
@@ -90,6 +93,21 @@ struct ReturnView: View {
                 )
             }
         }
+        .navigationDestination(isPresented: $isShowingReviewWriting) {
+            if let selectedReviewRental, let selectedReviewItem {
+                ReviewWritingView(
+                    rental: selectedReviewRental,
+                    item: selectedReviewItem,
+                    onMoveToReviewList: {
+                        isShowingReviewWriting = false
+                    },
+                    onMoveToHome: {
+                        isShowingReviewWriting = false
+                        onHomeButtonTapped()
+                    }
+                )
+            }
+        }
     }
     
     private var backgroundView: some View {
@@ -119,12 +137,18 @@ struct ReturnView: View {
                     if let item = store.clothItem(id: rental.clothItemId) {
                         ReturnItemCard(
                             rental: rental,
-                            item: item
-                        ) {
-                            selectedRental = rental
-                            selectedItem = item
-                            isShowingReturnDetail = true
-                        }
+                            item: item,
+                            onWriteReview: {
+                                selectedReviewRental = rental
+                                selectedReviewItem = item
+                                isShowingReviewWriting = true
+                            },
+                            onReturn: {
+                                selectedRental = rental
+                                selectedItem = item
+                                isShowingReturnDetail = true
+                            }
+                        )
                     }
                 }
                 
