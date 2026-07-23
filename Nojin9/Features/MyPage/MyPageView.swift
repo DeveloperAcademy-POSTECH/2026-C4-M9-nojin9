@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MyPageView: View {
-    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: AppDataStore
 
     private let menuItems = [
@@ -48,7 +47,6 @@ struct MyPageView: View {
             backgroundView
             
             VStack{
-                topBar
                 profileView
                 activitySummaryView
                 dividerView
@@ -57,43 +55,22 @@ struct MyPageView: View {
             }
             .padding(.top, 8)
         }
-        .navigationBarBackButtonHidden()
+        .navigationTitle("마이페이지")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
 
     // MARK: - 배경
 
     private var backgroundView: some View {
-        Image("Background")
-            .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-    }
-
-    // MARK: - 상단 바
-
-    private var topBar: some View {
         ZStack {
-            Text("마이페이지")
-                .font(.system(size: 17, weight: .semibold))
+            Color.customWhite.ignoresSafeArea()
 
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(.black)
-                        .frame(width: 44, height: 44)
-                        .background(.white.opacity(0.7))
-                        .clipShape(Circle())
-                }
-
-                Spacer()
-            }
+            Image("Background")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 13)
-        .frame(height: 54)
     }
 
     // MARK: - 프로필
@@ -108,6 +85,7 @@ struct MyPageView: View {
 
             Text(displayName)
                 .font(.system(size: 19, weight: .bold))
+                .foregroundStyle(Color.customBlack)
 
             Spacer()
 
@@ -121,7 +99,7 @@ struct MyPageView: View {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 16))
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(Color.customBlack)
             }
         }
         .padding(.horizontal, 16)
@@ -188,13 +166,13 @@ struct MyPageView: View {
                     HStack {
                         Text(menu)
                             .font(.system(size: 17))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(Color.customBlack)
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
                             .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color.gray60)
                     }
                     .frame(height: 58)
                     .contentShape(Rectangle())
@@ -219,7 +197,7 @@ struct MyPageView: View {
             }
         }
         .font(.system(size: 14, weight: .medium))
-        .foregroundStyle(.black)
+        .foregroundStyle(Color.customBlack)
         .padding(.top, 75)
         .padding(.bottom, 40)
     }

@@ -7,15 +7,18 @@ struct Nojin9App: App {
 
     var body: some Scene {
         WindowGroup {
-            if hasCompletedOnboarding {
-                HomeView()
-                    .environmentObject(store)
-            } else {
-                OnboardingFlowView {
-                    hasCompletedOnboarding = true
+            Group {
+                if hasCompletedOnboarding {
+                    HomeView()
+                } else {
+                    OnboardingFlowView {
+                        hasCompletedOnboarding = true
+                    }
                 }
-                .environmentObject(store)
             }
+            .environmentObject(store)
+            .preferredColorScheme(.light)
+            .tint(Color.customBlack)
         }
     }
 }

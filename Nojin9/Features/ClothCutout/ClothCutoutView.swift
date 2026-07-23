@@ -86,16 +86,16 @@ struct ClothCutoutView: View {
     private var loadingView: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.black)
+                .fill(Color.customBlack)
 
             VStack(spacing: 16) {
                 ProgressView()
                     .controlSize(.large)
-                    .tint(.white)
+                    .tint(Color.customWhite)
 
                 Text("배경을 제거하고 있어요")
                     .font(.subheadline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.customWhite)
             }
         }
         .frame(maxWidth: .infinity)
@@ -113,7 +113,7 @@ struct ClothCutoutView: View {
             .frame(height: 500)
             .background {
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.black)
+                    .fill(Color.customBlack)
             }
             .clipShape(
                 RoundedRectangle(cornerRadius: 20)
@@ -131,7 +131,7 @@ struct ClothCutoutView: View {
             Text(message)
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.gray60)
 
             Button("다시 시도") {
                 Task {
@@ -154,7 +154,7 @@ struct ClothCutoutView: View {
         }
 
         do {
-            let normalizedImage = originalImage.normalizedOrientation()
+            let normalizedImage = originalImage.normalizedUpImage()
 
             guard let cgImage = normalizedImage.cgImage else {
                 throw ImageNormalizationError.cgImageCreationFailed
@@ -174,17 +174,11 @@ struct ClothCutoutView: View {
         } catch is CancellationError {
             return
         } catch {
-            let nsError = error as NSError
-
             print("Vision 오류:", error)
-            print("오류 도메인:", nsError.domain)
-            print("오류 코드:", nsError.code)
-            print("오류 정보:", nsError.userInfo)
-
             errorMessage = error.localizedDescription
         }
     }
-} // 여기서 ClothCutoutView가 완전히 끝나야 함
+}
 
 
 // MARK: - Image Normalization
@@ -201,28 +195,38 @@ private enum ImageNormalizationError: LocalizedError {
 }
 
 private extension UIImage {
-    func normalizedOrientation() -> UIImage {
-        guard imageOrientation != .up else {
-            return self
-        }
+    var cgImagePropertyOrientation: CGImagePropertyOrientation {
+        switch imageOrientation {
+        case .up:
+            return .up
 
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = scale
-        format.opaque = false
+        case .upMirrored:
+            return .upMirrored
 
-        return UIGraphicsImageRenderer(
-            size: size,
-            format: format
-        ).image { _ in
-            draw(
-                in: CGRect(
-                    origin: .zero,
-                    size: size
-                )
-            )
+        case .down:
+            return .down
+
+        case .downMirrored:
+            return .downMirrored
+
+        case .left:
+            return .left
+
+        case .leftMirrored:
+            return .leftMirrored
+
+        case .right:
+            return .right
+
+        case .rightMirrored:
+            return .rightMirrored
+
+        @unknown default:
+            return .up
         }
     }
 }
+
 
 
 #Preview {

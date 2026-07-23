@@ -144,18 +144,18 @@ struct BackButton: View {
         Button(action: action) {
             Image(systemName: "chevron.left")
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.black)
+                .foregroundStyle(Color.customBlack)
                 .frame(width: 36, height: 36)
                 .background(
                     Circle()
-                        .fill(.white.opacity(0.9))
+                        .fill(Color.customWhite.opacity(0.9))
                 )
                 .overlay(
                     Circle()
-                        .stroke(.white.opacity(0.6), lineWidth: 1)
+                        .stroke(Color.customWhite.opacity(0.6), lineWidth: 1)
                 )
                 .shadow(
-                    color: .black.opacity(0.08),
+                    color: Color.customBlack.opacity(0.08),
                     radius: 12,
                     x: 0,
                     y: 6

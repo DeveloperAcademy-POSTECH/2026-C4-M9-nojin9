@@ -49,15 +49,15 @@ enum MockData {
     static let userSession = UserSession(currentUserId: currentUserId)
 
     static let clothItems: [ClothItem] = [
-        makeClothItem("15111111-1111-1111-1111-111111111111", ownerId: user1Id, name: "빈티지 그래픽 티셔츠", category: .top, imageName: "MyTop1", pointCost: 0, description: "내 옷장에 등록된 상의예요."),
-        makeClothItem("15111111-1111-1111-1111-111111111112", ownerId: user1Id, name: "아이보리 셔링 블라우스", category: .top, imageName: "MyTop2", pointCost: 0, description: "내 옷장에 등록된 상의예요."),
-        makeClothItem("15111111-1111-1111-1111-111111111113", ownerId: user1Id, name: "스카이블루 니트", category: .top, imageName: "MyTop3", pointCost: 0, description: "내 옷장에 등록된 상의예요."),
-        makeClothItem("15111111-1111-1111-1111-111111111114", ownerId: user1Id, name: "데님 미니스커트", category: .bottom, imageName: "MyBottom1", pointCost: 0, description: "내 옷장에 등록된 하의예요."),
-        makeClothItem("15111111-1111-1111-1111-111111111115", ownerId: user1Id, name: "크림 와이드 팬츠", category: .bottom, imageName: "MyBottom2", pointCost: 0, description: "내 옷장에 등록된 하의예요."),
-        makeClothItem("15111111-1111-1111-1111-111111111116", ownerId: user1Id, name: "리조트 밴딩 팬츠", category: .bottom, imageName: "MyBottom3", pointCost: 0, description: "내 옷장에 등록된 하의예요."),
-        makeClothItem("15111111-1111-1111-1111-111111111117", ownerId: user1Id, name: "블랙 숄더백", category: .accessory, imageName: "MyAccessories1", pointCost: 0, description: "내 옷장에 등록된 기타 아이템이에요."),
-        makeClothItem("15111111-1111-1111-1111-111111111118", ownerId: user1Id, name: "니트 비니", category: .accessory, imageName: "MyAccessories2", pointCost: 0, description: "내 옷장에 등록된 기타 아이템이에요."),
-        makeClothItem("15111111-1111-1111-1111-111111111119", ownerId: user1Id, name: "캠프 볼캡", category: .accessory, imageName: "MyAccessories3", pointCost: 0, description: "내 옷장에 등록된 기타 아이템이에요."),
+        makeClothItem("15111111-1111-1111-1111-111111111111", ownerId: user1Id, name: "빈티지 그래픽 티셔츠", category: .top, imageName: "MyTop1", pointCost: 2500, description: "내 옷장에 등록된 상의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111112", ownerId: user1Id, name: "아이보리 셔링 블라우스", category: .top, imageName: "MyTop2", pointCost: 2500, description: "내 옷장에 등록된 상의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111113", ownerId: user1Id, name: "스카이블루 니트", category: .top, imageName: "MyTop3", pointCost: 3000, description: "내 옷장에 등록된 상의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111114", ownerId: user1Id, name: "데님 미니스커트", category: .bottom, imageName: "MyBottom1", pointCost: 1500, description: "내 옷장에 등록된 하의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111115", ownerId: user1Id, name: "크림 와이드 팬츠", category: .bottom, imageName: "MyBottom2", pointCost: 1000, description: "내 옷장에 등록된 하의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111116", ownerId: user1Id, name: "리조트 밴딩 팬츠", category: .bottom, imageName: "MyBottom3", pointCost: 2500, description: "내 옷장에 등록된 하의예요."),
+        makeClothItem("15111111-1111-1111-1111-111111111117", ownerId: user1Id, name: "블랙 숄더백", category: .accessory, imageName: "MyAccessories1", pointCost: 1000, description: "내 옷장에 등록된 기타 아이템이에요."),
+        makeClothItem("15111111-1111-1111-1111-111111111118", ownerId: user1Id, name: "니트 비니", category: .accessory, imageName: "MyAccessories2", pointCost: 4000, description: "내 옷장에 등록된 기타 아이템이에요."),
+        makeClothItem("15111111-1111-1111-1111-111111111119", ownerId: user1Id, name: "캠프 볼캡", category: .accessory, imageName: "MyAccessories3", pointCost: 5000, description: "내 옷장에 등록된 기타 아이템이에요."),
         makeClothItem("44444444-4444-4444-4444-444444444444", ownerId: user2Id, name: "연회색 가디건", category: .top, imageName: "Top1", pointCost: 2500, description: "가볍게 걸치기 좋은 상의예요."),
         makeClothItem(returnedRentalClothItemId, ownerId: user2Id, name: "오프숄더 니트", category: .top, imageName: "Top2", pointCost: 2500, description: "약속 있는 날 입기 좋은 깔끔한 상의예요."),
         makeClothItem(borrowedRentalClothItemId, ownerId: user2Id, name: "하이넥 숏코트", category: .top, imageName: "Top3", pointCost: 3000, description: "편하게 입기 좋은 데일리 상의예요.", isBorrowed: true),
@@ -102,7 +102,7 @@ enum MockData {
     
     static let snapshot = AppDataSnapshot(
         users: users, userSession: userSession, clothItems: clothItems, clothItemRequests: clothItemRequests,
-        friendships: friendships, rentals: rentals, reviewSamples: reviewSamples, thankYouLetters: thankYouLetters, savedAt: baseDate
+        friendships: friendships, rentals: rentals, reviewSamples: reviewSamples, reviews: [], thankYouLetters: thankYouLetters, savedAt: baseDate
     )
 
     private static func makeClothItem(

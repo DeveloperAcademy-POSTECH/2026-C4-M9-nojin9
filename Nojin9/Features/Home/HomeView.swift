@@ -1,33 +1,45 @@
 import Foundation
 import SwiftUI
+import UIKit
+
+private enum ReviewRoute: Hashable {
+    case allReview
+    case itemSelection
+    case writing(rentalId: UUID, itemId: UUID)
+}
 
 struct HomeView: View {
     @EnvironmentObject private var store: AppDataStore
 
     @State private var isUploadViewPresented = false
+    @State private var isShowingUploadBackConfirmation = false
+    @State private var shouldConfirmUploadExit = false
+    @State private var uploadItemName = ""
+    @State private var uploadSelectedCategory: ClothCategory?
+    @State private var uploadPrecautions = ""
+    @State private var uploadSelectedImage: UIImage?
+    @State private var uploadPickedColor: PickedClothColor?
     @State private var isUnavailableClosetAlertPresented = false
     @State private var isMyPageViewPresented = false
     @State private var isReturnViewPresented = false
     @State private var isClosetAllViewPresented = false
+    @State private var reviewPath = NavigationPath()
     @State private var selectedClosetOwnerId: UUID?
     @State private var selectedClosetOwnerName = ""
+    @State private var selectedClosetCategory: MyClosetCategory = .all
 
     @State private var isRentalViewPresented = false
     @State private var selectedRentalItem: ClothItem?
     @State private var selectedClosetPage = 1
     @State private var currentReviewIndex = 0
+    @State private var selectedReview: ReviewData?
 
-    private let thankYouLetterPreviews: [HomeThankYouLetterPreview] = [
-        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_1_1"),
-        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_2_1"),
-        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_3_1"),
-        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_4_1"),
-        HomeThankYouLetterPreview(authorName: "서은", imageName: "ThanksReview_5_1"),
-        HomeThankYouLetterPreview(authorName: "현서", imageName: "ThanksReview_6_1")
-    ]
+    private let thankYouLetterPreviews = ReceivedReviewSeed.previews.map {
+        HomeThankYouLetterPreview(review: $0.review)
+    }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $reviewPath) {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
                     backgroundView
@@ -101,7 +113,17 @@ struct HomeView: View {
             .navigationDestination(
                 isPresented: $isUploadViewPresented
             ) {
-                UploadView()
+                UploadView(
+                    itemName: $uploadItemName,
+                    selectedCategory: $uploadSelectedCategory,
+                    precautions: $uploadPrecautions,
+                    selectedImage: $uploadSelectedImage,
+                    pickedColor: $uploadPickedColor,
+                    onUploadFinished: {
+                        resetUploadDraft()
+                        shouldConfirmUploadExit = false
+                    }
+                )
             }
             .navigationDestination(
                 isPresented: $isMyPageViewPresented
@@ -130,9 +152,85 @@ struct HomeView: View {
                 if let selectedClosetOwnerId {
                     MyClosetAllView(
                         ownerId: selectedClosetOwnerId,
-                        ownerName: selectedClosetOwnerName
+                        ownerName: selectedClosetOwnerName,
+                        initialCategory: selectedClosetCategory
                     )
                 }
+            }
+            .navigationDestination(for: ReviewRoute.self) { route in
+                switch route {
+                case .allReview:
+                    AllReviewView(
+                        onMoveToWriteReview: {
+                            reviewPath.append(ReviewRoute.itemSelection)
+                        },
+                        onMoveToHome: {
+                            reviewPath.removeLast()
+                        }
+                    )
+
+                case .itemSelection:
+                    ReviewItemSelectionView(
+                        onStartWriting: { rental, item in
+                            reviewPath.append(
+                                ReviewRoute.writing(
+                                    rentalId: rental.id,
+                                    itemId: item.id
+                                )
+                            )
+                        },
+                        onMoveToHome: {
+                            reviewPath = NavigationPath()
+                        }
+                    )
+
+                case let .writing(rentalId, itemId):
+                    if let rental = store.rental(id: rentalId),
+                       let item = store.clothItem(id: itemId) {
+                        ReviewWritingView(
+                            rental: rental,
+                            item: item,
+                            onMoveToReviewList: {
+                                // 작성 화면 한 단계만 제거
+                                // → ReviewItemSelectionView로 돌아감
+                                reviewPath.removeLast()
+                            },
+                            onMoveToHome: {
+                                // 리뷰 관련 화면을 전부 제거
+                                // → HomeView로 돌아감
+                                reviewPath = NavigationPath()
+                            }
+                        )
+                    }
+                }
+            }
+            .sheet(item: $selectedReview) { reviewData in
+                EachReview01(review: reviewData)
+                    .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
+                    .presentationDragIndicator(.hidden)
+            }
+            .onChange(of: isUploadViewPresented) { oldValue, newValue in
+                guard oldValue, !newValue, shouldConfirmUploadExit else {
+                    return
+                }
+
+                shouldConfirmUploadExit = false
+                isShowingUploadBackConfirmation = true
+            }
+            .alert(
+                "정말 뒤로 가시겠습니까?",
+                isPresented: $isShowingUploadBackConfirmation
+            ) {
+                Button("뒤로가기", role: .destructive) {
+                    resetUploadDraft()
+                }
+
+                Button("이어서 작성하기", role: .cancel) {
+                    shouldConfirmUploadExit = true
+                    isUploadViewPresented = true
+                }
+            } message: {
+                Text("지금까지 작성한 정보는 저장되지 않아요.")
             }
         }
     }
@@ -149,7 +247,19 @@ struct HomeView: View {
         geometry.safeAreaInsets.bottom + 42
     }
 
-    // MARK: - Data
+    private func startUploadFlow() {
+        resetUploadDraft()
+        shouldConfirmUploadExit = true
+        isUploadViewPresented = true
+    }
+
+    private func resetUploadDraft() {
+        uploadItemName = ""
+        uploadSelectedCategory = nil
+        uploadPrecautions = ""
+        uploadSelectedImage = nil
+        uploadPickedColor = nil
+    }
 
     private var myClosetItems: HomeClosetItems {
         guard let currentUser = store.currentUser else {
@@ -189,8 +299,6 @@ struct HomeView: View {
         return items
     }
 
-    // MARK: - Background
-
     private var backgroundView: some View {
         ZStack {
             Image("Background")
@@ -200,24 +308,20 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Top Menu
-
     private var topMenuView: some View {
         ToolbarUI(
             mode: .home,
             onAdd: {
-                isUploadViewPresented = true
+                startUploadFlow()
             },
-            onNotification: {
-                print("알림")
+            onLetter: {
+                reviewPath.append(ReviewRoute.allReview)
             },
             onProfile: {
                 isMyPageViewPresented = true
             }
         )
     }
-
-    // MARK: - Closet Page
 
     private func closetPage(
         mainTitle: String,
@@ -318,7 +422,7 @@ struct HomeView: View {
                 if let subTitle {
                     Text(subTitle)
                         .font(.system(size: 24))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.gray60)
                 }
             }
 
@@ -353,8 +457,6 @@ struct HomeView: View {
         .padding(.bottom, 2)
     }
 
-    // MARK: - Review
-
     private var reviewView: some View {
         reviewScrollView
     }
@@ -371,14 +473,19 @@ struct HomeView: View {
                 ZStack(alignment: .trailing) {
                     ScrollView(.horizontal) {
                         LazyHStack(spacing: 0) {
-                            ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
-                                ThankYouLetterPreviewCardView(
-                                    preview: preview,
-                                    cardSize: cardSize
-                                )
-                                .id(index)
-                                .frame(width: cardSize, height: cardSize)
-                            }
+	                            ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
+	                                Button {
+	                                    selectedReview = preview.review
+	                                } label: {
+	                                    ThankYouLetterPreviewCardView(
+	                                        preview: preview,
+	                                        cardSize: cardSize
+	                                    )
+	                                }
+	                                .buttonStyle(.plain)
+	                                .id(index)
+	                                .frame(width: cardSize, height: cardSize)
+	                            }
                         }
                     }
                     .scrollIndicators(.hidden)
@@ -430,8 +537,6 @@ struct HomeView: View {
             )
         }
     }
-
-    // MARK: - Closet
 
     private func centeredClosetView(
         items: HomeClosetItems,
@@ -492,7 +597,14 @@ struct HomeView: View {
                         isRentalViewPresented = true
                     }
                 ) {
-                    isUnavailableClosetAlertPresented = true
+                    guard let ownerId else {
+                        return
+                    }
+                    
+                    selectedClosetOwnerId = ownerId
+                    selectedClosetOwnerName = ownerName
+                    selectedClosetCategory = .top
+                    isClosetAllViewPresented = true
                 }
                 .frame(width: 307, height: 136)
 
@@ -504,7 +616,14 @@ struct HomeView: View {
                         isRentalViewPresented = true
                     }
                 ) {
-                    isUnavailableClosetAlertPresented = true
+                    guard let ownerId else {
+                        return
+                    }
+                    
+                    selectedClosetOwnerId = ownerId
+                    selectedClosetOwnerName = ownerName
+                    selectedClosetCategory = .bottom
+                    isClosetAllViewPresented = true
                 }
                 .frame(width: 307, height: 136)
 
@@ -517,7 +636,14 @@ struct HomeView: View {
                             isRentalViewPresented = true
                         }
                     ) {
-                        isUnavailableClosetAlertPresented = true
+                        guard let ownerId else {
+                            return
+                        }
+                        
+                        selectedClosetOwnerId = ownerId
+                        selectedClosetOwnerName = ownerName
+                        selectedClosetCategory = .other
+                        isClosetAllViewPresented = true
                     }
                     .frame(width: 307, height: 124)
                 }
@@ -529,6 +655,7 @@ struct HomeView: View {
 
                     selectedClosetOwnerId = ownerId
                     selectedClosetOwnerName = ownerName
+                    selectedClosetCategory = .all
                     isClosetAllViewPresented = true
                 }
                 .padding(.top, usesSmallClosetStyle ? 2 : 8.87)
@@ -571,8 +698,15 @@ private struct HomeThankYouLetterPreview: Identifiable {
         imageName
     }
 
-    let authorName: String
-    let imageName: String
+    let review: ReviewData
+
+    var authorName: String {
+        review.badgeName
+    }
+
+    var imageName: String {
+        review.mainImageNames.first ?? review.clothesImageName
+    }
 }
 
 private struct ReviewAuthorBadgeView: View {

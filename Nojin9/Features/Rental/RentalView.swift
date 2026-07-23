@@ -8,36 +8,80 @@
 import SwiftUI
 
 struct RentalView: View {
-    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: AppDataStore
 
     let clothItemId: UUID
     @State private var isShowingForm = false
+    @State private var isShowingBackConfirmation = false
+    @State private var shouldConfirmFormExit = false
+    @State private var rentalStartDate = Date()
+    @State private var rentalEndDate = Date()
+    @State private var isRentalAgreed = false
 
     private var item: ClothItem? {
         store.clothItem(id: clothItemId)
     }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        ZStack {
             if let item {
                 content(for: item)
             } else {
                 missingItemView
             }
-
-            BackButton {
-                dismiss()
-            }
-            .padding(.leading, 20)
-            .padding(.top, 60)
         }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .ignoresSafeArea(edges: .top)
-        .navigationBarHidden(true)
-        .fullScreenCover(isPresented: $isShowingForm) {
-            RentalFormView(clothItemId: clothItemId)
+        .navigationDestination(isPresented: $isShowingForm) {
+            RentalFormView(
+                clothItemId: clothItemId,
+                startDate: $rentalStartDate,
+                endDate: $rentalEndDate,
+                isAgreed: $isRentalAgreed,
+                onRentalFlowFinished: {
+                    resetRentalDraft()
+                    shouldConfirmFormExit = false
+                }
+            )
                 .environmentObject(store)
         }
+        .onChange(of: isShowingForm) { oldValue, newValue in
+            guard oldValue, !newValue, shouldConfirmFormExit else {
+                return
+            }
+
+            shouldConfirmFormExit = false
+            isShowingBackConfirmation = true
+        }
+        .alert(
+            "정말 뒤로 가시겠습니까?",
+            isPresented: $isShowingBackConfirmation
+        ) {
+            Button("뒤로가기", role: .destructive) {
+                resetRentalDraft()
+            }
+
+            Button("이어서 작성하기", role: .cancel) {
+                shouldConfirmFormExit = true
+                isShowingForm = true
+            }
+        } message: {
+            Text("지금까지 작성한 정보는 저장되지 않아요.")
+        }
+    }
+
+    private func startRentalForm() {
+        resetRentalDraft()
+        shouldConfirmFormExit = true
+        isShowingForm = true
+    }
+
+    private func resetRentalDraft() {
+        rentalStartDate = Date()
+        rentalEndDate = Date()
+        isRentalAgreed = false
     }
 
     private func content(for item: ClothItem) -> some View {
@@ -61,10 +105,13 @@ struct RentalView: View {
 
                     thankYouLetterSection(for: item)
                 }
+                .background(Color("customWhite"))
             }
+            .background(Color("customWhite"))
 
             bottomCTA(for: item)
         }
+        .background(Color("customWhite").ignoresSafeArea())
     }
 
     private func visualSection(for item: ClothItem) -> some View {
@@ -130,14 +177,14 @@ struct RentalView: View {
                         .frame(width: 28, height: 18)
                         .overlay {
                             RoundedRectangle(cornerRadius: 3)
-                                .stroke(Color.gray.opacity(0.25), lineWidth: 1)
+                                .stroke(Color("gray20"), lineWidth: 1)
                         }
                         .accessibilityHidden(true)
-                } else {
-                    Text(colorText(for: item))
-                        .font(.system(size: 15))
-                        .foregroundStyle(Color("customBlack"))
                 }
+
+                Text(colorText(for: item))
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color("customBlack"))
             }
             .padding(.top, 10)
             .accessibilityElement(children: .combine)
@@ -180,8 +227,12 @@ struct RentalView: View {
                     .foregroundStyle(Color("gray40"))
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color("brandPrimary10").opacity(0.4))
+                    .background(Color("customWhite"))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color("brandPrimary10"), lineWidth: 1)
+                    }
             } else {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(notices, id: \.self) { notice in
@@ -200,8 +251,12 @@ struct RentalView: View {
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color("brandPrimary10").opacity(0.4))
+                .background(Color("customWhite"))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color("brandPrimary10"), lineWidth: 1)
+                }
             }
         }
         .padding(.horizontal, 20)
@@ -222,6 +277,12 @@ struct RentalView: View {
                     .foregroundStyle(Color("gray40"))
                     .padding(.vertical, 20)
                     .centerView()
+                    .background(Color("customWhite"))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color("gray10"), lineWidth: 1)
+                    }
             } else {
                 ForEach(letters) { letter in
                     VStack(alignment: .leading, spacing: 10) {
@@ -260,7 +321,13 @@ struct RentalView: View {
                             .padding(.horizontal, -20)
                         }
                     }
-                    .padding(.bottom, 24)
+                    .padding(16)
+                    .background(Color("customWhite"))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color("gray10"), lineWidth: 1)
+                    }
                 }
             }
         }
@@ -277,7 +344,7 @@ struct RentalView: View {
         case .enabled(let title):
             ctaContainer {
                 Button(action: {
-                    isShowingForm = true
+                    startRentalForm()
                 }) {
                     ctaLabel(title: title, backgroundColor: Color("brandPrimary"))
                 }

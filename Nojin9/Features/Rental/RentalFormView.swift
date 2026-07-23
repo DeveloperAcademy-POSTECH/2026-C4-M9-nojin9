@@ -5,10 +5,10 @@ struct RentalFormView: View {
     @EnvironmentObject private var store: AppDataStore
 
     let clothItemId: UUID
-
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-    @State private var isAgreed = false
+    @Binding var startDate: Date
+    @Binding var endDate: Date
+    @Binding var isAgreed: Bool
+    let onRentalFlowFinished: () -> Void
 
     @State private var isShowingReceipt = false
 
@@ -66,26 +66,6 @@ struct RentalFormView: View {
     var body: some View {
         ZStack { // 💡 영수증을 최상단에 전체 오버레이로 덮기 위해 ZStack 감싸기
             VStack(spacing: 0) {
-
-                // MARK: - Navigation Bar
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Color("customBlack"))
-                    }
-                    Spacer()
-                    Text("빌려오기")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(Color("customBlack"))
-                    Spacer()
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 20))
-                        .opacity(0)
-                }
-                .padding(.horizontal, 20)
-                .frame(height: 56)
-                .background(Color("customWhite"))
 
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 0) {
@@ -180,7 +160,7 @@ struct RentalFormView: View {
                                     Text("종료일이 시작일보다 빠릅니다. 기간을 다시 선택해주세요.")
                                         .font(.system(size: 13, weight: .medium))
                                 }
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color("brandPrimary"))
                                 .padding(.top, 4)
                             }
                         }
@@ -215,7 +195,7 @@ struct RentalFormView: View {
                                     Spacer()
                                     Text("\(rentalDays) 일")
                                         .bodyBoldStyle()
-                                        .foregroundStyle(isDateInvalid ? .red : Color("customBlack"))
+                                        .foregroundStyle(isDateInvalid ? Color("brandPrimary") : Color("customBlack"))
                                 }
                             }
 
@@ -235,7 +215,7 @@ struct RentalFormView: View {
 
                                     Text(formatNumber(totalHeartPrice))
                                         .subtitleBoldStyle()
-                                        .foregroundStyle(isDateInvalid ? .red : Color("customBlack"))
+                                        .foregroundStyle(isDateInvalid ? Color("brandPrimary") : Color("customBlack"))
                                 }
                             }
 
@@ -243,7 +223,7 @@ struct RentalFormView: View {
                                 HStack(spacing: 10) {
                                     Image(systemName: isAgreed ? "checkmark.square.fill" : "square")
                                         .font(.system(size: 20))
-                                        .foregroundStyle(isAgreed ? Color("brandPrimary") : Color.gray)
+                                        .foregroundStyle(isAgreed ? Color("brandPrimary") : Color("gray60"))
 
                                     Text("위 내용에 전체 동의합니다.")
                                         .buttonStyle()
@@ -303,6 +283,7 @@ struct RentalFormView: View {
                 ReceiptSuccessView(
                     isPresented: $isShowingReceipt,
                     onHomeButtonTapped: {
+                        onRentalFlowFinished()
                         dismiss()
                     },
                     itemImageName: imageName(for: currentItem) ?? "",  // 현재 아이템 이미지 키값
@@ -315,7 +296,9 @@ struct RentalFormView: View {
                 )
             }
         }
-        .navigationBarHidden(true)
+        .navigationTitle("빌려오기")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
 
     private func formatNumber(_ num: Int) -> String {
@@ -374,7 +357,13 @@ struct RentalFormView: View {
 // ==========================================
 #Preview {
     NavigationStack {
-        RentalFormView(clothItemId: MockData.returnedRentalClothItemId)
+        RentalFormView(
+            clothItemId: MockData.returnedRentalClothItemId,
+            startDate: .constant(Date()),
+            endDate: .constant(Date()),
+            isAgreed: .constant(false),
+            onRentalFlowFinished: {}
+        )
     }
     .environmentObject(AppDataStore())
 }

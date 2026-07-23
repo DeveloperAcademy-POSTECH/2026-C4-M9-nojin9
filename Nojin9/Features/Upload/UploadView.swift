@@ -14,15 +14,15 @@ struct UploadView: View {
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: AppDataStore
-    
-    @State private var itemName = ""
-    @State private var selectedCategory: ClothCategory?
-    @State private var precautions = ""
+
+    @Binding var itemName: String
+    @Binding var selectedCategory: ClothCategory?
+    @Binding var precautions: String
+    @Binding var selectedImage: UIImage?
+    @Binding var pickedColor: PickedClothColor?
+    let onUploadFinished: () -> Void
     
     @State private var isShowingImageSource = false
-    
-    @State private var selectedImage: UIImage?
-    @State private var pickedColor: PickedClothColor?
     @State private var isCutoutProcessing = false
     @State private var cutoutErrorMessage: String?
     @State private var isShowingCutoutError = false
@@ -49,20 +49,24 @@ struct UploadView: View {
             isCutoutProcessing = false
         }
 
-        guard let originalCGImage = originalImage.cgImage else {
-            cutoutErrorMessage = "선택한 사진을 불러오지 못했어요."
+        // UIImage의 orientation 메타데이터를 실제 픽셀에 한 번만 반영합니다.
+        // 이후 Vision과 결과 UIImage는 모두 .up 기준으로 처리합니다.
+        let normalizedImage = originalImage.normalizedUpImage()
+
+        guard let normalizedCGImage = normalizedImage.cgImage else {
+            cutoutErrorMessage = "선택한 사진의 방향을 보정하지 못했어요."
             isShowingCutoutError = true
             return
         }
 
         do {
             let cutoutCGImage = try await cutoutService.generateCutout(
-                from: originalCGImage
+                from: normalizedCGImage
             )
 
             let cutoutImage = UIImage(
                 cgImage: cutoutCGImage,
-                scale: originalImage.scale,
+                scale: normalizedImage.scale,
                 orientation: .up
             )
 
@@ -73,16 +77,14 @@ struct UploadView: View {
             isShowingCutoutError = true
         }
     }
-    
+
     var body: some View {
         ZStack {
-            Color.white
+            Color.customWhite
                 .ignoresSafeArea()
             
             ScrollView {
                 VStack(spacing: 0) {
-                    navigationView
-                    
                     VStack(alignment: .leading, spacing: 22) {
                         photoSection
                         pointColorSection
@@ -99,7 +101,17 @@ struct UploadView: View {
             }
             .scrollDismissesKeyboard(.interactively)
         }
-        .navigationBarBackButtonHidden()
+        .onTapGesture {
+            UIApplication.shared.sendAction(
+                #selector(UIResponder.resignFirstResponder),
+                to: nil,
+                from: nil,
+                for: nil
+            )
+        }
+        .navigationTitle("내 물품 등록하기")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         
         .confirmationDialog(
             "사진 첨부하기",
@@ -171,38 +183,6 @@ struct UploadView: View {
     }
 }
 
-private extension UIImage {
-    var cgImageOrientation: CGImagePropertyOrientation {
-        switch imageOrientation {
-        case .up:
-            return .up
-
-        case .upMirrored:
-            return .upMirrored
-
-        case .down:
-            return .down
-
-        case .downMirrored:
-            return .downMirrored
-
-        case .left:
-            return .left
-
-        case .leftMirrored:
-            return .leftMirrored
-
-        case .right:
-            return .right
-
-        case .rightMirrored:
-            return .rightMirrored
-
-        @unknown default:
-            return .up
-        }
-    }
-}
 
 // MARK: - 상단 메뉴
 
@@ -221,8 +201,9 @@ private extension UploadView {
                         .font(.system(size: 22, weight: .medium))
                         .foregroundStyle(.customBlack)
                         .frame(width: 44, height: 44)
-                        .background(Color.gray.opacity(0.08))
+                        .background(.customWhite)
                         .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.08), radius: 8, y: 3)
                 }
                 
                 Spacer()
@@ -473,14 +454,21 @@ private extension UploadView {
         VStack(alignment: .leading, spacing: 10) {
             requiredTitle("물품 이름")
             
-            TextField("회색 오프숄더 니트", text: $itemName)
+            TextField(
+                "",
+                text: $itemName,
+                prompt: Text("회색 오프숄더 니트")
+                    .foregroundStyle(Color.gray60)
+            )
                 .font(.system(size: 16))
+                .foregroundStyle(Color.customBlack)
+                .tint(Color.brandPrimary)
                 .padding(.horizontal, 14)
                 .frame(height: 52)
-                .background(Color.white)
+                .background(Color.customWhite)
                 .overlay {
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.gray.opacity(0.35), lineWidth: 1)
+                        .stroke(Color.gray60.opacity(0.35), lineWidth: 1)
                 }
         }
     }
@@ -561,16 +549,18 @@ private extension UploadView {
             
             Text("주의사항은 항목별로 줄바꿈해 주세요.")
                 .font(.system(size: 14))
-                .foregroundStyle(.gray)
+                .foregroundStyle(Color.gray60)
             
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $precautions)
                     .font(.system(size: 16))
+                    .foregroundStyle(Color.customBlack)
+                    .tint(Color.brandPrimary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 8)
                     .frame(height: 125)
                     .scrollContentBackground(.hidden)
-                    .background(Color.white)
+                    .background(Color.customWhite)
                 
                 if precautions.isEmpty {
                     Text(
@@ -581,7 +571,7 @@ private extension UploadView {
                         """
                     )
                     .font(.system(size: 16))
-                    .foregroundStyle(Color.gray.opacity(0.6))
+                    .foregroundStyle(Color.gray60.opacity(0.6))
                     .padding(.horizontal, 13)
                     .padding(.vertical, 15)
                     .allowsHitTesting(false)
@@ -589,7 +579,7 @@ private extension UploadView {
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.gray.opacity(0.35), lineWidth: 1)
+                    .stroke(Color.gray60.opacity(0.35), lineWidth: 1)
             }
         }
     }
@@ -604,7 +594,7 @@ private extension UploadView {
         } label: {
             Text("등록하기")
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.customWhite)
                 .frame(maxWidth: .infinity)
                 .frame(height: 54)
                 .background(
@@ -630,11 +620,13 @@ private extension UploadView {
                 name: itemName,
                 category: selectedCategory,
                 description: precautions,
+                pointCost: selectedCategory.defaultPointCost,
                 imageName: storedImageName,
                 cutoutImageName: storedImageName,
                 keyColorName: pickedColor?.name,
                 keyColorHex: pickedColor?.hex
             )
+            onUploadFinished()
             dismiss()
         } catch {
             cutoutErrorMessage = "이미지를 저장하지 못했어요. 다시 시도해 주세요."
@@ -717,8 +709,15 @@ struct CameraPickerView: UIViewControllerRepresentable {
     }
 }
 
-//#Preview {
-//    NavigationStack {
-//        UploadView()
-//    }
-//}
+#Preview {
+    NavigationStack {
+        UploadView(
+            itemName: .constant(""),
+            selectedCategory: .constant(nil),
+            precautions: .constant(""),
+            selectedImage: .constant(nil),
+            pickedColor: .constant(nil),
+            onUploadFinished: {}
+        )
+    }
+}

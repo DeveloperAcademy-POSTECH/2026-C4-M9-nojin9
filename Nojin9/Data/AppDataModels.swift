@@ -53,6 +53,17 @@ extension ClothCategory {
             return "기타"
         }
     }
+
+    var defaultPointCost: Int {
+        switch self {
+        case .top:
+            return 2500
+        case .bottom:
+            return 1500
+        case .accessory:
+            return 1000
+        }
+    }
 }
 
 enum ClothCondition: String, Codable, Equatable {
@@ -134,6 +145,22 @@ struct ReviewSample: Identifiable, Codable, Equatable {
     var clothItemId: UUID
     var imageName: String
     var message: String
+    let createdAt: Date
+}
+
+struct Review: Identifiable, Codable, Equatable {
+    let id: UUID
+    let rentalId: UUID
+    let clothItemId: UUID
+
+    /// 감사 편지를 작성한 사람
+    let writerId: UUID
+
+    /// 옷의 주인
+    let receiverId: UUID
+
+    let message: String
+    let photoDataList: [Data]
     let createdAt: Date
 }
 
