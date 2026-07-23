@@ -10,6 +10,7 @@ import SwiftUI
 struct ReturnItemCard: View {
     let rental: Rental
     let item: ClothItem
+    let onWriteReview: () -> Void
     let onReturn: () -> Void
 
     var body: some View {
@@ -18,7 +19,7 @@ struct ReturnItemCard: View {
 
             HStack(spacing: 8) {
                 Button {
-                    print("편지 작성하기")
+                    onWriteReview()
                 } label: {
                     Text("편지 작성하기")
                         .font(.system(size: 16, weight: .bold))
@@ -154,6 +155,7 @@ extension Date {
     ReturnItemCard(
         rental: MockData.rentals[1],
         item: MockData.clothItems[4],
+        onWriteReview: {},
         onReturn: {}
     )
 }
