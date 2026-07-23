@@ -22,6 +22,12 @@ struct RentalView: View {
         store.clothItem(id: clothItemId)
     }
 
+    /// 현재 사용자가 옷의 주인인지 여부
+    private var isOwner: Bool {
+        guard let item else { return false }
+        return item.ownerId == store.snapshot.userSession.currentUserId
+    }
+
     var body: some View {
         ZStack {
             if let item {
@@ -33,6 +39,23 @@ struct RentalView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if isOwner {
+                    Menu {
+                        Button("수정하기") {
+                        }
+                        Button("삭제하기", role: .destructive) {
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(Color("customBlack"))
+                            .frame(width: 32, height: 32)
+                    }
+                }
+            }
+        }
         .ignoresSafeArea(edges: .top)
         .navigationDestination(isPresented: $isShowingForm) {
             RentalFormView(
@@ -432,14 +455,18 @@ struct RentalView: View {
         let currentUserId = store.snapshot.userSession.currentUserId
         let borrower = store.borrower(for: item)
 
+        // 💡 물건 주인이 '나'인 경우
         if item.ownerId == currentUserId {
             guard let borrower else {
+                // 아무도 안 빌려갔다면 버튼 자체를 노출하지 않음
                 return .hidden
             }
 
+            // 남이 빌려간 상태라면 버튼 유지 (대여 중 표시)
             return .disabled("\(borrower.name)이 대여 중")
         }
 
+        // 💡 물건 주인이 다른 사람인 경우
         guard let borrower else {
             return .enabled("빌려오기")
         }

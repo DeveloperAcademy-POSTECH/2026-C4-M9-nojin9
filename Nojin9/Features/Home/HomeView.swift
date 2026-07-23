@@ -163,22 +163,14 @@ struct HomeView: View {
                     AllReviewView(
                         onMoveToWriteReview: {
                             reviewPath.append(ReviewRoute.itemSelection)
-                        },
-                        onMoveToHome: {
-                            reviewPath.removeLast()
+                                        },
+                        onMoveToClothItem: { item in
+                            moveToClothItem(item)
                         }
                     )
 
                 case .itemSelection:
                     ReviewItemSelectionView(
-                        onStartWriting: { rental, item in
-                            reviewPath.append(
-                                ReviewRoute.writing(
-                                    rentalId: rental.id,
-                                    itemId: item.id
-                                )
-                            )
-                        },
                         onMoveToHome: {
                             reviewPath = NavigationPath()
                         }
@@ -191,13 +183,9 @@ struct HomeView: View {
                             rental: rental,
                             item: item,
                             onMoveToReviewList: {
-                                // 작성 화면 한 단계만 제거
-                                // → ReviewItemSelectionView로 돌아감
                                 reviewPath.removeLast()
                             },
                             onMoveToHome: {
-                                // 리뷰 관련 화면을 전부 제거
-                                // → HomeView로 돌아감
                                 reviewPath = NavigationPath()
                             }
                         )
@@ -205,9 +193,14 @@ struct HomeView: View {
                 }
             }
             .sheet(item: $selectedReview) { reviewData in
-                EachReview01(review: reviewData)
-                    .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
-                    .presentationDragIndicator(.hidden)
+                EachReview01(
+                    review: reviewData,
+                    onMoveToClothItem: { item in
+                        moveToClothItem(item)
+                    }
+                )
+                .presentationDetents([.height(UIScreen.main.bounds.height - 154)])
+                .presentationDragIndicator(.hidden)
             }
             .onChange(of: isUploadViewPresented) { oldValue, newValue in
                 guard oldValue, !newValue, shouldConfirmUploadExit else {
@@ -259,6 +252,11 @@ struct HomeView: View {
         uploadPrecautions = ""
         uploadSelectedImage = nil
         uploadPickedColor = nil
+    }
+
+    private func moveToClothItem(_ item: ClothItem) {
+        selectedRentalItem = item
+        isRentalViewPresented = true
     }
 
     private var myClosetItems: HomeClosetItems {
@@ -473,19 +471,19 @@ struct HomeView: View {
                 ZStack(alignment: .trailing) {
                     ScrollView(.horizontal) {
                         LazyHStack(spacing: 0) {
-	                            ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
-	                                Button {
-	                                    selectedReview = preview.review
-	                                } label: {
-	                                    ThankYouLetterPreviewCardView(
-	                                        preview: preview,
-	                                        cardSize: cardSize
-	                                    )
-	                                }
-	                                .buttonStyle(.plain)
-	                                .id(index)
-	                                .frame(width: cardSize, height: cardSize)
-	                            }
+                                ForEach(Array(thankYouLetterPreviews.enumerated()), id: \.element.id) { index, preview in
+                                    Button {
+                                        selectedReview = preview.review
+                                    } label: {
+                                        ThankYouLetterPreviewCardView(
+                                            preview: preview,
+                                            cardSize: cardSize
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                    .id(index)
+                                    .frame(width: cardSize, height: cardSize)
+                                }
                         }
                     }
                     .scrollIndicators(.hidden)
@@ -504,7 +502,7 @@ struct HomeView: View {
                         PrimaryIconButton(
                             icon: Image(systemName: "chevron.right")
                         ) {
-                            moveToNextReview(using: proxy)
+                            reviewPath.append(ReviewRoute.allReview)
                         }
                     }
                 }
