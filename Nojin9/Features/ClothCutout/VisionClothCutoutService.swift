@@ -76,7 +76,7 @@ final class VisionClothCutoutService:
 
             let outlinedImage = Self.addingWhiteOutline(
                 to: maskedImage,
-                radius: 18
+                radius: 70
             )
 
             guard let cutoutImage = ciContext.createCGImage(
