@@ -10,7 +10,6 @@ import SwiftUI
 
 struct ReviewWritingView: View {
     @EnvironmentObject private var store: AppDataStore
-    @Environment(\.dismiss) private var dismiss
 
     let rental: Rental
     let item: ClothItem
@@ -58,7 +57,6 @@ struct ReviewWritingView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                navigationBar
                 itemSummary
 
                 Rectangle()
@@ -84,38 +82,12 @@ struct ReviewWritingView: View {
                 .transition(.opacity)
             }
         }
-//        .navigationBarBackButtonHidden()
+        .navigationTitle("감사 편지 작성하기")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .onChange(of: selectedPhotos) { _, newValue in
             loadPhotos(from: newValue)
         }
-    }
-
-    // MARK: - Navigation Bar
-
-    private var navigationBar: some View {
-        ZStack {
-            Text("감사 편지 작성하기")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.customBlack)
-
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundStyle(.customBlack)
-                        .frame(width: 44, height: 44)
-                        .background(.customWhite)
-                        .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.08), radius: 8, y: 3)
-                }
-
-                Spacer()
-            }
-        }
-        .padding(.horizontal, 16)
-        .frame(height: 56)
     }
 
     // MARK: - Item Summary

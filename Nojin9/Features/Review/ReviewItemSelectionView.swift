@@ -32,8 +32,6 @@ struct ReviewItemSelectionView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                navigationBar
-
                 VStack(alignment: .leading, spacing: 10) {
                     Text("편지를 작성할 물품을 선택해주세요.")
                         .font(.system(size: 14))
@@ -53,33 +51,9 @@ struct ReviewItemSelectionView: View {
                 nextButton
             }
         }
-        .navigationBarBackButtonHidden()
-    }
-
-    private var navigationBar: some View {
-        ZStack {
-            Text("감사 편지 작성하기")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.customBlack)
-
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundStyle(.customBlack)
-                        .frame(width: 44, height: 44)
-                        .background(.customWhite)
-                        .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.08), radius: 8, y: 3)
-                }
-
-                Spacer()
-            }
-        }
-        .padding(.horizontal, 16)
-        .frame(height: 56)
+        .navigationTitle("감사 편지 작성하기")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
 
 
