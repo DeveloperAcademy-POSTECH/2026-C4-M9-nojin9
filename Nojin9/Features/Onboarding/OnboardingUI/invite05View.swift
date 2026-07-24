@@ -42,7 +42,7 @@ struct invite05View: View {
             .onAppear {
                 // 최초 화면 진입 시 0.35까지 차오름
                 withAnimation(.easeInOut(duration: 0.5)) {
-                    progress = 0.35
+                    progress = 0.5
                 }
             }
             
