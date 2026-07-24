@@ -84,7 +84,7 @@ struct ReviewWritingView: View {
                 .transition(.opacity)
             }
         }
-        .navigationBarBackButtonHidden()
+//        .navigationBarBackButtonHidden()
         .onChange(of: selectedPhotos) { _, newValue in
             loadPhotos(from: newValue)
         }
